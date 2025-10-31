@@ -1,11 +1,11 @@
-const base_url = process.env.BASE_URL ? process.env.BASE_URL : 'http://localhost:3030';
+const base_url = process.env.BASE_URL ? process.env.BASE_URL : 'http://0.0.0.0:3000';
 
 const hianimeApiDocs = {
-  openapi: '1.0.0',
+  openapi: '3.0.0',
   info: {
-    title: 'HiAnime API Documentation',
+    title: 'hianime-api',
     version: '1.0.0',
-    description: 'API documentation for HiAnime content endpoints',
+    description: 'API Documentation For HiAnime Content Endpoints',
   },
   servers: [
     {
@@ -32,7 +32,7 @@ const hianimeApiDocs = {
           {
             name: 'letter',
             in: 'path',
-
+            required: true,
             schema: {
               type: 'string',
               enum: [
@@ -272,7 +272,7 @@ const hianimeApiDocs = {
     },
     '/filter': {
       get: {
-        summary: 'filter anime',
+        summary: 'Filter anime',
         parameters: [
           { name: 'keyword', in: 'query', schema: { type: 'string' } },
           { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
