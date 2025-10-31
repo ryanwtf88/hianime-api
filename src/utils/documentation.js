@@ -1,6 +1,6 @@
 const apiDocumentation = {
   generalInfo: {
-    baseUrl: 'http://localhost:5000/api/v1',
+    baseUrl: process.env.BASE_URL ? process.env.BASE_URL : 'http://localhost:3000/api/v1',
     documentationUrl: 'https://github.com/ryanwtf88/hianime-api/blob/main/README.md',
   },
   endpoints: [
