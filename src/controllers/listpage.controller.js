@@ -1,6 +1,6 @@
-import { extractListPage } from '../extractor/extractListpage';
-import { axiosInstance } from '../services/axiosInstance';
-import { NotFoundError, validationError } from '../utils/errors';
+import { extractListPage } from '../extractor/extractListpage.js';
+import { axiosInstance } from '../services/axiosInstance.js';
+import { NotFoundError, validationError } from '../utils/errors.js';
 
 const listpageController = async (c) => {
   const validateQueries = [
