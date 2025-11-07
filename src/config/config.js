@@ -11,9 +11,9 @@ const config = {
   
   // Redis/Upstash Configuration
   redis: {
-    url: process.env.UPSTASH_REDIS_REST_URL || '',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-    enabled: Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN),
+    url: process.env.UPSTASH_REDIS_REST_URL || 'https://easy-dassie-30340.upstash.io',
+    token: process.env.UPSTASH_REDIS_REST_TOKEN || 'AXaEAAIncDJlNTY5YWM4NWQ5ZGE0Mzg1YTljY2ZiOThiZTA3YzE0MHAyMzAzNDA',
+    enabled: true, // Always enabled with hardcoded credentials
   },
   
   // External Providers
