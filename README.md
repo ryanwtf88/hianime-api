@@ -25,6 +25,7 @@
 - [Deployment](#deployment)
   - [Docker Deployment](#docker-deployment)
   - [Render Deployment](#render-deployment)
+  - [Vercel Deployment](#vercel-deployment-serverless--recommended)
   - [Replit Deployment](#replit-deployment)
 - [Documentation](#documentation)
   - [Anime Home Page](#1-get-anime-home-page)
@@ -213,6 +214,47 @@ docker-compose up -d
 | `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Optional* |
 
 *Required if you're using Redis for caching
+
+### Vercel Deployment (Serverless) ⭐ Recommended
+
+**One-Click Deploy:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ryanwtf88/hianime-api)
+
+**Manual Deployment:**
+
+1. Fork or clone the repository to your GitHub account
+2. Sign up at [Vercel](https://vercel.com)
+3. Create a new project and import your repository
+4. Configure environment variables in Vercel Dashboard:
+   - `UPSTASH_REDIS_REST_URL` (Required - Get from [Upstash](https://upstash.com))
+   - `UPSTASH_REDIS_REST_TOKEN` (Required)
+   - `ORIGIN=*` (or your frontend domain)
+   - `RATE_LIMIT_ENABLED=true`
+   - `RATE_LIMIT_WINDOW_MS=60000`
+   - `RATE_LIMIT_LIMIT=100`
+5. Click "Deploy"
+
+**Why Vercel?**
+- ✅ Serverless architecture with automatic scaling
+- ✅ Global CDN for fast response times
+- ✅ Free tier with generous limits
+- ✅ Automatic HTTPS and custom domains
+- ✅ Git-based deployments (auto-deploy on push)
+- ✅ Built-in Redis support via Upstash
+
+**Environment Variables:**
+
+| Key | Value | Required |
+|-----|-------|----------|
+| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Yes |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Yes |
+| `ORIGIN` | `*` or your domain | No |
+| `RATE_LIMIT_ENABLED` | `true` | No |
+| `RATE_LIMIT_WINDOW_MS` | `60000` | No |
+| `RATE_LIMIT_LIMIT` | `100` | No |
+
+📖 For detailed instructions, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
 
 ### Replit Deployment
 
