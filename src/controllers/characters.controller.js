@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { validationError } from '../utils/errors';
-import config from '../config/config';
-import { extractCharacters } from '../extractor/extractCharacters';
+import { validationError } from '../utils/errors.js';
+import config from '../config/config.js';
+import { extractCharacters } from '../extractor/extractCharacters.js';
 
 const charactersController = async (c) => {
   const id = c.req.param('id');

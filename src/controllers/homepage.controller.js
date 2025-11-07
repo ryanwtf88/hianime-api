@@ -1,6 +1,6 @@
-import { axiosInstance } from '../services/axiosInstance';
-import { validationError } from '../utils/errors';
-import { extractHomepage } from '../extractor/extractHomepage';
+import { axiosInstance } from '../services/axiosInstance.js';
+import { validationError } from '../utils/errors.js';
+import { extractHomepage } from '../extractor/extractHomepage.js';
 import { withCache } from '../utils/redis.js';
 
 const homepageController = async () => {
