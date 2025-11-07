@@ -1,4 +1,4 @@
-import { megacloud } from '../parsers/decryptor/megacloud';
+import { megacloud } from '../parsers/decryptor/megacloud.js';
 
 export const extractStream = async ({ selectedServer, id }) => {
   if (selectedServer.name === 'HD-4') {

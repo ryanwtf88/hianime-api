@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { validationError } from '../utils/errors';
-import config from '../config/config';
-import { extractServers } from '../extractor/extractServers';
+import { validationError } from '../utils/errors.js';
+import config from '../config/config.js';
+import { extractServers } from '../extractor/extractServers.js';
 
 export const getServers = async (id) => {
   const episode = id.split('ep=').at(-1);
