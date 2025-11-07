@@ -48,21 +48,30 @@ const streamController = async (c) => {
     });
   }
 
+  console.log('[streamController] Calling extractStream with:', { selectedServer, fullId });
+  
   const response = await extractStream({ selectedServer, id: fullId });
+  
+  console.log('[streamController] extractStream response:', response);
   
   if (!response) {
     throw new validationError('Failed to extract stream - no response from extractor', {
       server,
       id: fullId,
       type,
+      selectedServerId: selectedServer.id,
     });
   }
 
-  if (!response.link?.file && !response.streamingLink) {
+  // Check for both response formats
+  const hasValidLink = response.link?.file || response.streamingLink;
+  
+  if (!hasValidLink) {
     throw new validationError('Stream extraction failed - no valid stream link found', {
       server,
       id: fullId,
       type,
+      responseKeys: Object.keys(response),
       response,
     });
   }
