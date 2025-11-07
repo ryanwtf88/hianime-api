@@ -35,29 +35,33 @@ const serversController = async (c) => {
 
   if (!id) throw new validationError('id is required');
 
-  // Handle both formats:
-  // 1. Combined: id=watch/steinsgate-3?ep=213
-  // 2. Separate: id=steinsgate-3&ep=213 or id=watch/steinsgate-3&ep=213
-  let fullId = id;
-  
-  if (ep) {
-    // If ep is provided separately, construct the full id
-    const baseId = id.replace(/^watch\//, '').replace(/\?ep=\d+$/, '');
-    fullId = `watch/${baseId}?ep=${ep}`;
-  } else if (!id.includes('ep=')) {
+  // Parse id to handle various formats
+  let animeId = id;
+  let episodeNum = ep;
+
+  // Check if id contains ?ep= pattern (common mistake: /api/v1/servers?id=steinsgate-3?ep=213)
+  if (id.includes('?ep=')) {
+    const parts = id.split('?ep=');
+    animeId = parts[0].replace(/^watch\//, '');
+    episodeNum = episodeNum || parts[1];
+  }
+
+  // Remove watch/ prefix if exists
+  animeId = animeId.replace(/^watch\//, '');
+
+  // Validate episode number
+  if (!episodeNum) {
     throw new validationError('episode parameter is required', {
       validFormats: [
-        'id=watch/steinsgate-3?ep=213 (combined)',
-        'id=steinsgate-3&ep=213 (separate)',
+        '/api/v1/servers?id=steinsgate-3&ep=213',
+        '/api/v1/servers?id=watch/steinsgate-3&ep=213',
       ],
       provided: { id, ep },
     });
-  } else {
-    // Ensure watch/ prefix exists
-    if (!id.startsWith('watch/')) {
-      fullId = `watch/${id}`;
-    }
   }
+
+  // Construct the full ID in the correct format
+  const fullId = `watch/${animeId}?ep=${episodeNum}`;
 
   const response = await getServers(fullId);
 
