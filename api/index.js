@@ -1,7 +1,6 @@
 // Vercel Serverless Function Handler
-// This file serves as the entry point for Vercel serverless deployment
-
 import app from '../src/app.js';
+import { handle } from 'hono/vercel';
 
-// Export the Hono app as a serverless function
-export default app.fetch;
+// Export Hono app with Vercel adapter
+export default handle(app);
