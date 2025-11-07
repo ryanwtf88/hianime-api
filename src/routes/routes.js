@@ -1,23 +1,23 @@
 import { Hono } from 'hono';
-import documentationController from '../controllers/documentation.controller.js';
-import handler from '../utils/handler.js';
+import documentationController from '../controllers/documentation.controller';
+import handler from '../utils/handler';
 
 // controllers
-import homepageController from '../controllers/homepage.controller.js';
-import detailpageController from '../controllers/detailpage.controller.js';
-import listpageController from '../controllers/listpage.controller.js';
-import searchController from '../controllers/search.controller.js';
-import suggestionController from '../controllers/suggestion.controller.js';
-import charactersController from '../controllers/characters.controller.js';
-import characterDetailConroller from '../controllers/characterDetail.controller.js';
-import episodesController from '../controllers/episodes.controller.js';
-import serversController from '../controllers/serversController.js';
-import streamController from '../controllers/streamController.js';
-import allGenresController from '../controllers/allGenres.controller.js';
-import schaduleController from '../controllers/schedule.controller.js';
-import nextEpisodeSchaduleController from '../controllers/nextEpisodeSchadule.controller.js';
-import filterController from '../controllers/filter.controller.js';
-import filterOptions from '../utils/filter.js';
+import homepageController from '../controllers/homepage.controller';
+import detailpageController from '../controllers/detailpage.controller';
+import listpageController from '../controllers/listpage.controller';
+import searchController from '../controllers/search.controller';
+import suggestionController from '../controllers/suggestion.controller';
+import charactersController from '../controllers/characters.controller';
+import characterDetailConroller from '../controllers/characterDetail.controller';
+import episodesController from '../controllers/episodes.controller';
+import serversController from '../controllers/serversController';
+import streamController from '../controllers/streamController';
+import allGenresController from '../controllers/allGenres.controller';
+import schaduleController from '../controllers/schedule.controller';
+import nextEpisodeSchaduleController from '../controllers/nextEpisodeSchadule.controller';
+import filterController from '../controllers/filter.controller';
+import filterOptions from '../utils/filter';
 
 const router = new Hono();
 

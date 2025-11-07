@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { validationError } from '../utils/errors.js';
-import config from '../config/config.js';
-import extractSchadule from '../extractor/extractSchadule.js';
+import { validationError } from '../utils/errors';
+import config from '../config/config';
+import extractSchadule from '../extractor/extractSchadule';
 
 async function schaduleController(c) {
   const today = new Date(Date.now());

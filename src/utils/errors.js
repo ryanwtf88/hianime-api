@@ -12,7 +12,7 @@ export class NotFoundError extends AppError {
 }
 
 export class validationError extends AppError {
-  constructor(message = 'validation failed', details = null) {
+  constructor(message = 'validaion failed', details = null) {
     super(message, 400, details);
   }
 }

@@ -1,6 +1,6 @@
 import app from './src/app.js';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 30074;
 
 Bun.serve({
   port: PORT,
@@ -9,5 +9,5 @@ Bun.serve({
 });
 
 console.log(`server is running at http://0.0.0.0:${PORT}`);
-console.log(`docs: http://0.0.0.0:${PORT}/doc`);
+console.log(`docs: http://0.0.0.0:${PORT}/docs`);
 console.log(`swagger: http://0.0.0.0:${PORT}/ui`);

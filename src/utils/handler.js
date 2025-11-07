@@ -1,4 +1,4 @@
-import { fail, success } from './response.js';
+import { fail, success } from './response';
 
 const handler = (fn) => {
   return async (c, next) => {

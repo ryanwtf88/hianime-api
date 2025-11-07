@@ -1,6 +1,6 @@
-import { axiosInstance } from '../services/axiosInstance.js';
-import { validationError } from '../utils/errors.js';
-import { extractHomepage } from '../extractor/extractHomepage.js';
+import { axiosInstance } from '../services/axiosInstance';
+import { validationError } from '../utils/errors';
+import { extractHomepage } from '../extractor/extractHomepage';
 
 import { Redis } from '@upstash/redis';
 

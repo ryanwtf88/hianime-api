@@ -1,7 +1,7 @@
-import filterOptions from '../utils/filter.js';
-import { axiosInstance } from '../services/axiosInstance.js';
-import { validationError } from '../utils/errors.js';
-import { extractListPage } from '../extractor/extractListpage.js';
+import filterOptions from '../utils/filter';
+import { axiosInstance } from '../services/axiosInstance';
+import { validationError } from '../utils/errors';
+import { extractListPage } from '../extractor/extractListpage';
 
 const filterController = async (c) => {
   const {

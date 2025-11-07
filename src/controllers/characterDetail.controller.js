@@ -1,6 +1,6 @@
-import { extractCharacterDetail } from '../extractor/extractCharacterDetail.js';
-import { axiosInstance } from '../services/axiosInstance.js';
-import { NotFoundError, validationError } from '../utils/errors.js';
+import { extractCharacterDetail } from '../extractor/extractCharacterDetail';
+import { axiosInstance } from '../services/axiosInstance';
+import { NotFoundError, validationError } from '../utils/errors';
 
 const characterDetailConroller = async (c) => {
   const id = c.req.param('id');
