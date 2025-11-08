@@ -6,7 +6,7 @@ import { extractServers } from '../extractor/extractServers.js';
 export const getServers = async (id) => {
   const episode = id.split('ep=').at(-1);
   const ajaxUrl = `/ajax/v2/episode/servers?episodeId=${episode}`;
-  const Referer = `/watch/${id.replace('::', '?').replace(/^watch\//, '')}`;
+  const Referer = `/watch/${id.replace('::', '?')}`;
 
   try {
     const { data } = await axios.get(config.baseurl + ajaxUrl, {
@@ -19,51 +19,18 @@ export const getServers = async (id) => {
     const response = extractServers(data.html);
     return response;
   } catch (err) {
-    console.error('Error fetching servers:', err.message);
-    throw new validationError('failed to fetch servers', {
-      validExamples: [
-        'id=watch/steinsgate-3?ep=213',
-        'id=steinsgate-3&ep=213',
-      ],
-      error: err.message,
+    console.log(err.message);
+    throw new validationError('make sure given endpoint is correct', {
+      validIdEx: 'watch/steinsgate-3?ep=213',
     });
   }
 };
-
 const serversController = async (c) => {
-  let { id, ep } = c.req.query();
+  const id = c.req.query('id');
 
   if (!id) throw new validationError('id is required');
 
-  // Parse id to handle various formats
-  let animeId = id;
-  let episodeNum = ep;
-
-  // Check if id contains ?ep= pattern (common mistake: /api/v1/servers?id=steinsgate-3?ep=213)
-  if (id.includes('?ep=')) {
-    const parts = id.split('?ep=');
-    animeId = parts[0].replace(/^watch\//, '');
-    episodeNum = episodeNum || parts[1];
-  }
-
-  // Remove watch/ prefix if exists
-  animeId = animeId.replace(/^watch\//, '');
-
-  // Validate episode number
-  if (!episodeNum) {
-    throw new validationError('episode parameter is required', {
-      validFormats: [
-        '/api/v1/servers?id=steinsgate-3&ep=213',
-        '/api/v1/servers?id=watch/steinsgate-3&ep=213',
-      ],
-      provided: { id, ep },
-    });
-  }
-
-  // Construct the full ID in the correct format
-  const fullId = `watch/${animeId}?ep=${episodeNum}`;
-
-  const response = await getServers(fullId);
+  const response = await getServers(id);
 
   return response;
 };

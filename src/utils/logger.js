@@ -43,14 +43,12 @@ export const logger = {
     }
   },
 
-  // Request logging helper
   request: (method, url, params = null) => {
     if (currentLevel >= LOG_LEVELS.INFO) {
       console.log(formatMessage('INFO', `${method} ${url}`, params));
     }
   },
 
-  // Response logging helper
   response: (status, url, duration = null) => {
     if (currentLevel >= LOG_LEVELS.INFO) {
       const msg = duration 

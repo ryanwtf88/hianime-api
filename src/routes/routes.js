@@ -2,7 +2,6 @@ import { Hono } from 'hono';
 import documentationController from '../controllers/documentation.controller.js';
 import handler from '../utils/handler.js';
 
-// controllers
 import homepageController from '../controllers/homepage.controller.js';
 import detailpageController from '../controllers/detailpage.controller.js';
 import listpageController from '../controllers/listpage.controller.js';

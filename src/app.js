@@ -10,8 +10,6 @@ import { logger } from 'hono/logger';
 import config from './config/config.js';
 
 const app = new Hono();
-
-// Configure CORS with environment-based origins
 const origins = config.origin.includes(',') 
   ? config.origin.split(',').map(o => o.trim())
   : (config.origin === '*' ? '*' : [config.origin]);
@@ -28,7 +26,6 @@ app.use(
   })
 );
 
-// Apply rate limiting only if enabled
 if (config.rateLimit.enabled) {
   app.use(
     '*',
@@ -37,7 +34,6 @@ if (config.rateLimit.enabled) {
       limit: config.rateLimit.limit,
       standardHeaders: 'draft-6',
       keyGenerator: (c) => {
-        // Vercel-specific headers
         const vercelIp = c.req.header('x-vercel-forwarded-for');
         const cfConnectingIp = c.req.header('cf-connecting-ip');
         const realIp = c.req.header('x-real-ip');
@@ -49,18 +45,16 @@ if (config.rateLimit.enabled) {
   );
 }
 
-// Logger for API routes (disabled in production for better performance)
 if (!config.isProduction || process.env.ENABLE_LOGGING === 'true') {
   app.use('/api/v1/*', logger());
 }
 
-// Root route
-app.get('/', (c) => {
+app.get('/ui', (c) => {
   c.status(200);
   return c.json({
     message: 'Welcome to HiAnime API, crafted by RY4N',
     documentation: '/api/v1',
-    swagger: '/ui',
+    swagger: '/',
     docs: '/docs',
     health: '/ping',
     version: '1.0.0',
@@ -69,7 +63,6 @@ app.get('/', (c) => {
   });
 });
 
-// Health check endpoint
 app.get('/ping', (c) => {
   return c.json({ 
     status: 'ok', 
@@ -78,20 +71,14 @@ app.get('/ping', (c) => {
   });
 });
 
-// API routes
 app.route('/api/v1', hiAnimeRoutes);
-
-// Documentation routes
 app.get('/docs', (c) => c.json(hianimeApiDocs));
-app.get('/ui', swaggerUI({ url: '/docs' }));
-
-// Global error handler
+app.get('/', swaggerUI({ url: '/docs' }));
 app.onError((err, c) => {
   if (err instanceof AppError) {
     return fail(c, err.message, err.statusCode, err.details);
   }
   
-  // Log unexpected errors
   console.error('Unexpected Error:', err.message);
   if (!config.isProduction) {
     console.error('Stack:', err.stack);
@@ -100,7 +87,6 @@ app.onError((err, c) => {
   return fail(c, 'Internal server error', 500);
 });
 
-// 404 handler
 app.notFound((c) => {
   return fail(c, 'Route not found', 404);
 });
