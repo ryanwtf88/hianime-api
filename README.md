@@ -868,7 +868,7 @@ GET /api/v1/stream?id=:episodeId&server=:server&type=:type
 **Request Example:**
 
 ```javascript
-const resp = await fetch('/api/v1/stream?id=steinsgate-3?ep=213&server=hd-1&type=sub');
+const resp = await fetch('/api/v1/stream?server=HD-2&type=dub&id=steinsgate-3::ep=136197');
 const data = await resp.json();
 console.log(data);
 ```
@@ -879,29 +879,33 @@ console.log(data);
 {
   "success": true,
   "data": {
+    "id": "steinsgate-3::ep=136197",
+    "type": "dub",
+    "link": {
+      "file": "https://loda-lassan/master.m3u8",
+      "type": "hls"
+    },
     "tracks": [
       {
-        "file": "https://...",
+        "file": "https://loda-lassan/eng-2.vtt",
         "label": "English",
-        "kind": "captions"
+        "kind": "captions",
+        "default": true
+      },
+      {
+        "file": "https://loda-lassan.vtt",
+        "kind": "thumbnails"
       }
     ],
     "intro": {
-      "start": 75,
-      "end": 165
+      "start": 81,
+      "end": 170
     },
     "outro": {
-      "start": 1330,
-      "end": 1419
+      "start": 1315,
+      "end": 1404
     },
-    "sources": [
-      {
-        "url": "https://...",
-        "type": "hls"
-      }
-    ],
-    "anilistID": 9253,
-    "malID": 9253
+    "server": "HD-2"
   }
 }
 ```
