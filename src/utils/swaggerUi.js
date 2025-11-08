@@ -1,10 +1,10 @@
-const base_url = process.env.BASE_URL ? process.env.BASE_URL : 'http://0.0.0.0:3000';
+const base_url = process.env.BASE_URL ? process.env.BASE_URL : 'https://api-animo.vercel.app';
 
 const hianimeApiDocs = {
   openapi: '3.0.0',
   info: {
     title: 'hianime-api',
-    version: '1.0.0',
+    version: '2.0.0',
     description: 'API Documentation For HiAnime Content Endpoints',
   },
   servers: [
