@@ -13,7 +13,6 @@ import episodesController from '../controllers/episodes.controller.js';
 import serversController from '../controllers/serversController.js';
 import streamController from '../controllers/streamController.js';
 import allGenresController from '../controllers/allGenres.controller.js';
-import scheduleController from '../controllers/schedule.controller.js';
 import nextEpisodeSchaduleController from '../controllers/nextEpisodeSchadule.controller.js';
 import filterController from '../controllers/filter.controller.js';
 import filterOptions from '../utils/filter.js';
@@ -25,7 +24,6 @@ const router = new Hono();
 
 router.get('/', handler(documentationController));
 router.get('/home', handler(homepageController));
-router.get('/schedule', handler(scheduleController));
 router.get('/schedules', handler(schedulesController));
 router.get('/schadule/next/:id', handler(nextEpisodeSchaduleController));
 router.get('/anime/:id', handler(detailpageController));

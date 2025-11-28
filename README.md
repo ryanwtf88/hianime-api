@@ -282,37 +282,7 @@ console.log(data);
 
 ---
 
-### 2. GET Anime Schedule
-
-Retrieve the schedule of anime releases.
-
-**Endpoint:**
-```
-GET /api/v1/schedule
-```
-
-**Request Example:**
-
-```javascript
-const resp = await fetch('/api/v1/schedule');
-const data = await resp.json();
-console.log(data);
-```
-
-**Response Schema:**
-
-```javascript
-{
-  "success": true,
-  "data": {
-    "scheduledAnimes": [...]
-  }
-}
-```
-
----
-
-### 3. GET Next Episode Schedule
+### 2. GET Next Episode Schedule
 
 Get the next episode schedule for a specific anime.
 
