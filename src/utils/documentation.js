@@ -364,6 +364,17 @@ const apiDocumentation = {
       example: '/schedules?date=2024-01-01',
       description: 'fetches anime schedules for 7 days starting from the given date (or today).',
     },
+    {
+      name: 'embed',
+      endpoint: '/embed/:episodeId',
+      hasParams: true,
+      hasQueries: true,
+      paramsList: ['episodeId'],
+      queriesList: ['type'],
+      defaultQueries: { type: 'sub' },
+      example: '/embed/136197?type=sub',
+      description: 'embeds hianime.to video player directly for the given episode ID.',
+    },
   ],
 };
 export default apiDocumentation;
