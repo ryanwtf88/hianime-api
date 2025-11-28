@@ -8,8 +8,11 @@ const streamController = async (c) => {
   if (!id) throw new validationError('id is required');
 
   server = server.toUpperCase();
-  const episode = id.includes('ep=');
-  if (!episode) throw new validationError('episode  is not valid');
+
+  // Validate that id contains episode information
+  // if (!id.includes('?ep=') && !id.includes('&ep=')) {
+  //   throw new validationError('episode parameter is not valid - id must contain episode information (ep=)');
+  // }
 
   const servers = await getServers(id);
 

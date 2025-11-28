@@ -351,7 +351,7 @@ const apiDocumentation = {
       hasQueries: true,
       queriesList: ['id', 'type', 'server'],
       defaultQueries: { type: 'sub', server: 'hd-2' },
-      example: '/stream?type=dub&server=hd-4&id=steinsgate-3::ep=213',
+      example: '/stream?type=sub&server=hd-2&id=102994',
       description: 'fetches episode source based on episode id.',
     },
   ],

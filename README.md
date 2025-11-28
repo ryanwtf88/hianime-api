@@ -837,7 +837,7 @@ GET /api/v1/stream?id=:episodeId&server=:server&type=:type
 **Request Example:**
 
 ```javascript
-const resp = await fetch('/api/v1/stream?server=HD-2&type=dub&id=steinsgate-3::ep=136197');
+const resp = await fetch('/api/v1/stream?id=102994&server=hd-2&type=sub');
 const data = await resp.json();
 console.log(data);
 ```
