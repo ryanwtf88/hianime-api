@@ -288,13 +288,13 @@ Retrieve the schedule of anime releases.
 
 **Endpoint:**
 ```
-GET /api/v1/schadule
+GET /api/v1/schedule
 ```
 
 **Request Example:**
 
 ```javascript
-const resp = await fetch('/api/v1/schadule');
+const resp = await fetch('/api/v1/schedule');
 const data = await resp.json();
 console.log(data);
 ```
@@ -318,13 +318,13 @@ Get the next episode schedule for a specific anime.
 
 **Endpoint:**
 ```
-GET /api/v1/schadule/next/:id
+GET /api/v1/schedule/next/:id
 ```
 
 **Request Example:**
 
 ```javascript
-const resp = await fetch('/api/v1/schadule/next/one-piece-100');
+const resp = await fetch('/api/v1/schedule/next/one-piece-100');
 const data = await resp.json();
 console.log(data);
 ```
@@ -875,6 +875,49 @@ console.log(data);
       "end": 1404
     },
     "server": "HD-2"
+  }
+}
+```
+
+---
+
+### 15. GET Anime Schedules (7 Days)
+
+Retrieve anime schedules for 7 days starting from the given date (or today).
+
+**Endpoint:**
+```
+GET /api/v1/schedules
+```
+
+**Query Parameters:**
+
+- `date` - Start date in YYYY-MM-DD format (optional, defaults to today)
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/schedules?date=2024-01-01');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "2024-01-01": [
+      {
+        "id": "anime-id",
+        "time": "10:30",
+        "title": "Anime Title",
+        "jname": "Japanese Title",
+        "episode": 12
+      }
+    ],
+    "2024-01-02": [ ... ]
   }
 }
 ```

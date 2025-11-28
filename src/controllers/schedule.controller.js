@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { validationError } from '../utils/errors.js';
 import config from '../config/config.js';
-import extractSchadule from '../extractor/extractSchadule.js';
+import extractSchedule from '../extractor/extractSchedule.js';
 
-async function schaduleController(c) {
+async function scheduleController(c) {
   const today = new Date(Date.now());
 
   let todaysMonth = today.getMonth() + 1;
@@ -38,7 +38,7 @@ async function schaduleController(c) {
     const meta = {
       date: formattedDate,
     };
-    const response = extractSchadule(data.html);
+    const response = extractSchedule(data.html);
     return { meta, response };
   } catch (error) {
     console.error(error.message);
@@ -46,4 +46,4 @@ async function schaduleController(c) {
   }
 }
 
-export default schaduleController;
+export default scheduleController;

@@ -354,6 +354,16 @@ const apiDocumentation = {
       example: '/stream?type=sub&server=hd-2&id=102994',
       description: 'fetches episode source based on episode id.',
     },
+    {
+      name: 'schedules',
+      endpoint: '/schedules',
+      hasParams: false,
+      hasQueries: true,
+      queriesList: ['date'],
+      defaultQueries: { date: 'YYYY-MM-DD' },
+      example: '/schedules?date=2024-01-01',
+      description: 'fetches anime schedules for 7 days starting from the given date (or today).',
+    },
   ],
 };
 export default apiDocumentation;
