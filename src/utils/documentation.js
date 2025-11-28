@@ -168,7 +168,19 @@ const apiDocumentation = {
       example: '/animes/genre/action?page=3',
       description: 'Fetches anime based on specific genres.',
     },
-
+    {
+      name: 'Studio',
+      endpoint: '/animes/studio/:studio',
+      hasParams: true,
+      hasQueries: true,
+      queriesList: ['page'],
+      paramsList: ['studio'],
+      defaultQueries: {
+        page: 1,
+      },
+      example: '/animes/studio/toei-animation?page=2',
+      description: 'Fetches anime based on specific studios.',
+    },
     {
       name: 'Subbed Anime',
       endpoint: '/animes/subbed-anime',

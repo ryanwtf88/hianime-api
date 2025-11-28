@@ -41,7 +41,7 @@ router.get('/character/:id', handler(characterDetailConroller));
 router.get('/episodes/:id', handler(episodesController));
 router.get('/servers', handler(serversController));
 router.get('/stream', handler(streamController));
-router.get('/embed/:episodeId', handler(embedController));
+router.get('/embed/:episodeId', embedController);
 router.get('/genres', handler(allGenresController));
 router.get('/admin/clear-cache', handler(clearCacheController));
 
