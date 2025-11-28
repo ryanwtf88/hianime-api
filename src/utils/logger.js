@@ -1,3 +1,5 @@
+import config from '../config/config.js';
+
 const LOG_LEVELS = {
   ERROR: 0,
   WARN: 1,
@@ -5,16 +7,16 @@ const LOG_LEVELS = {
   DEBUG: 3,
 };
 
-const currentLevel = LOG_LEVELS[process.env.LOG_LEVEL?.toUpperCase()] ?? LOG_LEVELS.INFO;
+const currentLevel = LOG_LEVELS[config.logLevel] ?? LOG_LEVELS.INFO;
 
 const formatMessage = (level, message, data) => {
   const timestamp = new Date().toISOString();
   const prefix = `[${timestamp}] [${level}]`;
-  
+
   if (data) {
     return `${prefix} ${message} ${JSON.stringify(data, null, 2)}`;
   }
-  
+
   return `${prefix} ${message}`;
 };
 
@@ -51,7 +53,7 @@ export const logger = {
 
   response: (status, url, duration = null) => {
     if (currentLevel >= LOG_LEVELS.INFO) {
-      const msg = duration 
+      const msg = duration
         ? `Response ${status} for ${url} (${duration}ms)`
         : `Response ${status} for ${url}`;
       console.log(formatMessage('INFO', msg));

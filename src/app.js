@@ -10,7 +10,7 @@ import { logger } from 'hono/logger';
 import config from './config/config.js';
 
 const app = new Hono();
-const origins = config.origin.includes(',') 
+const origins = config.origin.includes(',')
   ? config.origin.split(',').map(o => o.trim())
   : (config.origin === '*' ? '*' : [config.origin]);
 
@@ -38,14 +38,14 @@ if (config.rateLimit.enabled) {
         const cfConnectingIp = c.req.header('cf-connecting-ip');
         const realIp = c.req.header('x-real-ip');
         const forwarded = c.req.header('x-forwarded-for');
-        
+
         return vercelIp || cfConnectingIp || realIp || forwarded?.split(',')[0].trim() || 'unknown';
       },
     })
   );
 }
 
-if (!config.isProduction || process.env.ENABLE_LOGGING === 'true') {
+if (!config.isProduction || config.enableLogging) {
   app.use('/api/v1/*', logger());
 }
 
@@ -64,8 +64,8 @@ app.get('/ui', (c) => {
 });
 
 app.get('/ping', (c) => {
-  return c.json({ 
-    status: 'ok', 
+  return c.json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.isVercel ? 'vercel' : 'self-hosted',
   });
@@ -78,7 +78,7 @@ app.onError((err, c) => {
   if (err instanceof AppError) {
     return fail(c, err.message, err.statusCode, err.details);
   }
-  
+
   console.error('Unexpected Error:', err.message);
   if (!config.isProduction) {
     console.error('Stack:', err.stack);

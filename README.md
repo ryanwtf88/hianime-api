@@ -24,7 +24,6 @@
   - [Local Setup](#local-setup)
 - [Deployment](#deployment)
   - [Docker Deployment](#docker-deployment)
-  - [Render Deployment](#render-deployment)
   - [Vercel Deployment](#vercel-deployment-serverless--recommended)
   - [Replit Deployment](#replit-deployment)
 - [Documentation](#documentation)
@@ -51,14 +50,16 @@
   - [Recently Updated](#21-get-recently-updated)
   - [Top Upcoming](#22-get-top-upcoming)
   - [Genre List](#23-get-anime-by-genre)
-  - [Subbed Anime](#24-get-subbed-anime)
-  - [Dubbed Anime](#25-get-dubbed-anime)
-  - [Movies](#26-get-anime-movies)
-  - [TV Series](#27-get-tv-series)
-  - [OVA](#28-get-ova)
-  - [ONA](#29-get-ona)
-  - [Special](#30-get-special)
-  - [Events](#31-get-events)
+  - [Producer List](#24-get-anime-by-producer)
+  - [Subbed Anime](#25-get-subbed-anime)
+  - [Dubbed Anime](#26-get-dubbed-anime)
+  - [Movies](#27-get-anime-movies)
+  - [TV Series](#28-get-tv-series)
+  - [OVA](#29-get-ova)
+  - [ONA](#30-get-ona)
+  - [Special](#31-get-special)
+  - [Events](#32-get-events)
+  - [Clear Cache](#33-clear-redis-cache)
 - [Development](#development)
 - [Contributors](#contributors)
 - [Acknowledgments](#acknowledgments)
@@ -182,39 +183,6 @@ Then run:
 docker-compose up -d
 ```
 
-### Render Deployment
-
-**One-Click Deploy:**
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ryanwtf88/hianime-api)
-
-**Manual Deployment:**
-
-1. Fork or clone the repository to your GitHub account
-2. Create a new Web Service on [Render Dashboard](https://dashboard.render.com/)
-3. Connect your GitHub repository
-4. Configure the service:
-   - **Name**: `hianime-api`
-   - **Region**: Choose your preferred region
-   - **Branch**: `master`
-   - **Runtime**: Docker
-   - **Instance Type**: Free or paid plan
-5. Add environment variables:
-   - `NODE_ENV=production`
-   - `PORT=3030`
-6. Click "Create Web Service"
-
-**Environment Variables:**
-
-| Key | Value | Required |
-|-----|-------|----------|
-| `NODE_ENV` | `production` | Yes |
-| `PORT` | `3030` | Yes |
-| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Optional* |
-| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Optional* |
-
-*Required if you're using Redis for caching
-
 ### Vercel Deployment (Serverless) ⭐ Recommended
 
 **One-Click Deploy:**
@@ -254,7 +222,7 @@ docker-compose up -d
 | `RATE_LIMIT_WINDOW_MS` | `60000` | No |
 | `RATE_LIMIT_LIMIT` | `100` | No |
 
-📖 For detailed instructions, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
+📖 For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ### Replit Deployment
 
@@ -398,6 +366,7 @@ GET /api/v1/animes/:query/:category?page=:page
 | `recently-updated` | No | - |
 | `top-upcoming` | No | - |
 | `genre` | Yes | action, adventure, cars, comedy, dementia, demons, drama, ecchi, fantasy, game, harem, historical, horror, isekai, josei, kids, magic, martial arts, mecha, military, music, mystery, parody, police, psychological, romance, samurai, school, sci-fi, seinen, shoujo, shoujo ai, shounen, shounen ai, slice of life, space, sports, super power, supernatural, thriller, vampire |
+| `producer` | Yes | Any producer slug (e.g., bones, toei-animation, mappa) |
 | `az-list` | Yes | 0-9, all, a-z |
 | `subbed-anime` | No | - |
 | `dubbed-anime` | No | - |
@@ -494,7 +463,7 @@ console.log(data);
     "status": "Finished Airing",
     "MAL_score": "8.52",
     "genres": [...],
-    "studios": "Wit Studio",
+    "studios": ["wit-studio"],
     "producers": [...],
     "moreSeasons": [...],
     "related": [...],
@@ -1103,7 +1072,58 @@ console.log(data);
 
 ---
 
-### 24. GET Subbed Anime
+### 24. GET Anime by Producer
+
+Retrieve anime filtered by production studio or company.
+
+**Endpoint:**
+```
+GET /api/v1/animes/producer/:producer?page=:page
+```
+
+**Producer Examples:** bones, toei-animation, mappa, ufotable, kyoto-animation, wit-studio, madhouse, a-1-pictures, trigger, cloverworks
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/animes/producer/bones?page=1');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "pageInfo": {
+      "totalPages": 15,
+      "currentPage": 1,
+      "hasNextPage": true
+    },
+    "animes": [
+      {
+        "title": "My Hero Academia",
+        "alternativeTitle": "Boku no Hero Academia",
+        "id": "my-hero-academia-67",
+        "poster": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/...",
+        "episodes": {
+          "sub": 13,
+          "dub": 13,
+          "eps": 13
+        },
+        "type": "TV",
+        "duration": "24m"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 25. GET Subbed Anime
 
 Retrieve anime with subtitles available.
 
@@ -1122,7 +1142,7 @@ console.log(data);
 
 ---
 
-### 25. GET Dubbed Anime
+### 26. GET Dubbed Anime
 
 Retrieve anime with English dub available.
 
@@ -1141,7 +1161,7 @@ console.log(data);
 
 ---
 
-### 26. GET Anime Movies
+### 27. GET Anime Movies
 
 Retrieve anime movies.
 
@@ -1160,7 +1180,7 @@ console.log(data);
 
 ---
 
-### 27. GET TV Series
+### 28. GET TV Series
 
 Retrieve anime TV series.
 
@@ -1179,7 +1199,7 @@ console.log(data);
 
 ---
 
-### 28. GET OVA
+### 29. GET OVA
 
 Retrieve Original Video Animation (OVA) content.
 
@@ -1198,7 +1218,7 @@ console.log(data);
 
 ---
 
-### 29. GET ONA
+### 30. GET ONA
 
 Retrieve Original Net Animation (ONA) content.
 
@@ -1217,7 +1237,7 @@ console.log(data);
 
 ---
 
-### 30. GET Special
+### 31. GET Special
 
 Retrieve special anime episodes.
 
@@ -1236,7 +1256,7 @@ console.log(data);
 
 ---
 
-### 31. GET Events
+### 32. GET Events
 
 Retrieve anime events.
 
@@ -1252,6 +1272,44 @@ const resp = await fetch('/api/v1/animes/events?page=1');
 const data = await resp.json();
 console.log(data);
 ```
+
+---
+
+### 33. Clear Redis Cache
+
+Clear all cached data from Redis. Useful for forcing fresh data retrieval.
+
+**Endpoint:**
+```
+GET /api/v1/admin/clear-cache
+```
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/admin/clear-cache');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "success": true,
+    "message": "Cache cleared successfully",
+    "keysCleared": 5
+  }
+}
+```
+
+**Notes:**
+- This endpoint clears ALL cached data
+- Use sparingly as it will impact performance temporarily
+- Returns the number of cache keys that were cleared
+- If Redis is not configured, returns an error message
 
 ---
 

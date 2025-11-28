@@ -17,6 +17,7 @@ import schaduleController from '../controllers/schedule.controller.js';
 import nextEpisodeSchaduleController from '../controllers/nextEpisodeSchadule.controller.js';
 import filterController from '../controllers/filter.controller.js';
 import filterOptions from '../utils/filter.js';
+import clearCacheController from '../controllers/clearCache.controller.js';
 
 const router = new Hono();
 
@@ -39,5 +40,6 @@ router.get('/episodes/:id', handler(episodesController));
 router.get('/servers', handler(serversController));
 router.get('/stream', handler(streamController));
 router.get('/genres', handler(allGenresController));
+router.get('/admin/clear-cache', handler(clearCacheController));
 
 export default router;

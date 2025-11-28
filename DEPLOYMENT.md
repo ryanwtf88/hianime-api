@@ -1,51 +1,189 @@
 # Deployment Guide
 
-This guide provides comprehensive instructions for deploying hianime-api using Docker, Render, and other platforms.
+This guide provides comprehensive instructions for deploying hianime-api using Docker, Vercel (recommended), and other platforms.
 
 ## Table of Contents
 
-- [Docker Deployment](#docker-deployment)
+- [Quick Start](#quick-start)
+- [Vercel Deployment](#vercel-deployment-recommended)
   - [Prerequisites](#prerequisites)
-  - [Building the Docker Image](#building-the-docker-image)
-  - [Running the Container](#running-the-container)
-  - [Docker Compose](#docker-compose)
-- [Render Deployment](#render-deployment)
   - [One-Click Deploy](#one-click-deploy)
   - [Manual Deployment](#manual-deployment)
   - [Environment Variables](#environment-variables)
-  - [Auto-Deploy Configuration](#auto-deploy-configuration)
-- [Replit Deployment](#replit-deployment)
-- [Vercel Deployment](#vercel-deployment)
+  - [Redis Setup with Upstash](#redis-setup-with-upstash)
+- [Docker Deployment](#docker-deployment)
+  - [Building the Image](#building-the-docker-image)
+  - [Running the Container](#running-the-container)
+  - [Docker Compose](#docker-compose)
 - [Railway Deployment](#railway-deployment)
+- [Replit Deployment](#replit-deployment)
+- [Environment Variables Reference](#environment-variables-reference)
+- [Redis Caching Setup](#redis-caching-setup)
 - [Troubleshooting](#troubleshooting)
-- [Health Checks](#health-checks)
+- [Performance Optimization](#performance-optimization)
 - [Production Best Practices](#production-best-practices)
+
+---
+
+## Quick Start
+
+**Fastest deployment options:**
+
+1. **Vercel** (Recommended) - Click deploy button below
+2. **Docker** - `docker build -t hianime-api . && docker run -p 3030:3030 hianime-api`
+3. **Railway** - Connect GitHub repo and deploy
+
+---
+
+## Vercel Deployment (Recommended)
+
+Vercel provides the best serverless deployment experience with automatic scaling, global CDN, and built-in Redis support.
+
+### Prerequisites
+
+- GitHub account
+- Vercel account (free tier available)
+- Upstash account for Redis (free tier available)
+
+### One-Click Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ryanwtf88/hianime-api)
+
+### Manual Deployment
+
+1. **Fork the repository** to your GitHub account
+
+2. **Sign up at [Vercel](https://vercel.com)** if you haven't already
+
+3. **Create a new project:**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New" → "Project"
+   - Import your forked repository
+   - Select the repository: `your-username/hianime-api`
+
+4. **Configure project settings:**
+   - **Framework Preset**: Other
+   - **Root Directory**: `./`
+   - **Build Command**: Leave empty (serverless)
+   - **Output Directory**: Leave empty
+   - **Install Command**: `bun install`
+
+5. **Add environment variables** (see [Environment Variables](#environment-variables) section)
+
+6. **Deploy**: Click "Deploy"
+
+7. **Wait for deployment**: First deployment takes 2-3 minutes
+
+### Environment Variables
+
+Add these in Vercel Dashboard → Project Settings → Environment Variables:
+
+| Variable | Value | Required | Description |
+|----------|-------|----------|-------------|
+| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | **Yes** | Redis connection URL |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | **Yes** | Redis auth token |
+| `ORIGIN` | `*` or your domain | No | CORS allowed origins |
+| `RATE_LIMIT_ENABLED` | `true` | No | Enable rate limiting |
+| `RATE_LIMIT_WINDOW_MS` | `60000` | No | Rate limit window (ms) |
+| `RATE_LIMIT_LIMIT` | `100` | No | Max requests per window |
+| `LOG_LEVEL` | `INFO` | No | Logging level |
+| `ENABLE_LOGGING` | `true` | No | Enable request logging |
+
+### Redis Setup with Upstash
+
+Redis caching is **required** for Vercel deployment to improve performance and reduce API calls.
+
+**Step 1: Create Upstash Account**
+1. Go to [Upstash Console](https://console.upstash.com/)
+2. Sign up with GitHub (free)
+
+**Step 2: Create Redis Database**
+1. Click "Create Database"
+2. **Name**: `hianime-api-cache`
+3. **Type**: Regional (faster) or Global (more reliable)
+4. **Region**: Choose closest to your users
+5. **Eviction**: Enable eviction (recommended)
+6. Click "Create"
+
+**Step 3: Get Credentials**
+1. Go to database details
+2. Scroll to "REST API" section
+3. Copy:
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+
+**Step 4: Add to Vercel**
+1. Go to Vercel Project Settings
+2. Navigate to "Environment Variables"
+3. Add both variables
+4. Redeploy your project
+
+**Verify Redis is Working:**
+```bash
+# Test cache endpoint
+curl https://your-api.vercel.app/api/v1/home
+
+# Check logs in Vercel dashboard for:
+# "Redis client initialized successfully"
+# "Cache HIT: home" or "Cache MISS: home"
+```
+
+### Vercel-Specific Configuration
+
+The `vercel.json` file configures serverless deployment:
+
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "index.js"
+    }
+  ]
+}
+```
+
+### Custom Domain
+
+1. Go to Project Settings → Domains
+2. Click "Add"
+3. Enter your domain
+4. Follow DNS configuration instructions
+5. Wait for SSL certificate (automatic)
+
+### Monitoring
+
+**View logs:**
+- Go to Deployments tab
+- Click on deployment
+- View "Functions" logs
+
+**Monitor performance:**
+- Analytics tab shows request metrics
+- Speed Insights for performance data
 
 ---
 
 ## Docker Deployment
 
-### Prerequisites
-
-- Docker installed on your system ([Install Docker](https://docs.docker.com/get-docker/))
-- Docker Compose (optional, for easier management)
-- Git (for cloning the repository)
-
 ### Building the Docker Image
 
-1. **Clone the repository:**
 ```bash
+# Clone repository
 git clone https://github.com/ryanwtf88/hianime-api.git
 cd hianime-api
-```
 
-2. **Build the Docker image:**
-```bash
+# Build image
 docker build -t hianime-api .
-```
 
-3. **Verify the image was created:**
-```bash
+# Verify
 docker images | grep hianime-api
 ```
 
@@ -61,68 +199,28 @@ docker run -p 3030:3030 hianime-api
 docker run -p 3030:3030 \
   -e NODE_ENV=production \
   -e PORT=3030 \
+  -e UPSTASH_REDIS_REST_URL=your_redis_url \
+  -e UPSTASH_REDIS_REST_TOKEN=your_redis_token \
   hianime-api
 ```
 
-**With detached mode (runs in background):**
+**Detached mode (background):**
 ```bash
-docker run -d -p 3030:3030 --name hianime-api-container hianime-api
+docker run -d \
+  -p 3030:3030 \
+  --name hianime-api \
+  --restart unless-stopped \
+  hianime-api
 ```
-
-**With custom port:**
-```bash
-docker run -p 8080:3030 -e PORT=3030 hianime-api
-```
-
-**With restart policy:**
-```bash
-docker run -d -p 3030:3030 --restart unless-stopped --name hianime-api-container hianime-api
-```
-
-### Container Management Commands
 
 **View logs:**
 ```bash
-# Follow logs in real-time
-docker logs -f hianime-api-container
-
-# View last 100 lines
-docker logs --tail 100 hianime-api-container
-```
-
-**Check container status:**
-```bash
-docker ps -a | grep hianime-api
-```
-
-**Stop the container:**
-```bash
-docker stop hianime-api-container
-```
-
-**Start a stopped container:**
-```bash
-docker start hianime-api-container
-```
-
-**Restart the container:**
-```bash
-docker restart hianime-api-container
-```
-
-**Remove the container:**
-```bash
-docker rm hianime-api-container
-```
-
-**Remove the image:**
-```bash
-docker rmi hianime-api
+docker logs -f hianime-api
 ```
 
 ### Docker Compose
 
-Create a `docker-compose.yml` file in the project root:
+Create `docker-compose.yml`:
 
 ```yaml
 version: '3.8'
@@ -136,9 +234,11 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3030
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3030/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3030/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -150,687 +250,364 @@ services:
         max-file: "3"
 ```
 
-**Docker Compose commands:**
-
+**Commands:**
 ```bash
-# Start the service in detached mode
+# Start
 docker-compose up -d
-
-# Start and rebuild the image
-docker-compose up -d --build
 
 # View logs
 docker-compose logs -f
 
-# View logs for specific service
-docker-compose logs -f hianime-api
-
-# Stop the service
+# Stop
 docker-compose down
 
-# Stop and remove volumes
-docker-compose down -v
-
-# Restart the service
-docker-compose restart
-
-# Check service status
-docker-compose ps
+# Rebuild and start
+docker-compose up -d --build
 ```
-
-### Docker with Environment File
-
-Create a `.env` file:
-
-```env
-NODE_ENV=production
-PORT=3030
-UPSTASH_REDIS_REST_URL=your_redis_url_here
-UPSTASH_REDIS_REST_TOKEN=your_redis_token_here
-```
-
-Update `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  hianime-api:
-    build: .
-    container_name: hianime-api
-    ports:
-      - "${PORT:-3030}:3030"
-    env_file:
-      - .env
-    restart: unless-stopped
-```
-
-Then run:
-
-```bash
-docker-compose --env-file .env up -d
-```
-
----
-
-## Render Deployment
-
-### One-Click Deploy
-
-Click the button below to deploy directly to Render:
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ryanwtf88/hianime-api)
-
-### Manual Deployment
-
-1. **Fork or clone the repository** to your GitHub account
-
-2. **Create a new Web Service** on Render:
-   - Go to [Render Dashboard](https://dashboard.render.com/)
-   - Click "New +" → "Web Service"
-   - Connect your GitHub repository
-   - Select the repository: `ryanwtf88/hianime-api`
-
-3. **Configure the service:**
-   - **Name**: `hianime-api` (or your preferred name)
-   - **Region**: Choose your preferred region (e.g., Oregon, Frankfurt, Singapore)
-   - **Branch**: `master` ⚠️ **Important: Use master, not main**
-   - **Root Directory**: Leave empty (uses root)
-   - **Runtime**: Docker
-   - **Docker Command**: Leave empty (uses CMD from Dockerfile)
-   - **Docker Context Directory**: Leave empty
-   - **Dockerfile Path**: `./Dockerfile`
-   - **Instance Type**: 
-     - Free (for testing, with limitations)
-     - Starter ($7/month, recommended for production)
-     - Standard or higher (for high traffic)
-
-4. **Add environment variables** (see below)
-
-5. **Deploy**: Click "Create Web Service"
-
-6. **Wait for deployment**: First deployment takes 3-5 minutes
-
-### Environment Variables
-
-Add these environment variables in the Render dashboard:
-
-| Key | Value | Required | Description |
-|-----|-------|----------|-------------|
-| `NODE_ENV` | `production` | Yes | Sets the application environment |
-| `PORT` | `3030` | Yes | Port the application listens on |
-| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Optional* | Redis connection URL for caching |
-| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Optional* | Redis authentication token |
-
-*Required if you're using Redis for caching
-
-**To add environment variables:**
-1. Go to your service in Render Dashboard
-2. Navigate to "Environment" tab
-3. Click "Add Environment Variable"
-4. Enter the key and value
-5. Click "Save Changes" (will trigger a redeploy)
-
-### Auto-Deploy Configuration
-
-The `render.yaml` file in the repository root configures automatic deployment:
-
-```yaml
-services:
-  - type: web
-    name: hianime-api
-    env: docker
-    branch: master  # Deploys from master branch
-    dockerfilePath: ./Dockerfile
-    autoDeploy: true
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 3030
-```
-
-**Auto-deploy triggers when you push changes to the `master` branch affecting:**
-- Any `.js`, `.ts`, `.jsx`, `.tsx` files
-- `package.json`
-- `bun.lockb`
-- `Dockerfile`
-- `render.yaml`
-
-**To disable auto-deploy:**
-1. Go to service settings in Render Dashboard
-2. Navigate to "Settings" tab
-3. Find "Auto-Deploy" section
-4. Toggle off "Auto-Deploy"
-
-### Render-Specific Tips
-
-**Check deployment status:**
-- View logs in real-time from the "Logs" tab
-- Monitor deployment progress in the "Events" tab
-
-**Custom domain:**
-1. Go to "Settings" tab
-2. Scroll to "Custom Domain"
-3. Click "Add Custom Domain"
-4. Follow DNS configuration instructions
-
-**Health checks:**
-- Render automatically performs health checks on the root path `/`
-- Configure custom health check path in "Settings" → "Health Check Path"
-
-**Persistent storage:**
-- Free tier restarts periodically and doesn't persist data
-- Use external services (Redis, databases) for persistent data
-
----
-
-## Replit Deployment
-
-Replit provides an easy way to deploy and test the API.
-
-### Steps:
-
-1. **Import repository:**
-   - Go to [Replit](https://replit.com/)
-   - Click "Create" → "Import from GitHub"
-   - Enter repository URL: `https://github.com/ryanwtf88/hianime-api`
-   - Click "Import from GitHub"
-
-2. **Configure:**
-   - Replit should auto-detect Bun runtime
-   - If not, create/update `.replit` file:
-   ```toml
-   run = "bun run start"
-   
-   [nix]
-   channel = "stable-22_11"
-   
-   [deployment]
-   run = ["sh", "-c", "bun run start"]
-   ```
-
-3. **Add environment variables:**
-   - Click "Secrets" (🔒 icon in left sidebar)
-   - Add variables:
-     - `NODE_ENV=production`
-     - `PORT=3030`
-
-4. **Run the application:**
-   - Click the "Run" button
-   - Replit will install dependencies and start the server
-
-5. **Access your API:**
-   - Use the provided Replit URL (e.g., `https://hianime-api.username.repl.co`)
-
-### Replit Limitations:
-
-- Free tier has limited uptime
-- May go to sleep after inactivity
-- Limited CPU and memory resources
-- Better suited for development/testing than production
-
----
-
-## Vercel Deployment
-
-While Vercel is optimized for frontend, you can deploy the API with some configuration.
-
-### Steps:
-
-1. **Fork the repository** to your GitHub account
-
-2. **Install Vercel CLI** (optional):
-```bash
-npm i -g vercel
-```
-
-3. **Create `vercel.json`** in project root:
-```json
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "src/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "src/index.ts"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
-}
-```
-
-4. **Deploy:**
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
-   - Click "Add New" → "Project"
-   - Import your forked repository
-   - Configure environment variables
-   - Deploy
-
-**Note:** Vercel has limitations on execution time and may not be ideal for all use cases. Consider Render or Railway for better API hosting.
 
 ---
 
 ## Railway Deployment
 
-Railway offers excellent support for Dockerized applications.
+Railway offers excellent Docker support with generous free tier.
 
 ### Steps:
 
 1. **Create account** at [Railway](https://railway.app/)
 
-2. **Create new project:**
+2. **New project:**
    - Click "New Project"
    - Select "Deploy from GitHub repo"
-   - Connect your GitHub account
-   - Select the `hianime-api` repository
+   - Connect GitHub and select repository
 
 3. **Configure:**
    - Railway auto-detects Dockerfile
-   - Add environment variables in the Variables tab:
-     - `NODE_ENV=production`
-     - `PORT=3030`
+   - Add environment variables in Variables tab
+   - Deploy automatically starts
 
-4. **Deploy:**
-   - Railway automatically builds and deploys
-   - You'll get a URL like `https://hianime-api.up.railway.app`
+4. **Get URL:**
+   - Railway provides URL like `https://hianime-api.up.railway.app`
 
 5. **Custom domain** (optional):
-   - Go to Settings
-   - Click "Generate Domain" or add custom domain
+   - Settings → Generate Domain or add custom
 
-### Railway Benefits:
-
-- Generous free tier ($5 credit/month)
+**Benefits:**
+- $5 free credit/month
 - Excellent Docker support
-- Simple deployment process
-- Built-in monitoring and logs
-- Easy scaling
+- Auto-deploy on git push
+- Built-in monitoring
+
+---
+
+## Replit Deployment
+
+Good for testing and development.
+
+### Steps:
+
+1. **Import repository:**
+   - Go to [Replit](https://replit.com/)
+   - Create → Import from GitHub
+   - Enter: `https://github.com/ryanwtf88/hianime-api`
+
+2. **Configure:**
+   - Create `.replit` file:
+   ```toml
+   run = "bun run start"
+   
+   [nix]
+   channel = "stable-22_11"
+   ```
+
+3. **Add secrets:**
+   - Click Secrets (🔒 icon)
+   - Add environment variables
+
+4. **Run:**
+   - Click Run button
+   - Access via Replit URL
+
+**Limitations:**
+- Free tier sleeps after inactivity
+- Limited resources
+- Better for development than production
+
+---
+
+## Environment Variables Reference
+
+### Required Variables
+
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `UPSTASH_REDIS_REST_URL` | `https://your-db.upstash.io` | Upstash Redis URL |
+| `UPSTASH_REDIS_REST_TOKEN` | `AXaEAAInc...` | Upstash Redis token |
+
+### Optional Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `5000` | Server port |
+| `NODE_ENV` | `development` | Environment mode |
+| `ORIGIN` | `*` | CORS allowed origins |
+| `RATE_LIMIT_ENABLED` | `true` | Enable rate limiting |
+| `RATE_LIMIT_WINDOW_MS` | `60000` | Rate limit window (1 min) |
+| `RATE_LIMIT_LIMIT` | `1000000000` | Max requests per window |
+| `LOG_LEVEL` | `INFO` | Log level (ERROR, WARN, INFO, DEBUG) |
+| `ENABLE_LOGGING` | `false` | Enable request logging |
+| `HIANIME_BASE_URL` | `https://hianime.to` | Source website URL |
+| `BASE_URL` | Auto-detected | API base URL |
+
+### Setting Environment Variables
+
+**Vercel:**
+```bash
+# Via CLI
+vercel env add UPSTASH_REDIS_REST_URL
+
+# Or in dashboard: Settings → Environment Variables
+```
+
+**Docker:**
+```bash
+# Via command line
+docker run -e VAR_NAME=value ...
+
+# Via .env file
+docker run --env-file .env ...
+```
+
+**Railway:**
+- Dashboard → Variables tab → Add variable
+
+---
+
+## Redis Caching Setup
+
+### Why Redis?
+
+- **Performance**: 90%+ faster response times
+- **Reduced Load**: Fewer requests to source website
+- **Scalability**: Handle more concurrent users
+- **Cost**: Free tier sufficient for most use cases
+
+### Cache Strategy
+
+**Cached Endpoints:**
+- `/api/v1/home` - 24 hours
+- `/api/v1/anime/:id` - 24 hours
+
+**Cache Keys:**
+- `home` - Homepage data
+- `anime:{id}` - Anime details
+
+**TTL (Time To Live):**
+- Default: 24 hours (86400 seconds)
+- Configurable in code
+
+### Clear Cache
+
+```bash
+# Clear all cache
+curl https://your-api.vercel.app/api/v1/admin/clear-cache
+```
+
+### Monitor Cache Performance
+
+Check logs for:
+- `Cache HIT: key` - Data served from cache (fast)
+- `Cache MISS: key` - Data fetched from source (slow)
+- `Cache SET: key (TTL: 86400s)` - Data cached
 
 ---
 
 ## Troubleshooting
 
+### Vercel Issues
+
+**Build fails:**
+- Check build logs in deployment details
+- Verify `package.json` has all dependencies
+- Ensure `bun.lockb` is committed
+- Check `vercel.json` syntax
+
+**Function timeout:**
+- Vercel has 10s timeout on Hobby plan
+- Implement caching to reduce response time
+- Upgrade to Pro for 60s timeout
+
+**Redis connection fails:**
+- Verify environment variables are set
+- Check Upstash database is active
+- Test Redis URL with curl
+- Ensure region is correct
+
+**CORS errors:**
+- Set `ORIGIN` environment variable
+- Check allowed origins in `config.js`
+- Verify request headers
+
 ### Docker Issues
-
-**Container exits immediately:**
-```bash
-# Check logs for errors
-docker logs hianime-api-container
-
-# Check if port is available
-lsof -i :3030  # macOS/Linux
-netstat -ano | findstr :3030  # Windows
-```
 
 **Port already in use:**
 ```bash
-# Use a different host port
+# Find process
+lsof -i :3030  # macOS/Linux
+netstat -ano | findstr :3030  # Windows
+
+# Use different port
 docker run -p 3031:3030 hianime-api
-
-# Or kill the process using the port
-kill -9 $(lsof -ti:3030)  # macOS/Linux
 ```
 
-**Cannot connect to Docker daemon:**
+**Container exits immediately:**
 ```bash
-# Linux - Start Docker service
-sudo systemctl start docker
-sudo systemctl enable docker
+# Check logs
+docker logs hianime-api
 
-# macOS/Windows - Restart Docker Desktop
-# Open Docker Desktop and restart from menu
+# Run interactively
+docker run -it hianime-api /bin/sh
 ```
 
-**Permission denied errors:**
+**Build fails:**
 ```bash
-# Linux - Add user to docker group
-sudo usermod -aG docker $USER
-newgrp docker
-
-# Or run with sudo
-sudo docker run -p 3030:3030 hianime-api
-```
-
-**Build fails with dependency errors:**
-```bash
-# Clear Docker cache and rebuild
+# Clear cache and rebuild
 docker build --no-cache -t hianime-api .
 
 # Check Dockerfile syntax
 docker build --progress=plain -t hianime-api .
 ```
 
-**Container runs but API not accessible:**
-```bash
-# Check container is running
-docker ps
-
-# Check container logs
-docker logs hianime-api-container
-
-# Test from inside container
-docker exec -it hianime-api-container curl http://localhost:3030
-
-# Check firewall settings
-sudo ufw status  # Linux
-```
-
-### Render Issues
-
-**Build fails:**
-- Verify `Dockerfile` is in the root directory
-- Check all dependencies are listed in `package.json`
-- Review build logs in Render dashboard under "Logs" tab
-- Ensure branch is set to `master` not `main`
-- Check if Dockerfile syntax is correct
-
-**Application crashes on startup:**
-- Check application logs in "Logs" tab
-- Verify all required environment variables are set
-- Ensure `PORT` environment variable is set to `3030`
-- Check if health check endpoint returns 200 OK
-- Review memory usage (upgrade instance if needed)
-
-**Slow response times:**
-- Consider upgrading from Free tier to Starter ($7/month)
-- Free tier has limited CPU and RAM
-- Implement Redis caching with Upstash
-- Monitor resource usage in dashboard
-- Check if external API (hianime.to) is slow
-
-**Deploy not triggering:**
-- Verify `render.yaml` branch is set to `master`
-- Check if auto-deploy is enabled in settings
-- Manually trigger deploy from dashboard
-- Ensure you're pushing to the correct branch
-
-**"Service Unavailable" errors:**
-- Check if free tier instance is sleeping (takes ~30s to wake)
-- Verify health check endpoint is working
-- Check application logs for errors
-- Ensure PORT matches in code and environment variables
-
-### Replit Issues
-
-**Dependencies not installing:**
-- Delete `.replit` and `replit.nix` files
-- Click "Shell" and run `bun install` manually
-- Restart the Repl
-
-**Port binding errors:**
-- Ensure `PORT` is set correctly in secrets
-- Replit auto-assigns a port; make sure your app listens on `0.0.0.0`
-
-**Repl keeps sleeping:**
-- Free Repls sleep after inactivity
-- Upgrade to Hacker plan for always-on
-- Use UptimeRobot or similar to ping your Repl periodically
-
 ### General Issues
 
 **API not responding:**
-1. Check if the service is running
-2. Verify the correct port is exposed and accessible
-3. Check firewall/security group settings
-4. Review application logs for errors
-5. Test health check endpoint: `curl http://localhost:3030/`
-6. Verify DNS and SSL certificates (for custom domains)
+1. Check service is running
+2. Verify correct port
+3. Test health endpoint: `/ping`
+4. Check firewall settings
+5. Review application logs
 
-**Memory issues:**
-- Increase Docker container memory limit:
-  ```bash
-  docker run -m 512m -p 3030:3030 hianime-api
-  ```
-- Upgrade Render instance type
-- Optimize code and implement proper caching
-- Monitor memory usage with `docker stats`
+**Slow responses:**
+1. Verify Redis is configured
+2. Check cache hit rate in logs
+3. Monitor source website speed
+4. Consider upgrading instance
 
-**Rate limiting from hianime.to:**
-- Implement request caching with Redis
-- Add delays between requests
-- Use multiple instances with load balancing
-- Respect robots.txt and rate limits
-
-**CORS errors:**
-- Add proper CORS headers in your application
-- Configure allowed origins in environment variables
-- Use a reverse proxy with proper CORS configuration
-
-**SSL/HTTPS issues:**
-- Render provides automatic HTTPS
-- For custom domains, verify DNS settings
-- Check SSL certificate status in dashboard
+**Rate limiting errors:**
+1. Implement request caching
+2. Add delays between requests
+3. Respect source website limits
+4. Use multiple instances
 
 ---
 
-## Health Checks
+## Performance Optimization
 
-The API includes a health check endpoint for monitoring.
+### 1. Enable Redis Caching
 
-### Health Check Endpoint
+**Impact**: 90%+ faster responses
 
-**GET** `/`
+```javascript
+// Already implemented in:
+// - src/controllers/homepage.controller.js
+// - src/controllers/detailpage.controller.js
+```
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Welcome to HiAnime API",
-  "version": "1.0.0",
-  "timestamp": "2025-10-28T12:00:00.000Z",
-  "status": "ok"
+### 2. Optimize Cache TTL
+
+```javascript
+// Adjust based on data freshness needs
+await withCache('key', fetchFunction, 60 * 60 * 24); // 24 hours
+```
+
+### 3. Use CDN
+
+- Vercel includes global CDN automatically
+- Reduces latency for global users
+
+### 4. Monitor Performance
+
+**Vercel Analytics:**
+- Enable in Project Settings
+- View response times
+- Identify slow endpoints
+
+**Upstash Metrics:**
+- Monitor cache hit rate
+- Track memory usage
+- Optimize eviction policy
+
+### 5. Implement Rate Limiting
+
+```javascript
+// Already configured in config.js
+rateLimit: {
+  windowMs: 60000,  // 1 minute
+  limit: 100,       // 100 requests
+  enabled: true
 }
 ```
-
-### Docker Health Check
-
-The Dockerfile includes an automatic health check:
-
-```dockerfile
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=40s \
-  CMD curl -f http://localhost:3030/ || exit 1
-```
-
-**Parameters:**
-- `interval`: Check every 30 seconds
-- `timeout`: Wait max 10 seconds for response
-- `retries`: Mark unhealthy after 3 failed checks
-- `start-period`: Grace period of 40 seconds during startup
-
-**Check container health status:**
-```bash
-docker inspect --format='{{.State.Health.Status}}' hianime-api-container
-```
-
-### Render Health Check
-
-Render automatically performs health checks:
-- Path: `/` (root endpoint)
-- Interval: Every 30 seconds
-- Timeout: 10 seconds
-- Unhealthy threshold: 3 consecutive failures
-
-**Custom health check path:**
-1. Go to service Settings in Render Dashboard
-2. Navigate to "Health Check Path"
-3. Enter your custom path (e.g., `/health`)
-4. Save changes
-
-### Monitoring Tools
-
-**UptimeRobot** - Free monitoring:
-1. Sign up at [UptimeRobot](https://uptimerobot.com/)
-2. Add new monitor
-3. Enter your API URL
-4. Set check interval (5 minutes on free plan)
-5. Configure email/SMS alerts
-
-**Healthchecks.io** - Cron monitoring:
-1. Create account at [Healthchecks.io](https://healthchecks.io/)
-2. Create new check
-3. Use the provided URL to ping from your app
-4. Get alerts if pings stop
 
 ---
 
 ## Production Best Practices
 
-### 1. Environment Variables
-- Never commit sensitive data to repository
-- Use `.env` files locally (add to `.gitignore`)
-- Store secrets in platform secret managers
-- Rotate credentials regularly
+### Security
 
-### 2. Security
-- **Enable CORS** appropriately for your use case:
-  ```javascript
-  // Allow specific origins
-  const allowedOrigins = ['https://yourdomain.com'];
-  ```
-- **Implement rate limiting** to prevent abuse:
-  ```javascript
-  // Example: 100 requests per 15 minutes per IP
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100
-  });
-  ```
-- Use HTTPS only (enforced by Render/Railway)
-- Validate and sanitize all inputs
-- Keep dependencies updated
+✅ **Use HTTPS only** (automatic on Vercel)  
+✅ **Set CORS properly** - Don't use `*` in production  
+✅ **Enable rate limiting**  
+✅ **Keep dependencies updated**: `bun update`  
+✅ **Rotate Redis credentials** regularly  
+✅ **Use environment variables** for secrets  
 
-### 3. Monitoring & Logging
-- Set up uptime monitoring (UptimeRobot, Pingdom)
-- Enable application logging:
-  ```javascript
-  console.log('[INFO]', timestamp, message);
-  console.error('[ERROR]', timestamp, error);
-  ```
-- Monitor error rates and response times
-- Set up alerts for downtime or errors
-- Use structured logging (JSON format)
+### Monitoring
 
-### 4. Caching Strategy
-- Implement Redis caching with Upstash
-- Cache frequently requested data
-- Set appropriate TTL (Time To Live) values
-- Use cache-control headers:
-  ```javascript
-  res.setHeader('Cache-Control', 'public, max-age=3600');
-  ```
+✅ **Set up uptime monitoring** (UptimeRobot, Pingdom)  
+✅ **Enable error tracking** (Sentry, LogRocket)  
+✅ **Monitor cache performance**  
+✅ **Track API response times**  
+✅ **Set up alerts** for downtime  
 
-### 5. Performance Optimization
-- Use CDN for static assets (if applicable)
-- Enable gzip compression
-- Optimize database queries
-- Implement pagination for large datasets
-- Use connection pooling
+### Scaling
 
-### 6. Backup & Recovery
-- Regularly backup configurations
-- Document deployment process
-- Keep infrastructure as code (Docker files, YAML configs)
-- Test disaster recovery procedures
-- Version control everything
+✅ **Start with free tier**  
+✅ **Monitor resource usage**  
+✅ **Scale when needed** (Vercel auto-scales)  
+✅ **Use caching** to reduce load  
+✅ **Implement request queuing** for high traffic  
 
-### 7. Scaling
-- **Horizontal scaling**: Add more instances
-- **Vertical scaling**: Upgrade instance size
-- Use load balancing for multiple instances
-- Implement request queuing for high traffic
-- Consider serverless for variable traffic
+### Maintenance
 
-### 8. Updates & Maintenance
-- Keep dependencies updated:
-  ```bash
-  bun update
-  ```
-- Monitor security advisories
-- Schedule regular maintenance windows
-- Test updates in staging before production
-- Use semantic versioning
-
-### 9. Cost Optimization
-- Start with free/cheap tiers
-- Monitor resource usage
-- Scale only when needed
-- Use caching to reduce API calls
-- Implement request coalescing
-
-### 10. Documentation
-- Keep API documentation up-to-date
-- Document deployment procedures
-- Maintain changelog
-- Create runbooks for common issues
-- Share knowledge with team
+✅ **Keep documentation updated**  
+✅ **Test updates in staging**  
+✅ **Use semantic versioning**  
+✅ **Backup configurations**  
+✅ **Document deployment process**  
 
 ---
 
 ## Additional Resources
 
 ### Official Documentation
+- [Vercel Documentation](https://vercel.com/docs)
+- [Upstash Documentation](https://docs.upstash.com/)
 - [Docker Documentation](https://docs.docker.com/)
-- [Docker Compose Documentation](https://docs.docker.com/compose/)
-- [Render Documentation](https://render.com/docs)
 - [Railway Documentation](https://docs.railway.app/)
 - [Bun Documentation](https://bun.sh/docs)
-- [Replit Documentation](https://docs.replit.com/)
 
 ### Project Resources
 - [GitHub Repository](https://github.com/ryanwtf88/hianime-api)
-- [Issues Tracker](https://github.com/ryanwtf88/hianime-api/issues)
 - [API Documentation](https://github.com/ryanwtf88/hianime-api#documentation)
-- [Contributing Guidelines](https://github.com/ryanwtf88/hianime-api/blob/master/CONTRIBUTING.md)
+- [Issues Tracker](https://github.com/ryanwtf88/hianime-api/issues)
+- [Discussions](https://github.com/ryanwtf88/hianime-api/discussions)
 
-### Community & Support
-- [GitHub Discussions](https://github.com/ryanwtf88/hianime-api/discussions)
+### Support
 - [Report Bug](https://github.com/ryanwtf88/hianime-api/issues/new)
 - [Request Feature](https://github.com/ryanwtf88/hianime-api/issues/new)
-
-### Learning Resources
-- [Docker Tutorial](https://docker-curriculum.com/)
-- [Bun Getting Started](https://bun.sh/docs/installation)
-- [REST API Best Practices](https://restfulapi.net/)
-- [Production Deployment Checklist](https://github.com/mtdvio/going-to-production)
+- [Ask Question](https://github.com/ryanwtf88/hianime-api/discussions)
 
 ---
 
-## Need Help?
+**Made with ❤️ by RY4N**
 
-If you encounter any issues:
-
-1. **Check this deployment guide** thoroughly
-2. **Review the [troubleshooting section](#troubleshooting)** for common issues
-3. **Search [existing issues](https://github.com/ryanwtf88/hianime-api/issues)** - someone may have faced the same problem
-4. **Check application logs** - most issues leave traces in logs
-5. **Create a new issue** with:
-   - Detailed description of the problem
-   - Steps to reproduce
-   - Error messages and logs
-   - Environment details (OS, Docker version, etc.)
-   - What you've already tried
-
-**When reporting issues, include:**
-- Deployment method (Docker, Render, etc.)
-- Error messages (full stack trace if available)
-- Environment (OS, versions)
-- Steps you've already taken
-- Relevant configuration files (sanitize sensitive data)
-
----
-
-<div align="center">
-
-**Happy Deploying! 🚀**
-
-Made with ❤️ by RY4N
-
-</div>
+For more deployment options and advanced configurations, see the [README.md](./README.md).

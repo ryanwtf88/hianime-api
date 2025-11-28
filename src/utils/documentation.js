@@ -1,7 +1,9 @@
+import config from '../config/config.js';
+
 const apiDocumentation = {
   generalInfo: {
-    baseUrl: process.env.BASE_URL ? process.env.BASE_URL : 'http://localhost:3000/api/v1',
-    documentationUrl: 'https://github.com/ryanwtf88/hianime-api/blob/main/README.md',
+    baseUrl: `${config.baseUrl}/api/${config.apiVersion}`,
+    documentationUrl: config.documentation.githubUrl,
   },
   endpoints: [
     {
