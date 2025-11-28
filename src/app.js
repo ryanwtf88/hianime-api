@@ -72,6 +72,10 @@ app.get('/ping', (c) => {
 });
 
 app.route('/api/v1', hiAnimeRoutes);
+app.get('/api', async (c) => {
+  const html = await Bun.file('src/views/docs.html').text();
+  return c.html(html);
+});
 app.get('/docs', (c) => c.json(hianimeApiDocs));
 app.get('/', swaggerUI({ url: '/docs' }));
 app.onError((err, c) => {

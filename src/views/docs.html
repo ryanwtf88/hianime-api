@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hianime Video API - Embed Docs</title>
+    <style>
+        :root {
+            --primary: #ffbade;
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --accent: #ffbade;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            margin-bottom: 60px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #fff, #ffbade);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--accent);
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            margin: 30px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            color: var(--text-dim);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .badge-get {
+            background-color: #61affe;
+            color: #000;
+        }
+        
+        code {
+            background-color: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            color: #ffbade;
+        }
+        
+        pre {
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+        
+        .endpoint-box {
+            background-color: var(--surface);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+        
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .param-table th, .param-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .param-table th {
+            color: var(--text-dim);
+            font-weight: normal;
+        }
+        
+        .try-it {
+            margin-top: 40px;
+            padding: 30px;
+            background: #151515;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        
+        input, select {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            background: #000;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hianime Video API</h1>
+            <p>A simple and powerful API to embed anime videos directly from Hianime.</p>
+        </header>
+
+        <section>
+            <h2>API Documentation</h2>
+            <p>Use our player to embed videos easily just in one step. Perfect for anime streaming websites.</p>
+            
+            <div class="endpoint-box">
+                <h3><span class="badge badge-get">GET</span> Embed Endpoint</h3>
+                <pre><code>https://api-animo.vercel.app/api/v1/embed/{episodeId}?type={sub|dub}</code></pre>
+                
+                <h4>Parameters</h4>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>episodeId</code></td>
+                            <td>String</td>
+                            <td>Yes</td>
+                            <td>The episode ID from hianime.to (e.g., <code>136197</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>String</td>
+                            <td>No</td>
+                            <td>Audio type: <code>sub</code> or <code>dub</code> (default: <code>sub</code>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>How to use</h2>
+            <p>1. Go to hianime.to and open an episode.</p>
+            <p>2. Look at the URL: <code>https://hianime.to/watch/anime-name?ep=136197</code></p>
+            <p>3. Copy the number after <code>?ep=</code> (e.g., <code>136197</code>).</p>
+            <p>4. Use it in the embed URL.</p>
+
+            <h3>Example Code</h3>
+            <pre><code>&lt;iframe 
+  src="https://api-animo.vercel.app/api/v1/embed/136197?type=sub" 
+  width="100%" 
+  height="500px" 
+  frameborder="0" 
+  allowfullscreen&gt;
+&lt;/iframe&gt;</code></pre>
+        </section>
+
+        <section class="try-it">
+            <h2>Test Your Embed</h2>
+            <p>Enter an episode ID to test the player.</p>
+            
+            <div>
+                <input type="text" id="epId" placeholder="Episode ID (e.g. 136197)" value="136197">
+                <select id="type">
+                    <option value="sub">Sub</option>
+                    <option value="dub">Dub</option>
+                </select>
+                <button onclick="updatePlayer()">Load Player</button>
+            </div>
+            
+            <iframe id="preview" src=""></iframe>
+            
+            <script>
+                function updatePlayer() {
+                    const id = document.getElementById('epId').value;
+                    const type = document.getElementById('type').value;
+                    const url = `/api/v1/embed/${id}?type=${type}`;
+                    document.getElementById('preview').src = url;
+                }
+                
+                // Load default
+                // updatePlayer(); 
+            </script>
+        </section>
+    </div>
+</body>
+</html>

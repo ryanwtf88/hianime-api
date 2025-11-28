@@ -1,6 +1,6 @@
 import { validationError } from '../utils/errors.js';
-import axios from 'axios';
 import config from '../config/config.js';
+import { load } from 'cheerio';
 
 const embedController = async (c) => {
     const episodeId = c.req.param('episodeId');
@@ -15,113 +15,93 @@ const embedController = async (c) => {
     }
 
     try {
-        const url = `${config.baseurl}/watch?ep=${episodeId}`;
-        console.log(`[Embed] Fetching hianime.to page: ${url}`);
-
-        const headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Referer': config.baseurl,
-            'Origin': config.baseurl
-        };
-
-        const response = await axios.get(url, {
-            headers,
-            timeout: 15000,
-            maxRedirects: 5
+        // Get servers list
+        const serversUrl = `${config.baseurl}/ajax/v2/episode/servers?episodeId=${episodeId}`;
+        const serversResponse = await fetch(serversUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
 
-        let html = response.data;
+        if (!serversResponse.ok) {
+            throw new Error(`Failed to fetch servers: ${serversResponse.status}`);
+        }
 
-        // Fix relative URLs to absolute
-        html = html.replace(/src="\/\//g, 'src="https://');
-        html = html.replace(/href="\/\//g, 'href="https://');
-        html = html.replace(/src="\//g, `src="${config.baseurl}/`);
-        html = html.replace(/href="\//g, `href="${config.baseurl}/`);
+        const serversData = await serversResponse.json();
 
-        const embedEnhancements = `
-            <style id="embed-custom-styles">
-                header, footer, nav, .header, .footer, .navigation,
-                .site-header, .site-footer, .menu, .sidebar,
-                .breadcrumb, .related, .recommendations,
-                .comments, .social, .share, .episode-list,
-                [class*="banner"], [class*="ad-"], [id*="ad-"],
-                [class*="advertisement"], iframe[src*="ads"],
-                .film-stats, .film-buttons, .film-info,
-                .block_area:not(:has(#player-wrapper)),
-                .block_area-content:not(:has(#player)),
-                .container:not(:has(#player-wrapper)),
-                .ani_detail-stage, .prebreadcrumb,
-                #header, #footer, #sidebar,
-                .deslide-wrap, .deslide-item,
-                .film-description, .film-stats-wrap {
-                    display: none !important;
-                }
-                
-                body {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    overflow: hidden !important;
-                    background: #000 !important;
-                }
-                
-                #wrapper, #main-wrapper, .container,
-                #player-wrapper, #player-container,
-                #iframe-embed, .player-frame {
-                    width: 100vw !important;
-                    height: 100vh !important;
-                    max-width: 100vw !important;
-                    max-height: 100vh !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    z-index: 9999 !important;
-                }
-                
-                iframe {
-                    width: 100% !important;
-                    height: 100% !important;
-                    border: none !important;
-                }
-            </style>
-            
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const adSelectors = [
-                        '[class*="ad-"]', '[id*="ad-"]',
-                        '[class*="banner"]', '[class*="advertisement"]',
-                        'header', 'footer', 'nav', '.sidebar',
-                        '.comments', '.related', '.recommendations',
-                        '.film-description', '.film-stats-wrap'
-                    ];
-                    
-                    adSelectors.forEach(selector => {
-                        document.querySelectorAll(selector).forEach(el => {
-                            if (!el.closest('#player-wrapper') && !el.closest('#iframe-embed')) {
-                                el.remove();
-                            }
-                        });
-                    });
-                    
-                    const player = document.querySelector('#player-wrapper') || 
-                                  document.querySelector('#iframe-embed') ||
-                                  document.querySelector('iframe[src*="embed"]');
-                    
-                    if (player) {
-                        document.body.innerHTML = '';
-                        document.body.appendChild(player);
-                        player.style.cssText = 'width: 100vw !important; height: 100vh !important; position: fixed !important; top: 0 !important; left: 0 !important;';
+        if (!serversData.status || !serversData.html) {
+            throw new Error('Invalid servers response');
+        }
+
+        // Parse servers HTML to get server ID
+        const $ = load(serversData.html);
+        const serverItem = $(`.server-item[data-type="${type}"]`).first();
+
+        if (!serverItem.length) {
+            throw new Error(`No ${type} server found`);
+        }
+
+        const serverId = serverItem.attr('data-id');
+
+        if (!serverId) {
+            throw new Error('Server ID not found');
+        }
+
+        // Get player iframe
+        const sourcesUrl = `${config.baseurl}/ajax/v2/episode/sources?id=${serverId}`;
+        const sourcesResponse = await fetch(sourcesUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!sourcesResponse.ok) {
+            throw new Error(`Failed to fetch sources: ${sourcesResponse.status}`);
+        }
+
+        const sourcesData = await sourcesResponse.json();
+
+        if (!sourcesData.link) {
+            throw new Error('Player link not found');
+        }
+
+        // Create embed HTML with iframe
+        const embedHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Anime Player</title>
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
                     }
-                });
-            </script>
+                    body {
+                        background: #000;
+                        overflow: hidden;
+                    }
+                    iframe {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100vw;
+                        height: 100vh;
+                        border: none;
+                    }
+                </style>
+            </head>
+            <body>
+                <iframe src="${sourcesData.link}" allowfullscreen></iframe>
+            </body>
+            </html>
         `;
 
-        html = html.replace('</head>', `${embedEnhancements}</head>`);
-
-        return c.html(html);
+        return c.html(embedHtml);
 
     } catch (error) {
         console.error('[Embed] Error:', error.message);
@@ -160,9 +140,10 @@ const embedController = async (c) => {
             </head>
             <body>
                 <div class="error">
-                    <h1>⚠️ Error</h1>
+                    <h1>Error</h1>
                     <p>Failed to load video player</p>
                     <p style="font-size: 14px; margin-top: 20px;">Episode ID: ${episodeId}</p>
+                    <p style="font-size: 12px; color: #ff5555; margin-top: 10px;">${error.message}</p>
                 </div>
             </body>
             </html>
