@@ -17,6 +17,7 @@ import nextEpisodeSchaduleController from '../controllers/nextEpisodeSchadule.co
 import filterController from '../controllers/filter.controller.js';
 import filterOptions from '../utils/filter.js';
 import clearCacheController from '../controllers/clearCache.controller.js';
+import embedController from '../controllers/embedController.js';
 
 import schedulesController from '../controllers/schedules.controller.js';
 
@@ -40,6 +41,7 @@ router.get('/character/:id', handler(characterDetailConroller));
 router.get('/episodes/:id', handler(episodesController));
 router.get('/servers', handler(serversController));
 router.get('/stream', handler(streamController));
+router.get('/embed/:episodeId', handler(embedController));
 router.get('/genres', handler(allGenresController));
 router.get('/admin/clear-cache', handler(clearCacheController));
 
