@@ -13,7 +13,6 @@ const listpageController = async (c) => {
     'top-upcoming',
     'genre',
     'producer',
-    'studio',
     'az-list',
     'subbed-anime',
     'dubbed-anime',
@@ -33,10 +32,10 @@ const listpageController = async (c) => {
 
   const page = c.req.query('page') || 1;
 
-  if ((query === 'genre' || query === 'producer' || query === 'studio') && !category) {
+  if ((query === 'genre' || query === 'producer') && !category) {
     throw new validationError(`category is require for query ${query}`);
   }
-  if (query !== 'genre' && query !== 'producer' && query !== 'studio' && query !== 'az-list' && category) {
+  if (query !== 'genre' && query !== 'producer' && query !== 'az-list' && category) {
     category = null;
   }
 

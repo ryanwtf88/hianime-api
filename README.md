@@ -337,7 +337,6 @@ GET /api/v1/animes/:query/:category?page=:page
 | `top-upcoming` | No | - |
 | `genre` | Yes | action, adventure, cars, comedy, dementia, demons, drama, ecchi, fantasy, game, harem, historical, horror, isekai, josei, kids, magic, martial arts, mecha, military, music, mystery, parody, police, psychological, romance, samurai, school, sci-fi, seinen, shoujo, shoujo ai, shounen, shounen ai, slice of life, space, sports, super power, supernatural, thriller, vampire |
 | `producer` | Yes | Any producer slug (e.g., bones, toei-animation, mappa) |
-| `studio` | Yes | Any studio slug (e.g., toei-animation, studio-pierrot) |
 | `az-list` | Yes | 0-9, all, a-z |
 | `subbed-anime` | No | - |
 | `dubbed-anime` | No | - |
