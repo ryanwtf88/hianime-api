@@ -438,14 +438,14 @@ const hianimeApiDocs = {
         responses: { 200: { description: 'Success' } },
       },
     },
-    '/schadule': {
+    '/schedules': {
       get: {
         summary: 'Get anime schedule',
         description: 'Fetches the schedule of anime releases',
         responses: { 200: { description: 'Success' } },
       },
     },
-    '/schadule/next/{id}': {
+    '/schedule/next/{id}': {
       get: {
         summary: 'Get next episode schedule',
         description: 'Fetches the next episode schedule for a specific anime',

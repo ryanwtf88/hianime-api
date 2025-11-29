@@ -363,6 +363,14 @@ const apiDocumentation = {
       example: '/schedules?date=2024-01-01',
       description: 'fetches anime schedules for 7 days starting from the given date (or today).',
     },
+    {
+      name: 'next episode schedule',
+      endpoint: '/schedule/next/:id',
+      hasParams: true,
+      hasQueries: false,
+      example: '/schedule/next/one-piece-100',
+      description: 'fetches the next episode schedule for a specific anime.',
+    },
   ],
 };
 export default apiDocumentation;

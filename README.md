@@ -81,6 +81,12 @@ hianime-api is a comprehensive RESTful API that provides endpoints to retrieve a
 
 3. The content that this API provides is not mine, nor is it hosted by me. These belong to their respective owners. This API just demonstrates how to build an API that scrapes websites and uses their content.
 
+## Used By
+
+This API is used by the following projects:
+
+- **[Animo](https://animo.qzz.io/)**: A comprehensive anime streaming platform that leverages this API for real-time anime data, schedules, and streaming links. Check it out to see the API in action!
+
 ---
 
 ## Installation
