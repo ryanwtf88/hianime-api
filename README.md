@@ -41,25 +41,25 @@
   - [Anime Episodes](#12-get-anime-episodes)
   - [Episode Servers](#13-get-anime-episode-servers)
   - [Streaming Links](#14-get-anime-episode-streaming-links)
-  - [All Genres](#15-get-all-genres)
-  - [Top Airing](#16-get-top-airing)
-  - [Most Popular](#17-get-most-popular)
-  - [Most Favorite](#18-get-most-favorite)
-  - [Completed Anime](#19-get-completed-anime)
-  - [Recently Added](#20-get-recently-added)
-  - [Recently Updated](#21-get-recently-updated)
-  - [Top Upcoming](#22-get-top-upcoming)
-  - [Genre List](#23-get-anime-by-genre)
-  - [Producer List](#24-get-anime-by-producer)
-  - [Subbed Anime](#25-get-subbed-anime)
-  - [Dubbed Anime](#26-get-dubbed-anime)
-  - [Movies](#27-get-anime-movies)
-  - [TV Series](#28-get-tv-series)
-  - [OVA](#29-get-ova)
-  - [ONA](#30-get-ona)
-  - [Special](#31-get-special)
-  - [Events](#32-get-events)
-  - [Clear Cache](#33-clear-redis-cache)
+  - [All Genres](#16-get-all-genres)
+  - [Top Airing](#17-get-top-airing)
+  - [Most Popular](#18-get-most-popular)
+  - [Most Favorite](#19-get-most-favorite)
+  - [Completed Anime](#20-get-completed-anime)
+  - [Recently Added](#21-get-recently-added)
+  - [Recently Updated](#22-get-recently-updated)
+  - [Top Upcoming](#23-get-top-upcoming)
+  - [Genre List](#24-get-anime-by-genre)
+  - [Producer List](#25-get-anime-by-producer)
+  - [Subbed Anime](#26-get-subbed-anime)
+  - [Dubbed Anime](#27-get-dubbed-anime)
+  - [Movies](#28-get-anime-movies)
+  - [TV Series](#29-get-tv-series)
+  - [OVA](#30-get-ova)
+  - [ONA](#31-get-ona)
+  - [Special](#32-get-special)
+  - [Events](#33-get-events)
+  - [Clear Cache](#34-clear-redis-cache)
 - [Development](#development)
 - [Contributors](#contributors)
 - [Acknowledgments](#acknowledgments)
@@ -73,7 +73,7 @@ hianime-api is a comprehensive RESTful API that provides endpoints to retrieve a
 
 ## Important Notice
 
-> **⚠️ Disclaimer**
+> ![Disclaimer](https://img.shields.io/badge/Disclaimer-red?style=for-the-badge&logo=alert&logoColor=white)
 
 1. This API is recommended for **personal use only**. Deploy your own instance and customize it as needed.
 
@@ -183,7 +183,7 @@ Then run:
 docker-compose up -d
 ```
 
-### Vercel Deployment (Serverless) ⭐ Recommended
+### Vercel Deployment (Serverless) ![Recommended](https://img.shields.io/badge/Recommended-blue?style=flat-square)
 
 **One-Click Deploy:**
 
@@ -204,12 +204,12 @@ docker-compose up -d
 5. Click "Deploy"
 
 **Why Vercel?**
-- ✅ Serverless architecture with automatic scaling
-- ✅ Global CDN for fast response times
-- ✅ Free tier with generous limits
-- ✅ Automatic HTTPS and custom domains
-- ✅ Git-based deployments (auto-deploy on push)
-- ✅ Built-in Redis support via Upstash
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Serverless architecture with automatic scaling
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Global CDN for fast response times
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with generous limits
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic HTTPS and custom domains
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Git-based deployments (auto-deploy on push)
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Built-in Redis support via Upstash
 
 **Environment Variables:**
 
@@ -222,7 +222,7 @@ docker-compose up -d
 | `RATE_LIMIT_WINDOW_MS` | `60000` | No |
 | `RATE_LIMIT_LIMIT` | `100` | No |
 
-📖 For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ### Replit Deployment
 
@@ -894,7 +894,7 @@ console.log(data);
 
 ---
 
-### 15. GET All Genres
+### 16. GET All Genres
 
 Retrieve all available anime genres.
 
@@ -931,7 +931,7 @@ console.log(data);
 
 ---
 
-### 16. GET Top Airing
+### 17. GET Top Airing
 
 Retrieve currently airing top anime.
 
@@ -950,7 +950,7 @@ console.log(data);
 
 ---
 
-### 17. GET Most Popular
+### 18. GET Most Popular
 
 Retrieve most popular anime.
 
@@ -969,7 +969,7 @@ console.log(data);
 
 ---
 
-### 18. GET Most Favorite
+### 19. GET Most Favorite
 
 Retrieve most favorited anime.
 
@@ -988,7 +988,7 @@ console.log(data);
 
 ---
 
-### 19. GET Completed Anime
+### 20. GET Completed Anime
 
 Retrieve completed anime series.
 
@@ -1007,7 +1007,7 @@ console.log(data);
 
 ---
 
-### 20. GET Recently Added
+### 21. GET Recently Added
 
 Retrieve recently added anime.
 
@@ -1026,7 +1026,7 @@ console.log(data);
 
 ---
 
-### 21. GET Recently Updated
+### 22. GET Recently Updated
 
 Retrieve recently updated anime.
 
@@ -1045,7 +1045,7 @@ console.log(data);
 
 ---
 
-### 22. GET Top Upcoming
+### 23. GET Top Upcoming
 
 Retrieve top upcoming anime.
 
@@ -1064,7 +1064,7 @@ console.log(data);
 
 ---
 
-### 23. GET Anime by Genre
+### 24. GET Anime by Genre
 
 Retrieve anime filtered by specific genre.
 
@@ -1085,7 +1085,7 @@ console.log(data);
 
 ---
 
-### 24. GET Anime by Producer
+### 25. GET Anime by Producer
 
 Retrieve anime filtered by production studio or company.
 
@@ -1136,7 +1136,7 @@ console.log(data);
 
 ---
 
-### 25. GET Subbed Anime
+### 26. GET Subbed Anime
 
 Retrieve anime with subtitles available.
 
@@ -1155,7 +1155,7 @@ console.log(data);
 
 ---
 
-### 26. GET Dubbed Anime
+### 27. GET Dubbed Anime
 
 Retrieve anime with English dub available.
 
@@ -1174,7 +1174,7 @@ console.log(data);
 
 ---
 
-### 27. GET Anime Movies
+### 28. GET Anime Movies
 
 Retrieve anime movies.
 
@@ -1193,7 +1193,7 @@ console.log(data);
 
 ---
 
-### 28. GET TV Series
+### 29. GET TV Series
 
 Retrieve anime TV series.
 
@@ -1212,7 +1212,7 @@ console.log(data);
 
 ---
 
-### 29. GET OVA
+### 30. GET OVA
 
 Retrieve Original Video Animation (OVA) content.
 
@@ -1231,7 +1231,7 @@ console.log(data);
 
 ---
 
-### 30. GET ONA
+### 31. GET ONA
 
 Retrieve Original Net Animation (ONA) content.
 
@@ -1250,7 +1250,7 @@ console.log(data);
 
 ---
 
-### 31. GET Special
+### 32. GET Special
 
 Retrieve special anime episodes.
 
@@ -1269,7 +1269,7 @@ console.log(data);
 
 ---
 
-### 32. GET Events
+### 33. GET Events
 
 Retrieve anime events.
 
@@ -1288,7 +1288,7 @@ console.log(data);
 
 ---
 
-### 33. Clear Redis Cache
+### 34. Clear Redis Cache
 
 Clear all cached data from Redis. Useful for forcing fresh data retrieval.
 
@@ -1375,7 +1375,7 @@ If you find this project useful, please consider giving it a star on GitHub!
 
 <div align="center">
 
-**Made with ❤️ by RY4N**
+**Made by RY4N**
 
 [Report Bug](https://github.com/ryanwtf88/hianime-api/issues) • [Request Feature](https://github.com/ryanwtf88/hianime-api/issues)
 
