@@ -1,6 +1,6 @@
-import { extractListPage } from '../extractor/extractListpage';
-import { axiosInstance } from '../services/axiosInstance';
-import { NotFoundError, validationError } from '../utils/errors';
+import { extractListPage } from '../extractor/extractListpage.js';
+import { axiosInstance } from '../services/axiosInstance.js';
+import { NotFoundError, validationError } from '../utils/errors.js';
 
 const listpageController = async (c) => {
   const validateQueries = [
@@ -12,6 +12,7 @@ const listpageController = async (c) => {
     'recently-updated',
     'top-upcoming',
     'genre',
+    'producer',
     'az-list',
     'subbed-anime',
     'dubbed-anime',
@@ -31,10 +32,10 @@ const listpageController = async (c) => {
 
   const page = c.req.query('page') || 1;
 
-  if (query === 'genre' && !category) {
+  if ((query === 'genre' || query === 'producer') && !category) {
     throw new validationError(`category is require for query ${query}`);
   }
-  if (query !== 'genre' && query !== 'az-list' && category) {
+  if (query !== 'genre' && query !== 'producer' && query !== 'az-list' && category) {
     category = null;
   }
 

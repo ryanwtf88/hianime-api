@@ -1,8 +1,8 @@
 import config from '../config/config.js';
 
 const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second base delay
-const TIMEOUT = 10000; // 10 seconds
+const RETRY_DELAY = 1000;
+const TIMEOUT = 10000;
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -13,7 +13,6 @@ export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
       if (attempt > 0) {
-        // Exponential backoff: wait longer with each retry
         const delay = RETRY_DELAY * Math.pow(2, attempt - 1);
         console.log(`Retry attempt ${attempt + 1}/${retries} after ${delay}ms delay...`);
         await sleep(delay);
@@ -40,8 +39,7 @@ export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
       clearTimeout(timeoutId);
       
       console.log(`Response status: ${response.status}`);
-      
-      // Handle rate limiting with retry
+     
       if (response.status === 429) {
         const retryAfter = response.headers.get('retry-after');
         const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : RETRY_DELAY * 2;
@@ -50,7 +48,6 @@ export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
         continue;
       }
 
-      // Handle server errors with retry
       if (response.status >= 500 && response.status < 600) {
         throw new Error(`Server error: HTTP ${response.status}`);
       }
@@ -79,13 +76,10 @@ export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
         lastError = new Error('Request timeout - the external API took too long to respond');
       }
 
-      // Don't retry on certain errors
       if (error.message.includes('HTTP 40') && !error.message.includes('429')) {
-        // Client errors (except 429) should not be retried
         break;
       }
 
-      // If this is the last attempt, we'll return the error
       if (attempt === retries - 1) {
         break;
       }

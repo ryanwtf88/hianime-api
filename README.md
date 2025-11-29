@@ -24,7 +24,7 @@
   - [Local Setup](#local-setup)
 - [Deployment](#deployment)
   - [Docker Deployment](#docker-deployment)
-  - [Render Deployment](#render-deployment)
+  - [Vercel Deployment](#vercel-deployment-serverless--recommended)
   - [Replit Deployment](#replit-deployment)
 - [Documentation](#documentation)
   - [Anime Home Page](#1-get-anime-home-page)
@@ -41,23 +41,25 @@
   - [Anime Episodes](#12-get-anime-episodes)
   - [Episode Servers](#13-get-anime-episode-servers)
   - [Streaming Links](#14-get-anime-episode-streaming-links)
-  - [All Genres](#15-get-all-genres)
-  - [Top Airing](#16-get-top-airing)
-  - [Most Popular](#17-get-most-popular)
-  - [Most Favorite](#18-get-most-favorite)
-  - [Completed Anime](#19-get-completed-anime)
-  - [Recently Added](#20-get-recently-added)
-  - [Recently Updated](#21-get-recently-updated)
-  - [Top Upcoming](#22-get-top-upcoming)
-  - [Genre List](#23-get-anime-by-genre)
-  - [Subbed Anime](#24-get-subbed-anime)
-  - [Dubbed Anime](#25-get-dubbed-anime)
-  - [Movies](#26-get-anime-movies)
-  - [TV Series](#27-get-tv-series)
-  - [OVA](#28-get-ova)
-  - [ONA](#29-get-ona)
-  - [Special](#30-get-special)
-  - [Events](#31-get-events)
+  - [All Genres](#16-get-all-genres)
+  - [Top Airing](#17-get-top-airing)
+  - [Most Popular](#18-get-most-popular)
+  - [Most Favorite](#19-get-most-favorite)
+  - [Completed Anime](#20-get-completed-anime)
+  - [Recently Added](#21-get-recently-added)
+  - [Recently Updated](#22-get-recently-updated)
+  - [Top Upcoming](#23-get-top-upcoming)
+  - [Genre List](#24-get-anime-by-genre)
+  - [Producer List](#25-get-anime-by-producer)
+  - [Subbed Anime](#26-get-subbed-anime)
+  - [Dubbed Anime](#27-get-dubbed-anime)
+  - [Movies](#28-get-anime-movies)
+  - [TV Series](#29-get-tv-series)
+  - [OVA](#30-get-ova)
+  - [ONA](#31-get-ona)
+  - [Special](#32-get-special)
+  - [Events](#33-get-events)
+  - [Clear Cache](#34-clear-redis-cache)
 - [Development](#development)
 - [Contributors](#contributors)
 - [Acknowledgments](#acknowledgments)
@@ -71,13 +73,19 @@ hianime-api is a comprehensive RESTful API that provides endpoints to retrieve a
 
 ## Important Notice
 
-> **⚠️ Disclaimer**
+> ![Disclaimer](https://img.shields.io/badge/Disclaimer-red?style=for-the-badge&logo=alert&logoColor=white)
 
 1. This API is recommended for **personal use only**. Deploy your own instance and customize it as needed.
 
 2. This API is just an **unofficial API for [hianime.to](https://hianime.to)** and is in no other way officially related to the same.
 
 3. The content that this API provides is not mine, nor is it hosted by me. These belong to their respective owners. This API just demonstrates how to build an API that scrapes websites and uses their content.
+
+## Used By
+
+This API is used by the following projects:
+
+- **[Animo](https://animo.qzz.io/)**: A comprehensive anime streaming platform that leverages this API for real-time anime data, schedules, and streaming links. Check it out to see the API in action!
 
 ---
 
@@ -181,38 +189,46 @@ Then run:
 docker-compose up -d
 ```
 
-### Render Deployment
+### Vercel Deployment (Serverless) ![Recommended](https://img.shields.io/badge/Recommended-blue?style=flat-square)
 
 **One-Click Deploy:**
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ryanwtf88/hianime-api)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ryanwtf88/hianime-api)
 
 **Manual Deployment:**
 
 1. Fork or clone the repository to your GitHub account
-2. Create a new Web Service on [Render Dashboard](https://dashboard.render.com/)
-3. Connect your GitHub repository
-4. Configure the service:
-   - **Name**: `hianime-api`
-   - **Region**: Choose your preferred region
-   - **Branch**: `master`
-   - **Runtime**: Docker
-   - **Instance Type**: Free or paid plan
-5. Add environment variables:
-   - `NODE_ENV=production`
-   - `PORT=3030`
-6. Click "Create Web Service"
+2. Sign up at [Vercel](https://vercel.com)
+3. Create a new project and import your repository
+4. Configure environment variables in Vercel Dashboard:
+   - `UPSTASH_REDIS_REST_URL` (Required - Get from [Upstash](https://upstash.com))
+   - `UPSTASH_REDIS_REST_TOKEN` (Required)
+   - `ORIGIN=*` (or your frontend domain)
+   - `RATE_LIMIT_ENABLED=true`
+   - `RATE_LIMIT_WINDOW_MS=60000`
+   - `RATE_LIMIT_LIMIT=100`
+5. Click "Deploy"
+
+**Why Vercel?**
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Serverless architecture with automatic scaling
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Global CDN for fast response times
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with generous limits
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic HTTPS and custom domains
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Git-based deployments (auto-deploy on push)
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Built-in Redis support via Upstash
 
 **Environment Variables:**
 
 | Key | Value | Required |
 |-----|-------|----------|
-| `NODE_ENV` | `production` | Yes |
-| `PORT` | `3030` | Yes |
-| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Optional* |
-| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Optional* |
+| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Yes |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Yes |
+| `ORIGIN` | `*` or your domain | No |
+| `RATE_LIMIT_ENABLED` | `true` | No |
+| `RATE_LIMIT_WINDOW_MS` | `60000` | No |
+| `RATE_LIMIT_LIMIT` | `100` | No |
 
-*Required if you're using Redis for caching
+For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ### Replit Deployment
 
@@ -272,49 +288,19 @@ console.log(data);
 
 ---
 
-### 2. GET Anime Schedule
-
-Retrieve the schedule of anime releases.
-
-**Endpoint:**
-```
-GET /api/v1/schadule
-```
-
-**Request Example:**
-
-```javascript
-const resp = await fetch('/api/v1/schadule');
-const data = await resp.json();
-console.log(data);
-```
-
-**Response Schema:**
-
-```javascript
-{
-  "success": true,
-  "data": {
-    "scheduledAnimes": [...]
-  }
-}
-```
-
----
-
-### 3. GET Next Episode Schedule
+### 2. GET Next Episode Schedule
 
 Get the next episode schedule for a specific anime.
 
 **Endpoint:**
 ```
-GET /api/v1/schadule/next/:id
+GET /api/v1/schedule/next/:id
 ```
 
 **Request Example:**
 
 ```javascript
-const resp = await fetch('/api/v1/schadule/next/one-piece-100');
+const resp = await fetch('/api/v1/schedule/next/one-piece-100');
 const data = await resp.json();
 console.log(data);
 ```
@@ -356,6 +342,7 @@ GET /api/v1/animes/:query/:category?page=:page
 | `recently-updated` | No | - |
 | `top-upcoming` | No | - |
 | `genre` | Yes | action, adventure, cars, comedy, dementia, demons, drama, ecchi, fantasy, game, harem, historical, horror, isekai, josei, kids, magic, martial arts, mecha, military, music, mystery, parody, police, psychological, romance, samurai, school, sci-fi, seinen, shoujo, shoujo ai, shounen, shounen ai, slice of life, space, sports, super power, supernatural, thriller, vampire |
+| `producer` | Yes | Any producer slug (e.g., bones, toei-animation, mappa) |
 | `az-list` | Yes | 0-9, all, a-z |
 | `subbed-anime` | No | - |
 | `dubbed-anime` | No | - |
@@ -452,7 +439,7 @@ console.log(data);
     "status": "Finished Airing",
     "MAL_score": "8.52",
     "genres": [...],
-    "studios": "Wit Studio",
+    "studios": ["wit-studio"],
     "producers": [...],
     "moreSeasons": [...],
     "related": [...],
@@ -826,7 +813,7 @@ GET /api/v1/stream?id=:episodeId&server=:server&type=:type
 **Request Example:**
 
 ```javascript
-const resp = await fetch('/api/v1/stream?id=steinsgate-3?ep=213&server=hd-1&type=sub');
+const resp = await fetch('/api/v1/stream?id=102994&server=hd-2&type=sub');
 const data = await resp.json();
 console.log(data);
 ```
@@ -837,36 +824,83 @@ console.log(data);
 {
   "success": true,
   "data": {
+    "id": "steinsgate-3::ep=136197",
+    "type": "dub",
+    "link": {
+      "file": "https://loda-lassan/master.m3u8",
+      "type": "hls"
+    },
     "tracks": [
       {
-        "file": "https://...",
+        "file": "https://loda-lassan/eng-2.vtt",
         "label": "English",
-        "kind": "captions"
+        "kind": "captions",
+        "default": true
+      },
+      {
+        "file": "https://loda-lassan.vtt",
+        "kind": "thumbnails"
       }
     ],
     "intro": {
-      "start": 75,
-      "end": 165
+      "start": 81,
+      "end": 170
     },
     "outro": {
-      "start": 1330,
-      "end": 1419
+      "start": 1315,
+      "end": 1404
     },
-    "sources": [
-      {
-        "url": "https://...",
-        "type": "hls"
-      }
-    ],
-    "anilistID": 9253,
-    "malID": 9253
+    "server": "HD-2"
   }
 }
 ```
 
 ---
 
-### 15. GET All Genres
+### 15. GET Anime Schedules (7 Days)
+
+Retrieve anime schedules for 7 days starting from the given date (or today).
+
+**Endpoint:**
+```
+GET /api/v1/schedules
+```
+
+**Query Parameters:**
+
+- `date` - Start date in YYYY-MM-DD format (optional, defaults to today)
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/schedules?date=2024-01-01');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "2024-01-01": [
+      {
+        "id": "anime-id",
+        "time": "10:30",
+        "title": "Anime Title",
+        "jname": "Japanese Title",
+        "episode": 12
+      }
+    ],
+    "2024-01-02": [ ... ]
+  }
+}
+```
+
+---
+
+### 16. GET All Genres
 
 Retrieve all available anime genres.
 
@@ -903,7 +937,7 @@ console.log(data);
 
 ---
 
-### 16. GET Top Airing
+### 17. GET Top Airing
 
 Retrieve currently airing top anime.
 
@@ -922,7 +956,7 @@ console.log(data);
 
 ---
 
-### 17. GET Most Popular
+### 18. GET Most Popular
 
 Retrieve most popular anime.
 
@@ -941,7 +975,7 @@ console.log(data);
 
 ---
 
-### 18. GET Most Favorite
+### 19. GET Most Favorite
 
 Retrieve most favorited anime.
 
@@ -960,7 +994,7 @@ console.log(data);
 
 ---
 
-### 19. GET Completed Anime
+### 20. GET Completed Anime
 
 Retrieve completed anime series.
 
@@ -979,7 +1013,7 @@ console.log(data);
 
 ---
 
-### 20. GET Recently Added
+### 21. GET Recently Added
 
 Retrieve recently added anime.
 
@@ -998,7 +1032,7 @@ console.log(data);
 
 ---
 
-### 21. GET Recently Updated
+### 22. GET Recently Updated
 
 Retrieve recently updated anime.
 
@@ -1017,7 +1051,7 @@ console.log(data);
 
 ---
 
-### 22. GET Top Upcoming
+### 23. GET Top Upcoming
 
 Retrieve top upcoming anime.
 
@@ -1036,7 +1070,7 @@ console.log(data);
 
 ---
 
-### 23. GET Anime by Genre
+### 24. GET Anime by Genre
 
 Retrieve anime filtered by specific genre.
 
@@ -1057,7 +1091,58 @@ console.log(data);
 
 ---
 
-### 24. GET Subbed Anime
+### 25. GET Anime by Producer
+
+Retrieve anime filtered by production studio or company.
+
+**Endpoint:**
+```
+GET /api/v1/animes/producer/:producer?page=:page
+```
+
+**Producer Examples:** bones, toei-animation, mappa, ufotable, kyoto-animation, wit-studio, madhouse, a-1-pictures, trigger, cloverworks
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/animes/producer/bones?page=1');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "pageInfo": {
+      "totalPages": 15,
+      "currentPage": 1,
+      "hasNextPage": true
+    },
+    "animes": [
+      {
+        "title": "My Hero Academia",
+        "alternativeTitle": "Boku no Hero Academia",
+        "id": "my-hero-academia-67",
+        "poster": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/...",
+        "episodes": {
+          "sub": 13,
+          "dub": 13,
+          "eps": 13
+        },
+        "type": "TV",
+        "duration": "24m"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 26. GET Subbed Anime
 
 Retrieve anime with subtitles available.
 
@@ -1076,7 +1161,7 @@ console.log(data);
 
 ---
 
-### 25. GET Dubbed Anime
+### 27. GET Dubbed Anime
 
 Retrieve anime with English dub available.
 
@@ -1095,7 +1180,7 @@ console.log(data);
 
 ---
 
-### 26. GET Anime Movies
+### 28. GET Anime Movies
 
 Retrieve anime movies.
 
@@ -1114,7 +1199,7 @@ console.log(data);
 
 ---
 
-### 27. GET TV Series
+### 29. GET TV Series
 
 Retrieve anime TV series.
 
@@ -1133,7 +1218,7 @@ console.log(data);
 
 ---
 
-### 28. GET OVA
+### 30. GET OVA
 
 Retrieve Original Video Animation (OVA) content.
 
@@ -1152,7 +1237,7 @@ console.log(data);
 
 ---
 
-### 29. GET ONA
+### 31. GET ONA
 
 Retrieve Original Net Animation (ONA) content.
 
@@ -1171,7 +1256,7 @@ console.log(data);
 
 ---
 
-### 30. GET Special
+### 32. GET Special
 
 Retrieve special anime episodes.
 
@@ -1190,7 +1275,7 @@ console.log(data);
 
 ---
 
-### 31. GET Events
+### 33. GET Events
 
 Retrieve anime events.
 
@@ -1206,6 +1291,44 @@ const resp = await fetch('/api/v1/animes/events?page=1');
 const data = await resp.json();
 console.log(data);
 ```
+
+---
+
+### 34. Clear Redis Cache
+
+Clear all cached data from Redis. Useful for forcing fresh data retrieval.
+
+**Endpoint:**
+```
+GET /api/v1/admin/clear-cache
+```
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/admin/clear-cache');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "success": true,
+    "message": "Cache cleared successfully",
+    "keysCleared": 5
+  }
+}
+```
+
+**Notes:**
+- This endpoint clears ALL cached data
+- Use sparingly as it will impact performance temporarily
+- Returns the number of cache keys that were cleared
+- If Redis is not configured, returns an error message
 
 ---
 
@@ -1258,7 +1381,7 @@ If you find this project useful, please consider giving it a star on GitHub!
 
 <div align="center">
 
-**Made with ❤️ by RY4N**
+**Made by RY4N**
 
 [Report Bug](https://github.com/ryanwtf88/hianime-api/issues) • [Request Feature](https://github.com/ryanwtf88/hianime-api/issues)
 

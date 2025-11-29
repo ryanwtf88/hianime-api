@@ -14,31 +14,22 @@ export default async function extractToken(url) {
 
     const $ = cheerio.load(html);
     const results = {};
-
-    // 1. Meta tag
     const meta = $('meta[name="_gg_fb"]').attr('content');
     if (meta) results.meta = meta;
-
-    // 2. Data attribute
     const dpi = $('[data-dpi]').attr('data-dpi');
     if (dpi) results.dataDpi = dpi;
-
-    // 3. Nonce from empty script
     const nonceScript = $('script[nonce]')
       .filter((i, el) => {
         return $(el).text().includes('empty nonce script');
       })
       .attr('nonce');
     if (nonceScript) results.nonce = nonceScript;
-
-    // 4. JS string assignment: window.<key> = "value";
     const stringAssignRegex = /window\.(\w+)\s*=\s*["']([\w-]+)["']/g;
     const stringMatches = [...html.matchAll(stringAssignRegex)];
     for (const [, key, value] of stringMatches) {
       results[`window.${key}`] = value;
     }
 
-    // 5. JS object assignment: window.<key> = { ... };
     const objectAssignRegex = /window\.(\w+)\s*=\s*(\{[\s\S]*?\});/g;
     const matches = [...html.matchAll(objectAssignRegex)];
     for (const [, varName, rawObj] of matches) {
@@ -52,11 +43,9 @@ export default async function extractToken(url) {
           }
         }
       } catch {
-        // Skip invalid object
       }
     }
 
-    // 6. HTML comment: <!-- _is_th:... -->
     $('*')
       .contents()
       .each(function () {

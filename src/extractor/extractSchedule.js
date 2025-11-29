@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
 
-const extractSchadule = (html) => {
+const extractSchedule = (html) => {
   const $ = load(html);
 
   const response = [];
@@ -24,4 +24,4 @@ const extractSchadule = (html) => {
   });
   return response;
 };
-export default extractSchadule;
+export default extractSchedule;

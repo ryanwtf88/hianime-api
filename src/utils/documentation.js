@@ -1,7 +1,9 @@
+import config from '../config/config.js';
+
 const apiDocumentation = {
   generalInfo: {
-    baseUrl: process.env.BASE_URL ? process.env.BASE_URL : 'http://localhost:3000/api/v1',
-    documentationUrl: 'https://github.com/ryanwtf88/hianime-api/blob/main/README.md',
+    baseUrl: `${config.baseUrl}/api/${config.apiVersion}`,
+    documentationUrl: config.documentation.githubUrl,
   },
   endpoints: [
     {
@@ -166,7 +168,6 @@ const apiDocumentation = {
       example: '/animes/genre/action?page=3',
       description: 'Fetches anime based on specific genres.',
     },
-
     {
       name: 'Subbed Anime',
       endpoint: '/animes/subbed-anime',
@@ -349,8 +350,26 @@ const apiDocumentation = {
       hasQueries: true,
       queriesList: ['id', 'type', 'server'],
       defaultQueries: { type: 'sub', server: 'hd-2' },
-      example: '/stream?type=dub&server=hd-4&id=steinsgate-3::ep=213',
+      example: '/stream?type=sub&server=hd-2&id=102994',
       description: 'fetches episode source based on episode id.',
+    },
+    {
+      name: 'schedules',
+      endpoint: '/schedules',
+      hasParams: false,
+      hasQueries: true,
+      queriesList: ['date'],
+      defaultQueries: { date: 'YYYY-MM-DD' },
+      example: '/schedules?date=2024-01-01',
+      description: 'fetches anime schedules for 7 days starting from the given date (or today).',
+    },
+    {
+      name: 'next episode schedule',
+      endpoint: '/schedule/next/:id',
+      hasParams: true,
+      hasQueries: false,
+      example: '/schedule/next/one-piece-100',
+      description: 'fetches the next episode schedule for a specific anime.',
     },
   ],
 };

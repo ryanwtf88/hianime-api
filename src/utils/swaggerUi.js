@@ -1,15 +1,15 @@
-const base_url = process.env.BASE_URL ? process.env.BASE_URL : 'http://0.0.0.0:3000';
+import config from '../config/config.js';
 
 const hianimeApiDocs = {
   openapi: '3.0.0',
   info: {
     title: 'hianime-api',
-    version: '1.0.0',
+    version: '2.0.0',
     description: 'API Documentation For HiAnime Content Endpoints',
   },
   servers: [
     {
-      url: `${base_url}/api/v1`,
+      url: `${config.baseUrl}/api/${config.apiVersion}`,
     },
   ],
   paths: {
@@ -436,6 +436,81 @@ const hianimeApiDocs = {
           { name: 'server', in: 'query', schema: { type: 'string', default: 'hd-2' } },
         ],
         responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/schedules': {
+      get: {
+        summary: 'Get anime schedule',
+        description: 'Fetches the schedule of anime releases',
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/schedule/next/{id}': {
+      get: {
+        summary: 'Get next episode schedule',
+        description: 'Fetches the next episode schedule for a specific anime',
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+        ],
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/filter/options': {
+      get: {
+        summary: 'Get filter options',
+        description: 'Returns available filter options for anime search',
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/genres': {
+      get: {
+        summary: 'Get all genres',
+        description: 'Fetches a list of all available anime genres',
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/animes/producer/{producer}': {
+      get: {
+        summary: 'Anime by producer',
+        description: 'Fetches anime filtered by production studio/company',
+        parameters: [
+          {
+            name: 'producer',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Producer/studio name slug',
+          },
+          {
+            name: 'page',
+            in: 'query',
+            schema: { type: 'integer', default: 1 },
+          },
+        ],
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/admin/clear-cache': {
+      get: {
+        summary: 'Clear Redis cache',
+        description: 'Clears all cached data from Redis. Returns the number of keys cleared.',
+        responses: {
+          200: {
+            description: 'Cache cleared successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean' },
+                    message: { type: 'string' },
+                    keysCleared: { type: 'integer' },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
