@@ -1,5 +1,6 @@
 {
   "name": "hianime-api",
+  "version": "1.0.0",
   "module": "index.js",
   "type": "module",
   "private": true,
