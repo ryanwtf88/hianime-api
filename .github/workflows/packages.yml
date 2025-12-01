@@ -65,18 +65,14 @@ jobs:
         run: bun audit
         continue-on-error: true
 
-      - name: Check for outdated dependencies
-        run: bun outdated
-        continue-on-error: true
-
       - name: Create quality report
         if: always()
         run: |
           echo "### Code Quality Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Linting completed" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Security audit completed" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Tests executed" >> $GITHUB_STEP_SUMMARY
+          echo "Linting completed" >> $GITHUB_STEP_SUMMARY
+          echo "Security audit completed" >> $GITHUB_STEP_SUMMARY
+          echo "Tests executed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
@@ -110,34 +106,27 @@ jobs:
 
       - name: Build project
         run: |
-          echo "Building project..."
           bun run start &
           SERVER_PID=$!
           sleep 5
           kill $SERVER_PID || true
-          echo "✅ Build successful"
 
       - name: Test API endpoints
         run: |
-          echo "Testing API health..."
           bun run start &
           SERVER_PID=$!
           sleep 5
-          
-          # Test health endpoint
           curl -f http://localhost:5000/ping || exit 1
-          
           kill $SERVER_PID || true
-          echo "✅ API tests passed"
 
       - name: Create build summary
         if: always()
         run: |
           echo "### Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Dependencies installed" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Build completed" >> $GITHUB_STEP_SUMMARY
-          echo "✅ API health check passed" >> $GITHUB_STEP_SUMMARY
+          echo "Dependencies installed" >> $GITHUB_STEP_SUMMARY
+          echo "Build completed" >> $GITHUB_STEP_SUMMARY
+          echo "API health check passed" >> $GITHUB_STEP_SUMMARY
 
   publish:
     name: Publish Package
@@ -200,7 +189,7 @@ jobs:
       - name: Create publish summary
         if: always()
         run: |
-          echo "### 📦 Package Published" >> $GITHUB_STEP_SUMMARY
+          echo "### Package Published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Package:** \`@${{ github.repository_owner }}/hianime-api\`" >> $GITHUB_STEP_SUMMARY
           echo "**Registry:** GitHub Packages" >> $GITHUB_STEP_SUMMARY
@@ -221,7 +210,7 @@ jobs:
     steps:
       - name: Create deployment summary
         run: |
-          echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Status" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ${{ needs.publish.result }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
