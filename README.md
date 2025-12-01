@@ -59,6 +59,9 @@
   - [ONA](#31-get-ona)
   - [Special](#32-get-special)
   - [Events](#33-get-events)
+  - [Anime News](#35-get-anime-news)
+  - [Watch2gether](#36-get-watch2gether-rooms)
+  - [Random Anime](#37-get-random-anime)
   - [Clear Cache](#34-clear-redis-cache)
 - [Development](#development)
 - [Contributors](#contributors)
@@ -99,6 +102,27 @@ Make sure you have Bun.js installed on your system.
 
 ```bash
 https://bun.sh/docs/installation
+```
+
+### NPM Usage
+
+**Run via CLI (npx):**
+
+```bash
+npx @ryanwtf88/hianime-api
+```
+
+**Install as Library:**
+
+```bash
+npm install @ryanwtf88/hianime-api
+```
+
+**Usage as Library:**
+
+```javascript
+import app from '@ryanwtf88/hianime-api';
+// Mount app or use fetch handler
 ```
 
 ### Local Setup
@@ -1346,6 +1370,115 @@ bun run dev
 
 ```bash
 bun start
+```
+
+---
+
+### 35. GET Anime News
+
+Retrieve latest anime news articles.
+
+**Endpoint:**
+```
+GET /api/v1/news?page=:page
+```
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/news?page=1');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "news": [
+      {
+        "id": "article-id",
+        "title": "Article Title",
+        "description": "...",
+        "thumbnail": "https://...",
+        "uploadedAt": "2 hours ago"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 36. GET Watch2gether Rooms
+
+Retrieve active watch party rooms.
+
+**Endpoint:**
+```
+GET /api/v1/watch2gether?room=:filter
+```
+
+**Filters:** `all`, `on_air`, `scheduled`, `waiting`, `ended`
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/watch2gether?room=on_air');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "rooms": [
+      {
+        "id": "room-id",
+        "animeTitle": "One Piece",
+        "roomTitle": "Watch One Piece together",
+        "status": "On-air",
+        "type": "SUB",
+        "episode": "Episode 1"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 37. GET Random Anime
+
+Retrieve a random anime ID.
+
+**Endpoint:**
+```
+GET /api/v1/random
+```
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/random');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "id": "anime-id-123"
+  }
+}
 ```
 
 ---

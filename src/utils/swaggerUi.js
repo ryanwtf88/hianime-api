@@ -490,6 +490,35 @@ const hianimeApiDocs = {
         responses: { 200: { description: 'Success' } },
       },
     },
+    '/news': {
+      get: {
+        summary: 'Get anime news',
+        description: 'Fetches latest anime news articles',
+        parameters: [{ name: 'page', in: 'query', schema: { type: 'integer', default: 1 } }],
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/watch2gether': {
+      get: {
+        summary: 'Get watch2gether rooms',
+        description: 'Fetches active watch party rooms',
+        parameters: [
+          {
+            name: 'room',
+            in: 'query',
+            schema: { type: 'string', enum: ['all', 'on_air', 'scheduled', 'waiting', 'ended'], default: 'all' },
+          },
+        ],
+        responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/random': {
+      get: {
+        summary: 'Get random anime',
+        description: 'Fetches a random anime ID',
+        responses: { 200: { description: 'Success' } },
+      },
+    },
     '/admin/clear-cache': {
       get: {
         summary: 'Clear Redis cache',
