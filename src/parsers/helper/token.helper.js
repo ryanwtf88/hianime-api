@@ -43,6 +43,7 @@ export default async function extractToken(url) {
           }
         }
       } catch {
+        // ignore errors
       }
     }
 

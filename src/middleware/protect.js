@@ -7,7 +7,7 @@ const protect = async (c, next) => {
         if (!ip) throw new NotFoundError('404 Page Not Found');
 
         await next();
-    } catch (error) {
+    } catch {
         throw new NotFoundError('404 Page Not Found');
     }
 };
