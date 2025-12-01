@@ -17,6 +17,9 @@ import nextEpisodeScheduleController from '../controllers/nextEpisodeSchedule.co
 import filterController from '../controllers/filter.controller.js';
 import filterOptions from '../utils/filter.js';
 import clearCacheController from '../controllers/clearCache.controller.js';
+import newsController from '../controllers/news.controller.js';
+import watch2getherController from '../controllers/watch2gether.controller.js';
+import randomController from '../controllers/random.controller.js';
 
 import schedulesController from '../controllers/schedules.controller.js';
 
@@ -41,6 +44,9 @@ router.get('/episodes/:id', handler(episodesController));
 router.get('/servers', handler(serversController));
 router.get('/stream', handler(streamController));
 router.get('/genres', handler(allGenresController));
+router.get('/news', handler(newsController));
+router.get('/watch2gether', handler(watch2getherController));
+router.get('/random', handler(randomController));
 router.get('/admin/clear-cache', handler(clearCacheController));
 
 export default router;
