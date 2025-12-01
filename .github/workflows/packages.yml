@@ -147,22 +147,23 @@ jobs:
 
       - name: Configure package.json for GitHub Packages
         run: |
-          node -e "
-          const fs = require('fs');
-          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-          pkg.name = '@${{ github.repository_owner }}/${pkg.name}';
+          node -e '
+          const fs = require("fs");
+          const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          const owner = "${{ github.repository_owner }}".toLowerCase();
+          pkg.name = "@" + owner + "/" + pkg.name;
           pkg.private = false;
           pkg.publishConfig = {
-            registry: 'https://npm.pkg.github.com',
-            access: 'public'
+            registry: "https://npm.pkg.github.com",
+            access: "public"
           };
-          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-          "
+          fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
+          console.log("Updated package.json name to:", pkg.name);
+          '
 
       - name: Publish to GitHub Packages
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
 
 
