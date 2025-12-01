@@ -1,7 +1,11 @@
 {
   "name": "hianime-api",
   "version": "1.0.0",
-  "module": "index.js",
+  "bin": {
+    "hianime-api": "./index.js"
+  },
+  "main": "./src/app.js",
+  "module": "./src/app.js",
   "type": "module",
   "private": true,
   "peerDependencies": {
