@@ -29,19 +29,26 @@ app.use(
 if (config.rateLimit.enabled) {
   app.use(
     '*',
-    rateLimiter({
-      windowMs: config.rateLimit.windowMs,
-      limit: config.rateLimit.limit,
-      standardHeaders: 'draft-6',
-      keyGenerator: (c) => {
-        const vercelIp = c.req.header('x-vercel-forwarded-for');
-        const cfConnectingIp = c.req.header('cf-connecting-ip');
-        const realIp = c.req.header('x-real-ip');
-        const forwarded = c.req.header('x-forwarded-for');
+    rateLimiter(
+      {
+        windowMs: config.rateLimit.windowMs,
+        limit: config.rateLimit.limit,
+        standardHeaders: 'draft-6',
+        keyGenerator: (c) => {
+          const vercelIp = c.req.header('x-vercel-forwarded-for');
+          const cfConnectingIp = c.req.header('cf-connecting-ip');
+          const realIp = c.req.header('x-real-ip');
+          const forwarded = c.req.header('x-forwarded-for');
 
-        return vercelIp || cfConnectingIp || realIp || forwarded?.split(',')[0].trim() || 'unknown';
-      },
-    })
+          return vercelIp || cfConnectingIp || realIp || forwarded?.split(',')[0].trim() || 'unknown';
+        },
+        skip: (c) => {
+          // Skip rate limiting for proxy and embed endpoints (HLS streaming needs many requests)
+          const path = c.req.path;
+          return path.includes('/proxy') || path.includes('/embed');
+        },
+      }
+    )
   );
 }
 
