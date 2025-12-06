@@ -49,10 +49,8 @@ const proxyController = async (c) => {
                 const encodedUrl = encodeURIComponent(targetUrl);
                 const encodedReferer = encodeURIComponent(referer || 'https://megacloud.tv');
 
-                // Construct proxy URL (point back to this same endpoint)
-                const proxyPath = c.req.path;
-
-                return `${proxyPath}?url=${encodedUrl}&referer=${encodedReferer}`;
+                // Construct proxy URL with absolute path for Vercel compatibility
+                return `/api/v1/proxy?url=${encodedUrl}&referer=${encodedReferer}`;
             });
 
             const newContent = newLines.join('\n');
