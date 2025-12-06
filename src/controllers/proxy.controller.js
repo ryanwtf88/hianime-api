@@ -25,7 +25,19 @@ const proxyController = async (c) => {
         // Add CORS headers
         c.header('Access-Control-Allow-Origin', '*');
         c.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        c.header('Access-Control-Allow-Headers', 'Range, Content-Type');
         c.header('Content-Type', contentType);
+
+        // Copy range headers if present (for seeking)
+        const rangeHeader = response.headers.get('content-range');
+        if (rangeHeader) {
+            c.header('Content-Range', rangeHeader);
+        }
+
+        const acceptRanges = response.headers.get('accept-ranges');
+        if (acceptRanges) {
+            c.header('Accept-Ranges', acceptRanges);
+        }
 
         // If it's an M3U8 playlist, we need to rewrite the internal URLs
         if (contentType.includes('mpegurl') || url.endsWith('.m3u8')) {
@@ -54,15 +66,16 @@ const proxyController = async (c) => {
             });
 
             const newContent = newLines.join('\n');
-            return c.body(newContent);
+            return c.text(newContent);
         }
 
-        // For TS segments or other binary data, return the stream directly
-        return c.body(response.body);
+        // For TS segments or other binary data, return as arrayBuffer
+        const arrayBuffer = await response.arrayBuffer();
+        return c.body(arrayBuffer);
 
     } catch (error) {
         console.error(`Proxy Error for ${url}:`, error.message);
-        return c.text('Proxy Error', 500);
+        return c.text(`Proxy Error: ${error.message}`, 500);
     }
 };
 
