@@ -26,7 +26,9 @@ app.use(
   })
 );
 
-if (config.rateLimit.enabled) {
+// Rate limiting is disabled for Cloudflare Workers due to global scope restrictions
+// Use Cloudflare's built-in rate limiting instead: https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
+if (config.rateLimit.enabled && !config.isCloudflare) {
   app.use(
     '*',
     rateLimiter(

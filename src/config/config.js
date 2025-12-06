@@ -1,9 +1,20 @@
+// Get environment variables from globalThis (Cloudflare Workers) or process.env (Node.js)
+const getEnv = (key, defaultValue = '') => {
+  if (typeof globalThis.CLOUDFLARE_ENV !== 'undefined') {
+    return globalThis.CLOUDFLARE_ENV[key] || defaultValue;
+  }
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key] || defaultValue;
+  }
+  return defaultValue;
+};
+
 const config = {
-  baseurl: process.env.HIANIME_BASE_URL || 'https://hianime.to',
-  baseurl_v2: process.env.HIANIME_BASE_URL_V2 || 'https://aniwatchtv.to',
-  baseUrl: process.env.BASE_URL || 'https://hianime-api.workers.dev',
-  origin: process.env.ORIGIN || '*',
-  port: process.env.PORT || 5000,
+  baseurl: getEnv('HIANIME_BASE_URL', 'https://hianime.to'),
+  baseurl_v2: getEnv('HIANIME_BASE_URL_V2', 'https://aniwatchtv.to'),
+  baseUrl: getEnv('BASE_URL', 'https://hianime-api.workers.dev'),
+  origin: getEnv('ORIGIN', '*'),
+  port: parseInt(getEnv('PORT', '5000')),
 
   apiVersion: 'v1',
 
@@ -12,33 +23,32 @@ const config = {
   },
 
   redis: {
-    url: process.env.UPSTASH_REDIS_REST_URL || 'https://easy-dassie-30340.upstash.io',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || 'AXaEAAIncDJlNTY5YWM4NWQ5ZGE0Mzg1YTljY2ZiOThiZTA3YzE0MHAyMzAzNDA',
+    url: getEnv('UPSTASH_REDIS_REST_URL', 'https://easy-dassie-30340.upstash.io'),
+    token: getEnv('UPSTASH_REDIS_REST_TOKEN', 'AXaEAAIncDJlNTY5YWM4NWQ5ZGE0Mzg1YTljY2ZiOThiZTA3YzE0MHAyMzAzNDA'),
     enabled: true,
   },
 
   providers: {
-    megacloud: process.env.MEGACLOUD_URL || 'https://megacloud.blog',
-    megaplay: process.env.MEGAPLAY_URL || 'https://megaplay.buzz',
-    vidwish: process.env.VIDWISH_URL || 'https://vidwish.live',
-
+    megacloud: getEnv('MEGACLOUD_URL', 'https://megacloud.blog'),
+    megaplay: getEnv('MEGAPLAY_URL', 'https://megaplay.buzz'),
+    vidwish: getEnv('VIDWISH_URL', 'https://vidwish.live'),
   },
 
   rateLimit: {
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60000,
-    limit: parseInt(process.env.RATE_LIMIT_LIMIT) || 1000000000,
-    enabled: process.env.RATE_LIMIT_ENABLED !== 'false',
+    windowMs: parseInt(getEnv('RATE_LIMIT_WINDOW_MS', '60000')),
+    limit: parseInt(getEnv('RATE_LIMIT_LIMIT', '1000000000')),
+    enabled: getEnv('RATE_LIMIT_ENABLED', 'true') !== 'false',
   },
 
   headers: {
-    'User-Agent': process.env.USER_AGENT || 'Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0',
+    'User-Agent': getEnv('USER_AGENT', 'Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0'),
   },
 
-  logLevel: process.env.LOG_LEVEL?.toUpperCase() || 'INFO',
-  enableLogging: process.env.ENABLE_LOGGING === 'true',
+  logLevel: getEnv('LOG_LEVEL', 'INFO').toUpperCase(),
+  enableLogging: getEnv('ENABLE_LOGGING', 'false') === 'true',
 
-  isProduction: process.env.NODE_ENV === 'production',
-  isDevelopment: process.env.NODE_ENV === 'development',
+  isProduction: getEnv('NODE_ENV', 'production') === 'production',
+  isDevelopment: getEnv('NODE_ENV', '') === 'development',
   isCloudflare: true,
 };
 
