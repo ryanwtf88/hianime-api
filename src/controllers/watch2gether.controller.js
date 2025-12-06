@@ -4,8 +4,17 @@ import { extractWatch2gether } from '../extractor/extractWatch2gether.js';
 import { withCache } from '../utils/redis.js';
 import config from '../config/config.js';
 
+const VALID_ROOM_FILTERS = ['all', 'on_air', 'scheduled', 'waiting', 'ended'];
+
 const watch2getherController = async (c) => {
     const room = c.req.query('room') || 'all';
+
+    // Validate room parameter
+    if (!VALID_ROOM_FILTERS.includes(room)) {
+        throw new validationError(
+            `Invalid room filter. Must be one of: ${VALID_ROOM_FILTERS.join(', ')}`
+        );
+    }
 
     return await withCache(
         `watch2gether-${room}`,

@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import app from './src/app.js';
+import { clearAllCache } from './src/utils/redis.js';
 
 const PORT = process.env.PORT || 30074;
 
@@ -12,3 +13,13 @@ Bun.serve({
 console.log(`server is running at http://0.0.0.0:${PORT}`);
 console.log(`docs: http://0.0.0.0:${PORT}/docs`);
 console.log(`swagger: http://0.0.0.0:${PORT}/ui`);
+
+// Clear all cache every 30 minutes to prevent stale data
+const CACHE_CLEAR_INTERVAL = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+setInterval(async () => {
+  console.log('Running scheduled cache clear...');
+  await clearAllCache();
+}, CACHE_CLEAR_INTERVAL);
+
+console.log(`Cache auto-clear scheduled every 30 minutes`);

@@ -5,97 +5,262 @@ import extractToken from '../helper/token.helper.js';
 
 const { baseurl } = config;
 
-export async function megacloud({ selectedServer, id }) {
-  const epID = id.split('ep=').pop();
-  const fallback_1 = 'megaplay.buzz';
-  const fallback_2 = 'vidwish.live';
+const MAX_RETRIES = 2;
+const TIMEOUT = 15000; // 15 seconds
+let cachedKey = null;
+let keyLastFetched = 0;
+const KEY_CACHE_DURATION = 3600000; // 1 hour in milliseconds
+
+/**
+ * Fetch and cache the decryption key
+ */
+async function getDecryptionKey() {
+  const now = Date.now();
+
+  // Return cached key if still valid
+  if (cachedKey && (now - keyLastFetched) < KEY_CACHE_DURATION) {
+    console.log('Using cached decryption key');
+    return cachedKey;
+  }
 
   try {
-    const [{ data: sourcesData }, { data: key }] = await Promise.all([
-      axios.get(`${baseurl}/ajax/v2/episode/sources?id=${selectedServer.id}`),
-      axios.get('https://raw.githubusercontent.com/itzzzme/megacloud-keys/refs/heads/main/key.txt'),
+    const { data: key } = await axios.get(
+      'https://raw.githubusercontent.com/itzzzme/megacloud-keys/refs/heads/main/key.txt',
+      { timeout: 5000 }
+    );
+
+    cachedKey = key.trim();
+    keyLastFetched = now;
+    console.log('Decryption key fetched and cached');
+    return cachedKey;
+  } catch (error) {
+    console.error('Failed to fetch decryption key:', error.message);
+    // Return cached key even if expired as fallback
+    if (cachedKey) {
+      console.log('Using expired cached key as fallback');
+      return cachedKey;
+    }
+    throw new Error('Unable to fetch decryption key');
+  }
+}
+
+/**
+ * Attempt to decrypt sources using primary method
+ */
+async function decryptPrimarySource(baseUrl, sourceId, key) {
+  try {
+    const tokenUrl = `${baseUrl}/${sourceId}?k=1&autoPlay=0&oa=0&asi=1`;
+    console.log('Extracting token from:', tokenUrl);
+
+    const token = await extractToken(tokenUrl);
+    if (!token) {
+      throw new Error('Failed to extract token');
+    }
+
+    console.log('Fetching sources with token...');
+    const { data } = await axios.get(
+      `${baseUrl}/getSources?id=${sourceId}&_k=${token}`,
+      {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Referer': `${baseUrl}/${sourceId}`,
+        },
+        timeout: TIMEOUT,
+      }
+    );
+
+    const encrypted = data?.sources;
+    if (!encrypted) {
+      throw new Error('Encrypted source missing from response');
+    }
+
+    console.log('Decrypting sources...');
+    const decrypted = CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
+
+    if (!decrypted) {
+      throw new Error('Decryption returned empty result');
+    }
+
+    const sources = JSON.parse(decrypted);
+    return { sources, rawData: data };
+  } catch (error) {
+    console.error('Primary source decryption failed:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Attempt fallback sources
+ */
+async function getFallbackSource(epID, serverType, serverName) {
+  const fallbackProviders = [
+    { name: 'megaplay', domain: 'megaplay.buzz' },
+    { name: 'vidwish', domain: 'vidwish.live' },
+    { name: 'streamwish', domain: 'streamwish.to' },
+  ];
+
+  // Select primary fallback based on server name
+  const primaryFallback = serverName.toLowerCase() === 'hd-1'
+    ? fallbackProviders[0]
+    : fallbackProviders[1];
+
+  // Try primary fallback first, then others
+  const orderedProviders = [
+    primaryFallback,
+    ...fallbackProviders.filter(p => p.domain !== primaryFallback.domain)
+  ];
+
+  for (const provider of orderedProviders) {
+    try {
+      console.log(`Trying fallback provider: ${provider.name} (${provider.domain})`);
+
+      const { data: html } = await axios.get(
+        `https://${provider.domain}/stream/s-2/${epID}/${serverType}`,
+        {
+          headers: {
+            'Referer': `https://${provider.domain}/`,
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          timeout: TIMEOUT,
+        }
+      );
+
+      const dataIdMatch = html.match(/data-id=["'](\d+)["']/);
+      const realId = dataIdMatch?.[1];
+
+      if (!realId) {
+        console.log(`Could not extract data-id from ${provider.name}`);
+        continue;
+      }
+
+      console.log(`Fetching sources from ${provider.name} with id: ${realId}`);
+      const { data: fallbackData } = await axios.get(
+        `https://${provider.domain}/stream/getSources?id=${realId}`,
+        {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Referer': `https://${provider.domain}/`,
+          },
+          timeout: TIMEOUT,
+        }
+      );
+
+      if (fallbackData?.sources?.file) {
+        console.log(`Successfully got fallback source from ${provider.name}`);
+        return {
+          sources: [{ file: fallbackData.sources.file }],
+          rawData: fallbackData,
+          provider: provider.name,
+        };
+      }
+    } catch (error) {
+      console.error(`Fallback ${provider.name} failed:`, error.message);
+      continue;
+    }
+  }
+
+  throw new Error('All fallback providers failed');
+}
+
+/**
+ * Main megacloud decryption function
+ */
+export async function megacloud({ selectedServer, id }, retryCount = 0) {
+  const epID = id.split('ep=').pop();
+
+  try {
+    console.log(`\n=== Megacloud Decryption Start (attempt ${retryCount + 1}/${MAX_RETRIES + 1}) ===`);
+    console.log(`Episode ID: ${epID}, Server: ${selectedServer.name}, Type: ${selectedServer.type}`);
+
+    // Fetch sources data and decryption key in parallel
+    const [{ data: sourcesData }, key] = await Promise.all([
+      axios.get(`${baseurl}/ajax/v2/episode/sources?id=${selectedServer.id}`, {
+        timeout: TIMEOUT,
+      }),
+      getDecryptionKey(),
     ]);
 
     const ajaxLink = sourcesData?.link;
-    if (!ajaxLink) throw new Error('Missing link in sourcesData');
+    if (!ajaxLink) {
+      throw new Error('Missing link in sourcesData');
+    }
 
+    console.log('Ajax link:', ajaxLink);
+
+    // Extract source ID from link
     const sourceIdMatch = /\/([^/?]+)\?/.exec(ajaxLink);
     const sourceId = sourceIdMatch?.[1];
-    if (!sourceId) throw new Error('Unable to extract sourceId from link');
+    if (!sourceId) {
+      throw new Error('Unable to extract sourceId from link');
+    }
 
+    // Extract base URL
     const baseUrlMatch = ajaxLink.match(/^(https?:\/\/[^/]+(?:\/[^/]+){3})/);
-    if (!baseUrlMatch) throw new Error('Could not extract base URL from ajaxLink');
+    if (!baseUrlMatch) {
+      throw new Error('Could not extract base URL from ajaxLink');
+    }
     const baseUrl = baseUrlMatch[1];
+
+    console.log(`Base URL: ${baseUrl}, Source ID: ${sourceId}`);
 
     let decryptedSources = null;
     let rawSourceData = {};
+    let usedFallback = false;
 
+    // Try primary decryption method
     try {
-      // throw new Error('skip for now');
-      const token = await extractToken(`${baseUrl}/${sourceId}?k=1&autoPlay=0&oa=0&asi=1`);
-      const { data } = await axios.get(`${baseUrl}/getSources?id=${sourceId}&_k=${token}`);
-      rawSourceData = data;
-      const encrypted = rawSourceData?.sources;
-      if (!encrypted) throw new Error('Encrypted source missing');
+      const result = await decryptPrimarySource(baseUrl, sourceId, key);
+      decryptedSources = result.sources;
+      rawSourceData = result.rawData;
+      console.log('Primary decryption successful');
+    } catch (primaryError) {
+      console.log('Primary method failed, trying fallback...');
 
-      const decrypted = CryptoJS.AES.decrypt(encrypted, key.trim()).toString(CryptoJS.enc.Utf8);
-      if (!decrypted) throw new Error('Failed to decrypt source');
-      decryptedSources = JSON.parse(decrypted);
-    } catch {
+      // Try fallback sources
       try {
-        const fallback = selectedServer.name.toLowerCase() === 'hd-1' ? fallback_1 : fallback_2;
-
-        const { data: html } = await axios.get(
-          `https://${fallback}/stream/s-2/${epID}/${selectedServer.type}`,
-          {
-            headers: {
-              Referer: `https://${fallback_1}/`,
-            },
-          }
-        );
-
-        const dataIdMatch = html.match(/data-id=["'](\d+)["']/);
-        const realId = dataIdMatch?.[1];
-        if (!realId) throw new Error('Could not extract data-id for fallback');
-
-        const { data: fallback_data } = await axios.get(
-          `https://${fallback}/stream/getSources?id=${realId}`,
-          {
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest',
-            },
-          }
-        );
-
-        decryptedSources = [{ file: fallback_data.sources.file }];
-        if (!rawSourceData.tracks || rawSourceData.tracks.length === 0) {
-          rawSourceData.tracks = fallback_data.tracks ?? [];
-        }
-        if (!rawSourceData.intro) {
-          rawSourceData.intro = fallback_data.intro ?? null;
-        }
-        if (!rawSourceData.outro) {
-          rawSourceData.outro = fallback_data.outro ?? null;
-        }
+        const fallbackResult = await getFallbackSource(epID, selectedServer.type, selectedServer.name);
+        decryptedSources = fallbackResult.sources;
+        rawSourceData = fallbackResult.rawData;
+        usedFallback = true;
+        console.log(`Fallback successful using ${fallbackResult.provider}`);
       } catch (fallbackError) {
-        throw new Error('Fallback failed: ' + fallbackError.message);
+        throw new Error(`Both primary and fallback failed. Primary: ${primaryError.message}, Fallback: ${fallbackError.message}`);
       }
     }
 
-    return {
+    // Validate we have sources
+    if (!decryptedSources || !decryptedSources[0]?.file) {
+      throw new Error('No valid source file found in decrypted data');
+    }
+
+    const result = {
       id,
       type: selectedServer.type,
       link: {
-        file: decryptedSources?.[0]?.file ?? '',
+        file: decryptedSources[0].file,
         type: 'hls',
       },
       tracks: rawSourceData.tracks ?? [],
       intro: rawSourceData.intro ?? null,
       outro: rawSourceData.outro ?? null,
       server: selectedServer.name,
+      usedFallback,
     };
+
+    console.log('=== Megacloud Decryption Success ===\n');
+    return result;
+
   } catch (error) {
-    console.error(`Error during decryptSources_v1(${id}):`, error.message);
+    console.error(`Megacloud decryption error (attempt ${retryCount + 1}):`, error.message);
+
+    // Retry logic
+    if (retryCount < MAX_RETRIES) {
+      console.log(`Retrying... (${retryCount + 2}/${MAX_RETRIES + 1})`);
+      await new Promise(resolve => setTimeout(resolve, 2000 * (retryCount + 1)));
+      return megacloud({ selectedServer, id }, retryCount + 1);
+    }
+
+    console.error('=== Megacloud Decryption Failed ===\n');
     return null;
   }
 }

@@ -99,6 +99,31 @@ export const deleteCachedData = async (key) => {
 };
 
 /**
+ * Clear all cached data from Redis
+ * @returns {Promise<boolean>} Success status
+ */
+export const clearAllCache = async () => {
+  const redis = getRedisClient();
+  if (!redis) return false;
+
+  try {
+    // Get all keys
+    const keys = await redis.keys('*');
+    if (keys && keys.length > 0) {
+      // Delete all keys
+      await redis.del(...keys);
+      console.log(`Cache CLEAR ALL: Deleted ${keys.length} keys`);
+      return true;
+    }
+    console.log('Cache CLEAR ALL: No keys to delete');
+    return true;
+  } catch (error) {
+    console.error('Redis CLEAR ALL error:', error.message);
+    return false;
+  }
+};
+
+/**
  * Check if Redis is available and enabled
  * @returns {boolean}
  */
@@ -134,6 +159,7 @@ export default {
   getCachedData,
   setCachedData,
   deleteCachedData,
+  clearAllCache,
   isRedisEnabled,
   withCache,
 };
