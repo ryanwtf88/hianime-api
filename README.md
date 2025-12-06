@@ -41,28 +41,31 @@
   - [Anime Episodes](#12-get-anime-episodes)
   - [Episode Servers](#13-get-anime-episode-servers)
   - [Streaming Links](#14-get-anime-episode-streaming-links)
-  - [All Genres](#16-get-all-genres)
-  - [Top Airing](#17-get-top-airing)
-  - [Most Popular](#18-get-most-popular)
-  - [Most Favorite](#19-get-most-favorite)
-  - [Completed Anime](#20-get-completed-anime)
-  - [Recently Added](#21-get-recently-added)
-  - [Recently Updated](#22-get-recently-updated)
-  - [Top Upcoming](#23-get-top-upcoming)
-  - [Genre List](#24-get-anime-by-genre)
-  - [Producer List](#25-get-anime-by-producer)
-  - [Subbed Anime](#26-get-subbed-anime)
-  - [Dubbed Anime](#27-get-dubbed-anime)
-  - [Movies](#28-get-anime-movies)
-  - [TV Series](#29-get-tv-series)
-  - [OVA](#30-get-ova)
-  - [ONA](#31-get-ona)
-  - [Special](#32-get-special)
-  - [Events](#33-get-events)
-  - [Anime News](#35-get-anime-news)
-  - [Watch2gether](#36-get-watch2gether-rooms)
-  - [Random Anime](#37-get-random-anime)
-  - [Clear Cache](#34-clear-redis-cache)
+  - [Embedded Player](#15-get-embedded-video-player)
+  - [Proxy Stream/Subtitle](#16-get-proxy-streamsubtitle)
+  - [Anime Schedules](#17-get-anime-schedules-7-days)
+  - [All Genres](#18-get-all-genres)
+  - [Top Airing](#19-get-top-airing)
+  - [Most Popular](#20-get-most-popular)
+  - [Most Favorite](#21-get-most-favorite)
+  - [Completed Anime](#22-get-completed-anime)
+  - [Recently Added](#23-get-recently-added)
+  - [Recently Updated](#24-get-recently-updated)
+  - [Top Upcoming](#25-get-top-upcoming)
+  - [Genre List](#26-get-anime-by-genre)
+  - [Producer List](#27-get-anime-by-producer)
+  - [Subbed Anime](#28-get-subbed-anime)
+  - [Dubbed Anime](#29-get-dubbed-anime)
+  - [Movies](#30-get-anime-movies)
+  - [TV Series](#31-get-tv-series)
+  - [OVA](#32-get-ova)
+  - [ONA](#33-get-ona)
+  - [Special](#34-get-special)
+  - [Events](#35-get-events)
+  - [Anime News](#37-get-anime-news)
+  - [Watch2gether](#38-get-watch2gether-rooms)
+  - [Random Anime](#39-get-random-anime)
+  - [Clear Cache](#36-clear-redis-cache)
 - [Development](#development)
 - [Contributors](#contributors)
 - [Acknowledgments](#acknowledgments)
@@ -881,7 +884,132 @@ console.log(data);
 
 ---
 
-### 15. GET Anime Schedules (7 Days)
+### 15. GET Embedded Video Player
+
+Returns an embedded video player HTML page for the specified episode.
+
+**Endpoint (Path Parameters):**
+```
+GET /api/v1/embed/:server/:id/:type
+```
+
+**Endpoint (Query Parameters):**
+```
+GET /api/v1/embed?id=:episodeId&server=:server&type=:type
+```
+
+**Path/Query Parameters:**
+
+- `server` - Server ID (hd-1, hd-2) (default: hd-2)
+- `id` - Episode ID (required)
+- `type` - Audio type: sub or dub (default: sub)
+
+**Request Example (Path Params):**
+
+```javascript
+// Direct embed URL
+window.location.href = '/api/v1/embed/hd-2/102994/sub';
+```
+
+**Request Example (Query Params):**
+
+```javascript
+// Embed with query parameters
+window.location.href = '/api/v1/embed?id=102994&server=hd-2&type=sub';
+```
+
+**Response:**
+
+Returns an HTML page with an embedded video player featuring:
+- HLS.js video playback with adaptive quality
+- Quality selection (Auto, 1080p, 720p, 480p, 360p)
+- Playback speed control (0.25x - 2x)
+- Subtitle support with customizable styling
+- Skip intro/outro buttons (10 seconds)
+- Fullscreen support
+- Picture-in-picture mode
+- Keyboard shortcuts
+- Progress bar with intro/outro highlights
+
+**Usage Example:**
+
+```html
+<!-- Embed in iframe -->
+<iframe 
+  src="https://your-api.com/api/v1/embed/hd-2/102994/sub"
+  width="100%" 
+  height="500px"
+  frameborder="0"
+  allowfullscreen
+></iframe>
+```
+
+---
+
+### 16. GET Proxy Stream/Subtitle
+
+Proxies video streams and subtitle files with proper headers to bypass CORS restrictions.
+
+**Endpoint:**
+```
+GET /api/v1/proxy?url=:url&referer=:referer
+```
+
+**Query Parameters:**
+
+- `url` - URL to proxy (video stream M3U8 or subtitle VTT file) (required)
+- `referer` - Referer header value (default: https://megacloud.tv)
+
+**Request Example (Video Stream):**
+
+```javascript
+const streamUrl = encodeURIComponent('https://example.com/video/master.m3u8');
+const referer = encodeURIComponent('https://megacloud.tv');
+const resp = await fetch(`/api/v1/proxy?url=${streamUrl}&referer=${referer}`);
+// Returns proxied M3U8 playlist with rewritten URLs
+```
+
+**Request Example (Subtitle):**
+
+```javascript
+const subtitleUrl = encodeURIComponent('https://example.com/subtitles/english.vtt');
+const resp = await fetch(`/api/v1/proxy?url=${subtitleUrl}&referer=${referer}`);
+// Returns proxied VTT subtitle file
+```
+
+**Response (M3U8 Playlist):**
+
+```
+#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=2000000,RESOLUTION=1920x1080
+/api/v1/proxy?url=https%3A%2F%2Fexample.com%2F1080p.m3u8&referer=https%3A%2F%2Fmegacloud.tv
+#EXT-X-STREAM-INF:BANDWIDTH=1000000,RESOLUTION=1280x720
+/api/v1/proxy?url=https%3A%2F%2Fexample.com%2F720p.m3u8&referer=https%3A%2F%2Fmegacloud.tv
+```
+
+**Response (VTT Subtitle):**
+
+```
+WEBVTT
+
+00:00:01.000 --> 00:00:04.000
+This is a subtitle line
+
+00:00:05.000 --> 00:00:08.000
+Another subtitle line
+```
+
+**Features:**
+
+- Automatically rewrites M3U8 playlist URLs to proxy through the API
+- Streams video segments directly without buffering
+- Adds proper CORS headers
+- Maintains original referer for source validation
+- Supports both video streams and subtitle files
+
+---
+
+### 17. GET Anime Schedules (7 Days)
 
 Retrieve anime schedules for 7 days starting from the given date (or today).
 
@@ -924,7 +1052,7 @@ console.log(data);
 
 ---
 
-### 16. GET All Genres
+### 18. GET All Genres
 
 Retrieve all available anime genres.
 
@@ -961,7 +1089,7 @@ console.log(data);
 
 ---
 
-### 17. GET Top Airing
+### 19. GET Top Airing
 
 Retrieve currently airing top anime.
 
@@ -980,7 +1108,7 @@ console.log(data);
 
 ---
 
-### 18. GET Most Popular
+### 20. GET Most Popular
 
 Retrieve most popular anime.
 
@@ -999,7 +1127,7 @@ console.log(data);
 
 ---
 
-### 19. GET Most Favorite
+### 21. GET Most Favorite
 
 Retrieve most favorited anime.
 
@@ -1018,7 +1146,7 @@ console.log(data);
 
 ---
 
-### 20. GET Completed Anime
+### 22. GET Completed Anime
 
 Retrieve completed anime series.
 
@@ -1037,7 +1165,7 @@ console.log(data);
 
 ---
 
-### 21. GET Recently Added
+### 23. GET Recently Added
 
 Retrieve recently added anime.
 
@@ -1056,7 +1184,7 @@ console.log(data);
 
 ---
 
-### 22. GET Recently Updated
+### 24. GET Recently Updated
 
 Retrieve recently updated anime.
 
@@ -1075,7 +1203,7 @@ console.log(data);
 
 ---
 
-### 23. GET Top Upcoming
+### 25. GET Top Upcoming
 
 Retrieve top upcoming anime.
 
@@ -1094,7 +1222,7 @@ console.log(data);
 
 ---
 
-### 24. GET Anime by Genre
+### 26. GET Anime by Genre
 
 Retrieve anime filtered by specific genre.
 
@@ -1115,7 +1243,7 @@ console.log(data);
 
 ---
 
-### 25. GET Anime by Producer
+### 27. GET Anime by Producer
 
 Retrieve anime filtered by production studio or company.
 
@@ -1166,7 +1294,7 @@ console.log(data);
 
 ---
 
-### 26. GET Subbed Anime
+### 28. GET Subbed Anime
 
 Retrieve anime with subtitles available.
 
@@ -1185,7 +1313,7 @@ console.log(data);
 
 ---
 
-### 27. GET Dubbed Anime
+### 29. GET Dubbed Anime
 
 Retrieve anime with English dub available.
 
@@ -1204,7 +1332,7 @@ console.log(data);
 
 ---
 
-### 28. GET Anime Movies
+### 30. GET Anime Movies
 
 Retrieve anime movies.
 
@@ -1223,7 +1351,7 @@ console.log(data);
 
 ---
 
-### 29. GET TV Series
+### 31. GET TV Series
 
 Retrieve anime TV series.
 
@@ -1242,7 +1370,7 @@ console.log(data);
 
 ---
 
-### 30. GET OVA
+### 32. GET OVA
 
 Retrieve Original Video Animation (OVA) content.
 
@@ -1261,7 +1389,7 @@ console.log(data);
 
 ---
 
-### 31. GET ONA
+### 33. GET ONA
 
 Retrieve Original Net Animation (ONA) content.
 
@@ -1280,7 +1408,7 @@ console.log(data);
 
 ---
 
-### 32. GET Special
+### 34. GET Special
 
 Retrieve special anime episodes.
 
@@ -1299,7 +1427,7 @@ console.log(data);
 
 ---
 
-### 33. GET Events
+### 35. GET Events
 
 Retrieve anime events.
 
@@ -1318,7 +1446,7 @@ console.log(data);
 
 ---
 
-### 34. Clear Redis Cache
+### 36. Clear Redis Cache
 
 Clear all cached data from Redis. Useful for forcing fresh data retrieval.
 
@@ -1374,7 +1502,7 @@ bun start
 
 ---
 
-### 35. GET Anime News
+### 37. GET Anime News
 
 Retrieve latest anime news articles.
 
@@ -1412,7 +1540,7 @@ console.log(data);
 
 ---
 
-### 36. GET Watch2gether Rooms
+### 38. GET Watch2gether Rooms
 
 Retrieve active watch party rooms.
 
@@ -1453,7 +1581,7 @@ console.log(data);
 
 ---
 
-### 37. GET Random Anime
+### 39. GET Random Anime
 
 Retrieve a random anime ID.
 

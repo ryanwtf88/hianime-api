@@ -74,14 +74,32 @@ async function decryptPrimarySource(baseUrl, sourceId, key) {
       throw new Error('Encrypted source missing from response');
     }
 
-    console.log('Decrypting sources...');
-    const decrypted = CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
+    let sources = null;
+    if (typeof encrypted === 'string') {
+      console.log('Decrypting sources...');
+      console.log('Encrypted Start:', encrypted.substring(0, 50));
+      let decrypted = '';
+      try {
+        // Try standard decryption first (passphrase)
+        decrypted = CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
+      } catch (e) {
+        console.log('Standard decryption failed, trying Hex key...');
+        try {
+          decrypted = CryptoJS.AES.decrypt(encrypted, CryptoJS.enc.Hex.parse(key)).toString(CryptoJS.enc.Utf8);
+        } catch (e2) {
+          console.log('Hex decryption failed too.');
+        }
+      }
 
-    if (!decrypted) {
-      throw new Error('Decryption returned empty result');
+      if (!decrypted) {
+        throw new Error('Decryption returned empty result');
+      }
+      sources = JSON.parse(decrypted);
+    } else {
+      console.log('Sources appear to be unencrypted (JSON object/array). using directly.');
+      sources = encrypted;
     }
 
-    const sources = JSON.parse(decrypted);
     return { sources, rawData: data };
   } catch (error) {
     console.error('Primary source decryption failed:', error.message);

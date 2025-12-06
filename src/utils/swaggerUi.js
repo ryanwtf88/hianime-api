@@ -512,6 +512,45 @@ const hianimeApiDocs = {
         responses: { 200: { description: 'Success' } },
       },
     },
+    '/embed/{server}/{id}/{type}': {
+      get: {
+        summary: 'Embedded video player',
+        description: 'Returns an embedded video player for the specified episode',
+        parameters: [
+          { name: 'server', in: 'path', required: true, schema: { type: 'string', enum: ['hd-1', 'hd-2'], default: 'hd-2' }, description: 'Server ID' },
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'Episode ID' },
+          { name: 'type', in: 'path', required: true, schema: { type: 'string', enum: ['sub', 'dub'], default: 'sub' }, description: 'Audio type' },
+        ],
+        responses: { 200: { description: 'HTML video player page' } },
+      },
+    },
+    '/embed': {
+      get: {
+        summary: 'Embedded video player (query params)',
+        description: 'Returns an embedded video player using query parameters',
+        parameters: [
+          { name: 'id', in: 'query', required: true, schema: { type: 'string' }, description: 'Episode ID' },
+          { name: 'server', in: 'query', schema: { type: 'string', enum: ['hd-1', 'hd-2'], default: 'hd-2' }, description: 'Server ID' },
+          { name: 'type', in: 'query', schema: { type: 'string', enum: ['sub', 'dub'], default: 'sub' }, description: 'Audio type' },
+        ],
+        responses: { 200: { description: 'HTML video player page' } },
+      },
+    },
+    '/proxy': {
+      get: {
+        summary: 'Proxy video streams and subtitles',
+        description: 'Proxies video streams and subtitles with proper headers to bypass CORS restrictions',
+        parameters: [
+          { name: 'url', in: 'query', required: true, schema: { type: 'string' }, description: 'URL to proxy (video stream or subtitle file)' },
+          { name: 'referer', in: 'query', schema: { type: 'string', default: 'https://megacloud.tv' }, description: 'Referer header value' },
+        ],
+        responses: {
+          200: { description: 'Proxied content (video stream or subtitle file)' },
+          400: { description: 'Missing URL parameter' },
+          500: { description: 'Proxy error' },
+        },
+      },
+    },
     '/random': {
       get: {
         summary: 'Get random anime',
