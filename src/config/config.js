@@ -18,10 +18,10 @@ const config = {
   },
 
   providers: {
-    megacloud: process.env.MEGACLOUD_URL || 'https://megacloud.club',
+    megacloud: process.env.MEGACLOUD_URL || 'https://megacloud.blog',
     megaplay: process.env.MEGAPLAY_URL || 'https://megaplay.buzz',
     vidwish: process.env.VIDWISH_URL || 'https://vidwish.live',
-    streamwish: process.env.STREAMWISH_URL || 'https://streamwish.to',
+
   },
 
   rateLimit: {

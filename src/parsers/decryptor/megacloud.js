@@ -96,7 +96,7 @@ async function getFallbackSource(epID, serverType, serverName) {
   const fallbackProviders = [
     { name: 'megaplay', domain: 'megaplay.buzz' },
     { name: 'vidwish', domain: 'vidwish.live' },
-    { name: 'streamwish', domain: 'streamwish.to' },
+
   ];
 
   // Select primary fallback based on server name
