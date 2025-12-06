@@ -25,7 +25,7 @@ async function getDecryptionKey() {
 
   try {
     const { data: key } = await axios.get(
-      'https://raw.githubusercontent.com/itzzzme/megacloud-keys/refs/heads/main/key.txt',
+      'https://raw.githubusercontent.com/ryanwtf88/megacloud-keys/refs/heads/master/key.txt',
       { timeout: 5000 }
     );
 
