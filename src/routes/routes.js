@@ -48,6 +48,13 @@ router.get('/stream', handler(streamController));
 router.get('/embed/:server/:id/:type', embedController);
 router.get('/embed', embedController);
 router.get('/proxy', proxyController);
+router.options('/proxy', (c) => {
+  c.header('Access-Control-Allow-Origin', '*');
+  c.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  c.header('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Accept-Encoding');
+  c.header('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges, Cache-Control');
+  return c.text('', 204);
+});
 router.get('/genres', handler(allGenresController));
 router.get('/news', handler(newsController));
 router.get('/watch2gether', handler(watch2getherController));

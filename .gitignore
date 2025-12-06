@@ -133,3 +133,5 @@ demo.js
 /htmls
 /filter.js
 
+.vercel
+.env*.local

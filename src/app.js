@@ -19,8 +19,8 @@ app.use(
   cors({
     origin: origins,
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    exposeHeaders: ['Content-Length', 'X-Request-Id'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Range', 'Accept', 'Accept-Encoding'],
+    exposeHeaders: ['Content-Length', 'X-Request-Id', 'Content-Range', 'Accept-Ranges', 'Cache-Control'],
     maxAge: 600,
     credentials: true,
   })
