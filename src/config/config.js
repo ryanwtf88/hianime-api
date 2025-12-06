@@ -12,7 +12,7 @@ const getEnv = (key, defaultValue = '') => {
 const config = {
   baseurl: getEnv('HIANIME_BASE_URL', 'https://hianime.to'),
   baseurl_v2: getEnv('HIANIME_BASE_URL_V2', 'https://aniwatchtv.to'),
-  baseUrl: getEnv('BASE_URL', 'https://hianime-api.workers.dev'),
+  baseUrl: getEnv('BASE_URL', 'https://api.animo.qzz.io'),
   origin: getEnv('ORIGIN', '*'),
   port: parseInt(getEnv('PORT', '5000')),
 
