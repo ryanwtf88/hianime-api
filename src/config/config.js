@@ -1,7 +1,7 @@
 const config = {
   baseurl: process.env.HIANIME_BASE_URL || 'https://hianime.to',
   baseurl_v2: process.env.HIANIME_BASE_URL_V2 || 'https://aniwatchtv.to',
-  baseUrl: process.env.BASE_URL || 'https://api-animo.vercel.app',
+  baseUrl: process.env.BASE_URL || 'https://hianime-api.workers.dev',
   origin: process.env.ORIGIN || '*',
   port: process.env.PORT || 5000,
 
@@ -39,7 +39,7 @@ const config = {
 
   isProduction: process.env.NODE_ENV === 'production',
   isDevelopment: process.env.NODE_ENV === 'development',
-  isVercel: Boolean(process.env.VERCEL),
+  isCloudflare: true,
 };
 
 export default config;

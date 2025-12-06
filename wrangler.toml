@@ -1,0 +1,32 @@
+name = "hianime-api"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+# Account ID
+account_id = "cd4ab75cca150f63177325a6bb1c355f"
+
+# Worker configuration
+workers_dev = true
+route = ""
+zone_id = ""
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# KV Namespaces (if using Cloudflare KV for caching instead of Upstash)
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "your-kv-namespace-id"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# - UPSTASH_REDIS_REST_URL
+# - UPSTASH_REDIS_REST_TOKEN
+# - ANIWATCH_API_KEY (if needed)
+
+# Build configuration
+[build]
+command = ""
+
+# Limits
+limits = { cpu_ms = 50 }

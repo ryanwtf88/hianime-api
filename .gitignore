@@ -135,3 +135,4 @@ demo.js
 
 .vercel
 .env*.local
+.dev.vars
