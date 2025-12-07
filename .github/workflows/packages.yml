@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - master
-      - main
+      - vercel
+      - cloudflare
     paths-ignore:
       - '**.md'
       - 'LICENSE'
@@ -13,7 +14,8 @@ on:
   pull_request:
     branches:
       - master
-      - main
+      - vercel
+      - cloudflare
   workflow_dispatch:
 
 concurrency:
