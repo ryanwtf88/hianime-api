@@ -24,7 +24,8 @@
   - [Local Setup](#local-setup)
 - [Deployment](#deployment)
   - [Docker Deployment](#docker-deployment)
-  - [Vercel Deployment](#vercel-deployment-serverless--recommended)
+  - [Cloudflare Workers Deployment](#cloudflare-workers-deployment-recommended)
+  - [Vercel Proxy](#vercel-proxy-separate-deployment)
   - [Replit Deployment](#replit-deployment)
 - [Documentation](#documentation)
   - [Anime Home Page](#1-get-anime-home-page)
@@ -216,32 +217,33 @@ Then run:
 docker-compose up -d
 ```
 
-### Vercel Deployment (Serverless) ![Recommended](https://img.shields.io/badge/Recommended-blue?style=flat-square)
+### Cloudflare Workers Deployment ![Recommended](https://img.shields.io/badge/Recommended-blue?style=flat-square)
 
 **One-Click Deploy:**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ryanwtf88/hianime-api)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ryanwtf88/hianime-api)
 
 **Manual Deployment:**
 
 1. Fork or clone the repository to your GitHub account
-2. Sign up at [Vercel](https://vercel.com)
-3. Create a new project and import your repository
-4. Configure environment variables in Vercel Dashboard:
+2. Sign up at [Cloudflare](https://dash.cloudflare.com)
+3. Install Wrangler CLI: `npm install -g wrangler`
+4. Login to Cloudflare: `wrangler login`
+5. Deploy: `wrangler deploy`
+6. Configure environment variables in Cloudflare Dashboard:
    - `UPSTASH_REDIS_REST_URL` (Required - Get from [Upstash](https://upstash.com))
    - `UPSTASH_REDIS_REST_TOKEN` (Required)
    - `ORIGIN=*` (or your frontend domain)
    - `RATE_LIMIT_ENABLED=true`
    - `RATE_LIMIT_WINDOW_MS=60000`
    - `RATE_LIMIT_LIMIT=100`
-5. Click "Deploy"
 
-**Why Vercel?**
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Serverless architecture with automatic scaling
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Global CDN for fast response times
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with generous limits
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic HTTPS and custom domains
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Git-based deployments (auto-deploy on push)
+**Why Cloudflare Workers?**
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Edge computing with ultra-low latency
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Global network across 300+ cities
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with 100,000 requests/day
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic HTTPS and DDoS protection
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Git-based deployments
 - ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Built-in Redis support via Upstash
 
 **Environment Variables:**
@@ -255,7 +257,22 @@ docker-compose up -d
 | `RATE_LIMIT_WINDOW_MS` | `60000` | No |
 | `RATE_LIMIT_LIMIT` | `100` | No |
 
-For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+For detailed instructions, see [CLOUDFLARE.md](./CLOUDFLARE.md)
+
+### Vercel Proxy (Separate Deployment)
+
+For HLS streaming with CORS support, deploy our separate proxy:
+
+**Repository:** [vercel-proxy](https://github.com/ryanwtf88/vercel-proxy)
+
+This standalone proxy is deployed on Vercel to handle CDN requests that may be blocked by Cloudflare Workers. It adds CORS headers and rewrites M3U8 playlists.
+
+**Quick Deploy:**
+1. Visit the [vercel-proxy repository](https://github.com/ryanwtf88/vercel-proxy)
+2. Click "Deploy to Vercel" or fork and deploy manually
+3. Use the proxy endpoint in your streaming requests
+
+For more details, see the [vercel-proxy README](https://github.com/ryanwtf88/vercel-proxy#readme)
 
 ### Replit Deployment
 

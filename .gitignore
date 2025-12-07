@@ -136,3 +136,6 @@ demo.js
 .vercel
 .env*.local
 .dev.vars
+
+# Vercel proxy (separate repository)
+vercel-proxy/
