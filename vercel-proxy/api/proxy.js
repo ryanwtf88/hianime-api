@@ -91,7 +91,7 @@ export default async function handler(req, res) {
                 // Encode and proxy
                 const encodedUrl = encodeURIComponent(targetUrl);
                 const encodedReferer = encodeURIComponent(referer || 'https://megacloud.tv');
-                return `https://animo-proxy.vercel.app/api/proxy?url=${encodedUrl}&referer=${encodedReferer}`;
+                return `https://vercel-proxy-two-nu.vercel.app/api/proxy?url=${encodedUrl}&referer=${encodedReferer}`;
             });
 
             const newContent = newLines.join('\n');

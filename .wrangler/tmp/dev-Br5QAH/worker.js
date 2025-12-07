@@ -33809,10 +33809,12 @@ var extractStream = /* @__PURE__ */ __name(async ({ selectedServer, id }) => {
   const streamingLink = await megacloud({ selectedServer, id });
   if (streamingLink && streamingLink.link && streamingLink.link.file) {
     const directUrl = streamingLink.link.file;
-    streamingLink.link.directUrl = directUrl;
-    streamingLink.link.file = directUrl;
     const encodedUrl = encodeURIComponent(directUrl);
-    streamingLink.link.proxyUrl = `${config_default.baseUrl}/api/v1/embed/proxy?url=${encodedUrl}`;
+    const encodedReferer = encodeURIComponent("https://megacloud.tv");
+    const proxiedUrl = `https://vercel-proxy-two-nu.vercel.app/api/proxy?url=${encodedUrl}&referer=${encodedReferer}`;
+    streamingLink.link.directUrl = directUrl;
+    streamingLink.link.file = proxiedUrl;
+    streamingLink.link.proxyUrl = proxiedUrl;
   }
   return streamingLink;
 }, "extractStream");
@@ -34397,10 +34399,7 @@ var embedController = /* @__PURE__ */ __name(async (c) => {
     if (!stream || !stream.link || !stream.link.file) {
       return c.text("Failed to extract stream", 500);
     }
-    const rawM3u8Url = stream.link.file;
-    const referer = "https://megacloud.tv";
-    const proxyUrl = `/api/v1/proxy?url=${encodeURIComponent(rawM3u8Url)}&referer=${encodeURIComponent(referer)}`;
-    const m3u8Url = proxyUrl;
+    const m3u8Url = stream.link.file;
     const tracks = stream.tracks || [];
     const intro = stream.intro || {};
     const outro = stream.outro || {};
@@ -34820,7 +34819,7 @@ var embedController = /* @__PURE__ */ __name(async (c) => {
                 trackEl.kind = 'subtitles';
                 trackEl.label = track.label;
                 trackEl.srclang = 'en';
-                trackEl.src = \`/api/v1/proxy?url=\${encodeURIComponent(track.file)}&referer=\${encodeURIComponent('https://megacloud.tv')}\`;
+                trackEl.src = track.file; // Use direct subtitle URL
                 if (track.default && index === 0) {
                     trackEl.default = true;
                     currentSubtitle = index;
