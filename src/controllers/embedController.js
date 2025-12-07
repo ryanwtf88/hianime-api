@@ -53,13 +53,10 @@ const embedController = async (c) => {
             return c.text('Failed to extract stream', 500);
         }
 
-        // Use proxied URL (via Vercel) - CDN needs CORS headers added
-        const m3u8Url = stream.link.file; // Already proxied from extractStream
+        const m3u8Url = stream.link.file;
         const tracks = stream.tracks || [];
         const intro = stream.intro || {};
         const outro = stream.outro || {};
-
-        // Pass the episode type (sub/dub) to the player
         const episodeType = type || 'sub';
         
         const html = `

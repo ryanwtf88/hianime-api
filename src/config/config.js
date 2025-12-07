@@ -1,4 +1,3 @@
-// Get environment variables from globalThis (Cloudflare Workers) or process.env (Node.js)
 const getEnv = (key, defaultValue = '') => {
   if (typeof globalThis.CLOUDFLARE_ENV !== 'undefined') {
     return globalThis.CLOUDFLARE_ENV[key] || defaultValue;

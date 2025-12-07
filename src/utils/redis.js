@@ -1,8 +1,3 @@
-/**
- * Redis Utility for Vercel Serverless Environment
- * Provides a centralized way to handle Redis/Upstash connections
- */
-
 import { Redis } from '@upstash/redis';
 import config from '../config/config.js';
 
@@ -22,7 +17,7 @@ export const getRedisClient = () => {
       redisClient = new Redis({
         url: config.redis.url,
         token: config.redis.token,
-        automaticDeserialization: false, // We'll handle JSON parsing manually
+        automaticDeserialization: false,
       });
       console.log('Redis client initialized successfully');
     } catch (error) {

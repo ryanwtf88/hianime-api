@@ -26,8 +26,6 @@ app.use(
   })
 );
 
-// Rate limiting is disabled for Cloudflare Workers due to global scope restrictions
-// Use Cloudflare's built-in rate limiting instead: https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
 if (config.rateLimit.enabled && !config.isCloudflare) {
   app.use(
     '*',
@@ -44,7 +42,6 @@ if (config.rateLimit.enabled && !config.isCloudflare) {
           return cfConnectingIp || realIp || forwarded?.split(',')[0].trim() || 'unknown';
         },
         skip: (c) => {
-          // Skip rate limiting for proxy and embed endpoints (HLS streaming needs many requests)
           const path = c.req.path;
           return path.includes('/proxy') || path.includes('/embed');
         },
@@ -60,7 +57,7 @@ if (!config.isProduction || config.enableLogging) {
 app.get('/ui', (c) => {
   c.status(200);
   return c.json({
-    message: 'Welcome to HiAnime API, crafted by RY4N',
+    message: 'Welcome to HiAnime API, Crafted by RY4N',
     documentation: '/api/v1',
     swagger: '/',
     docs: '/docs',

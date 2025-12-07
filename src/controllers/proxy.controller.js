@@ -9,10 +9,7 @@ const proxyController = async (c) => {
     }
 
     try {
-        // Get range header from incoming request
         const rangeHeader = c.req.header('range');
-        
-        // Build fetch headers
         const fetchHeaders = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Referer': referer || 'https://megacloud.tv',
@@ -20,7 +17,6 @@ const proxyController = async (c) => {
             'Accept': '*/*',
         };
 
-        // Forward range header if present
         if (rangeHeader) {
             fetchHeaders['Range'] = rangeHeader;
         }
@@ -36,14 +32,12 @@ const proxyController = async (c) => {
 
         const contentType = response.headers.get('content-type') || 'application/vnd.apple.mpegurl';
 
-        // Add CORS headers
         c.header('Access-Control-Allow-Origin', '*');
         c.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
         c.header('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Accept-Encoding');
         c.header('Access-Control-Expose-Headers', 'Content-Length, Content-Range, Accept-Ranges, Cache-Control');
         c.header('Content-Type', contentType);
 
-        // Forward important headers
         const contentLength = response.headers.get('content-length');
         if (contentLength) {
             c.header('Content-Length', contentLength);
@@ -61,36 +55,29 @@ const proxyController = async (c) => {
             c.header('Accept-Ranges', 'bytes');
         }
 
-        // Cache control for media segments
         if (url.endsWith('.ts') || url.endsWith('.m4s')) {
             c.header('Cache-Control', 'public, max-age=31536000, immutable');
         } else if (url.endsWith('.m3u8')) {
             c.header('Cache-Control', 'no-cache');
         }
 
-        // If it's an M3U8 playlist, we need to rewrite the internal URLs
         if (contentType.includes('mpegurl') || url.endsWith('.m3u8')) {
             const content = await response.text();
 
-            // Resolve base URL for relative paths
             const basePath = url.substring(0, url.lastIndexOf('/') + 1);
-
-            // Rewrite URLs
             const lines = content.split('\n');
             const newLines = lines.map(line => {
                 line = line.trim();
-                if (!line || line.startsWith('#')) return line; // Skip comments/empty
+                if (!line || line.startsWith('#')) return line;
 
                 let targetUrl = line;
                 if (!line.startsWith('http')) {
                     targetUrl = basePath + line;
                 }
 
-                // Encode the target URL properly
                 const encodedUrl = encodeURIComponent(targetUrl);
                 const encodedReferer = encodeURIComponent(referer || 'https://megacloud.tv');
 
-                // Construct proxy URL (point back to this same endpoint)
                 const proxyPath = c.req.path;
 
                 return `${proxyPath}?url=${encodedUrl}&referer=${encodedReferer}`;
@@ -100,8 +87,6 @@ const proxyController = async (c) => {
             return c.text(newContent);
         }
 
-        // For TS segments or other binary data, return the stream directly
-        // Set proper status for range requests
         if (response.status === 206 || contentRange) {
             c.status(206);
         }

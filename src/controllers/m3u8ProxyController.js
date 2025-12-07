@@ -8,13 +8,7 @@ const m3u8ProxyController = async (c) => {
     }
 
     try {
-        console.log(`[M3U8 Proxy] Request for: ${url.substring(0, 80)}...`);
-
-        // Since CDN blocks Cloudflare Workers IPs, redirect browser to fetch directly
-        // This maintains compatibility with frontends expecting a proxy endpoint
-        // but lets the browser handle the actual CDN request
-        
-        // Return a minimal M3U8 that redirects to the direct URL
+        console.log(`Request for: ${url.substring(0, 80)}...`);
         const redirectM3u8 = `#EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:BANDWIDTH=1000000
@@ -29,12 +23,12 @@ ${url}
         c.header('Content-Type', 'application/vnd.apple.mpegurl');
         c.header('Cache-Control', 'no-cache');
 
-        console.log(`[M3U8 Proxy] Returning redirect to direct URL`);
+        console.log(`Returning redirect to direct URL`);
 
         return c.text(redirectM3u8);
 
     } catch (error) {
-        console.error(`[M3U8 Proxy] Error: ${error.message}`);
+        console.error(`Error: ${error.message}`);
         return c.text(`Proxy Error: ${error.message}`, 500);
     }
 };
