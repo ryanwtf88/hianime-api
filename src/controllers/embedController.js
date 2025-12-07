@@ -59,6 +59,9 @@ const embedController = async (c) => {
         const intro = stream.intro || {};
         const outro = stream.outro || {};
 
+        // Pass the episode type (sub/dub) to the player
+        const episodeType = type || 'sub';
+        
         const html = `
 <!DOCTYPE html>
 <html>
@@ -409,6 +412,7 @@ const embedController = async (c) => {
     <script>
         const intro = ${JSON.stringify(intro || { start: 0, end: 0 })};
         const outro = ${JSON.stringify(outro || { start: 0, end: 0 })};
+        const episodeType = '${episodeType}';
         const subtitles = ${JSON.stringify(tracks.filter(t => t.kind === 'captions'))};
         
         
@@ -422,6 +426,7 @@ const embedController = async (c) => {
         let currentQuality = -1;
         let currentSpeed = 1;
         let currentSubtitle = null;
+        let subtitlesLoaded = false;
 
         // Initialize HLS with optimized config
         if (Hls.isSupported()) {
@@ -470,23 +475,55 @@ const embedController = async (c) => {
 
         // Load subtitles function
         function loadSubtitles() {
+            // Prevent loading subtitles multiple times
+            if (subtitlesLoaded) {
+                console.log('Subtitles already loaded, skipping...');
+                return;
+            }
+            
+            // For dub episodes, don't load subtitles by default (audio is already in English)
+            // Only load if subtitles are explicitly available and user wants them
+            if (episodeType === 'dub' && subtitles.length === 0) {
+                console.log('Dub episode - no subtitles needed');
+                subtitlesLoaded = true;
+                return;
+            }
+            
+            // Remove any existing subtitle tracks to prevent duplicates
+            const existingTracks = video.querySelectorAll('track');
+            existingTracks.forEach(track => track.remove());
+            
+            // Load subtitle tracks
             subtitles.forEach((track, index) => {
                 const trackEl = document.createElement('track');
                 trackEl.kind = 'subtitles';
                 trackEl.label = track.label;
                 trackEl.srclang = 'en';
                 trackEl.src = track.file; // Use direct subtitle URL
-                if (track.default && index === 0) {
+                
+                // For sub episodes, enable first subtitle by default
+                // For dub episodes, keep subtitles off by default
+                if (episodeType === 'sub' && track.default && index === 0) {
                     trackEl.default = true;
                     currentSubtitle = index;
                 }
+                
                 video.appendChild(trackEl);
             });
             
-            // Enable first subtitle by default if available
-            if (video.textTracks.length > 0 && currentSubtitle !== null) {
+            // Enable first subtitle by default only for sub episodes
+            if (episodeType === 'sub' && video.textTracks.length > 0 && currentSubtitle !== null) {
                 video.textTracks[currentSubtitle].mode = 'showing';
+            } else if (episodeType === 'dub') {
+                // For dub episodes, keep all subtitles hidden by default
+                Array.from(video.textTracks).forEach(track => {
+                    track.mode = 'hidden';
+                });
+                currentSubtitle = null;
             }
+            
+            subtitlesLoaded = true;
+            console.log('Subtitles loaded:', subtitles.length, 'tracks for', episodeType, 'episode');
         }
 
         // Add intro/outro highlights to progress bar
@@ -627,7 +664,10 @@ const embedController = async (c) => {
             let html = '<div class="menu-header" data-action="back">← Subtitles</div>';
             
             if (subtitles.length === 0) {
-                html += '<div class="menu-item" style="opacity: 0.5; cursor: default;">No subtitles available</div>';
+                const message = episodeType === 'dub' 
+                    ? 'No subtitles (Dub audio)' 
+                    : 'No subtitles available';
+                html += '<div class="menu-item" style="opacity: 0.5; cursor: default;">' + message + '</div>';
             } else {
                 html += '<div class="menu-item' + (currentSubtitle === null ? ' active' : '') + '" data-subtitle="null">Off</div>';
                 
