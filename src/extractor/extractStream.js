@@ -19,7 +19,8 @@ export const extractStream = async ({ selectedServer, id }) => {
     const encodedReferer = encodeURIComponent('https://megacloud.tv');
     
     // Use Vercel proxy endpoint (deployed separately)
-    const proxiedUrl = `https://vercel-proxy-two-nu.vercel.app/api/proxy?url=${encodedUrl}&referer=${encodedReferer}`;
+    // Repository: https://github.com/ryanwtf88/vercel-proxy
+    const proxiedUrl = `https://vercel-proxy-ryanwtf88.vercel.app/api/proxy?url=${encodedUrl}&referer=${encodedReferer}`;
     
     streamingLink.link.directUrl = directUrl; // Keep original
     streamingLink.link.file = proxiedUrl; // Primary URL is proxied through Vercel
