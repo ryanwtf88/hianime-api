@@ -127,13 +127,18 @@ const embedController = async (c) => {
             padding: 3px 7px;
         }
 
-        /* Position subtitles above controls */
+        /* Position subtitles above controls - single display only */
         video::-webkit-media-text-track-container {
             bottom: 80px !important;
         }
         
         [mediaisfullscreen] video::-webkit-media-text-track-container {
             bottom: 100px !important;
+        }
+        
+        /* Hide media-chrome's default subtitle display to prevent duplicates */
+        media-controller::part(captions) {
+            display: none !important;
         }
 
         media-controller[mediaisfullscreen] {
@@ -324,7 +329,7 @@ const embedController = async (c) => {
     </style>
 </head>
 <body>
-      <media-controller breakpoints="md:480" defaultsubtitles gesturesdisabled defaultstreamtype="on-demand">
+      <media-controller breakpoints="md:480" gesturesdisabled defaultstreamtype="on-demand">
         <video slot="media" id="video-player" crossorigin="anonymous" playsinline autoplay></video>
         
         <div class="yt-gradient-bottom"></div>
@@ -413,7 +418,7 @@ const embedController = async (c) => {
         const intro = ${JSON.stringify(intro || { start: 0, end: 0 })};
         const outro = ${JSON.stringify(outro || { start: 0, end: 0 })};
         const episodeType = '${episodeType}';
-        const subtitles = ${JSON.stringify(tracks.filter(t => t.kind === 'captions'))};
+        const subtitles = ${JSON.stringify(tracks || [])};
         
         
         const video = document.getElementById('video-player');
