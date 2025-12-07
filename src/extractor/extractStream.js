@@ -9,22 +9,21 @@ export const extractStream = async ({ selectedServer, id }) => {
 
   const streamingLink = await megacloud({ selectedServer, id });
   
-  // Return direct CDN URLs for browser to fetch
-  // CDN has CORS enabled and allows direct browser access
-  // CDN blocks Cloudflare Workers IPs, so proxy won't work
+  // Use Vercel proxy for CORS support
+  // CDN blocks Cloudflare Workers but allows Vercel
+  // CDN doesn't have CORS headers, so we need proxy to add them
   
-  // Add both direct and proxied URLs for frontend compatibility
   if (streamingLink && streamingLink.link && streamingLink.link.file) {
     const directUrl = streamingLink.link.file;
-    
-    // Store both URLs
-    streamingLink.link.directUrl = directUrl;
-    streamingLink.link.file = directUrl; // Primary URL is direct
-    
-    // Optional: Add proxy endpoint URL for frontend that expects it
-    // But note: This will redirect back to direct URL
     const encodedUrl = encodeURIComponent(directUrl);
-    streamingLink.link.proxyUrl = `${config.baseUrl}/api/v1/embed/proxy?url=${encodedUrl}`;
+    const encodedReferer = encodeURIComponent('https://megacloud.tv');
+    
+    // Use Vercel proxy endpoint (deployed separately)
+    const proxiedUrl = `https://animo-proxy.vercel.app/api/proxy?url=${encodedUrl}&referer=${encodedReferer}`;
+    
+    streamingLink.link.directUrl = directUrl; // Keep original
+    streamingLink.link.file = proxiedUrl; // Primary URL is proxied through Vercel
+    streamingLink.link.proxyUrl = proxiedUrl; // Same as file
   }
   
   return streamingLink;

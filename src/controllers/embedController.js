@@ -53,8 +53,8 @@ const embedController = async (c) => {
             return c.text('Failed to extract stream', 500);
         }
 
-        // Use direct CDN URL - CDN allows browser access
-        const m3u8Url = stream.link.file;
+        // Use proxied URL (via Vercel) - CDN needs CORS headers added
+        const m3u8Url = stream.link.file; // Already proxied from extractStream
         const tracks = stream.tracks || [];
         const intro = stream.intro || {};
         const outro = stream.outro || {};
