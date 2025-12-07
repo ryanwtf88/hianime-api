@@ -53,11 +53,8 @@ const embedController = async (c) => {
             return c.text('Failed to extract stream', 500);
         }
 
-        const rawM3u8Url = stream.link.file;
-        const referer = 'https://megacloud.tv';
-        const proxyUrl = `/api/v1/proxy?url=${encodeURIComponent(rawM3u8Url)}&referer=${encodeURIComponent(referer)}`;
-
-        const m3u8Url = proxyUrl;
+        // Use direct CDN URL - CDN allows browser access
+        const m3u8Url = stream.link.file;
         const tracks = stream.tracks || [];
         const intro = stream.intro || {};
         const outro = stream.outro || {};
@@ -478,7 +475,7 @@ const embedController = async (c) => {
                 trackEl.kind = 'subtitles';
                 trackEl.label = track.label;
                 trackEl.srclang = 'en';
-                trackEl.src = \`/api/v1/proxy?url=\${encodeURIComponent(track.file)}&referer=\${encodeURIComponent('https://megacloud.tv')}\`;
+                trackEl.src = track.file; // Use direct subtitle URL
                 if (track.default && index === 0) {
                     trackEl.default = true;
                     currentSubtitle = index;
