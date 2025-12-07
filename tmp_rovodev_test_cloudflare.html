@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare API Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; }
+        video { width: 100%; max-width: 640px; }
+        #log { background: #f5f5f5; padding: 15px; margin-top: 20px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Cloudflare Workers API Test</h1>
+    
+    <div>
+        <button onclick="testAPI()">Test API Connection</button>
+        <button onclick="testStream()">Load Stream</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <video id="video" controls></video>
+    
+    <div id="log"></div>
+
+    <script>
+        const API_URL = 'https://hianime-api.ryanwtf.workers.dev';
+        const video = document.getElementById('video');
+        let hls;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${type}]`, message);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function testAPI() {
+            log('Testing API connection...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/ping`);
+                const data = await response.json();
+                log(`✓ API Connected: ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                log(`✗ API Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStream() {
+            log('Fetching stream URL...', 'info');
+            
+            try {
+                // Get stream URL
+                const streamResponse = await fetch(`${API_URL}/api/v1/stream?id=one-piece-100?ep=1&server=HD-1&type=sub`);
+                const streamData = await streamResponse.json();
+                
+                if (!streamData.success) {
+                    log(`✗ Stream API failed: ${JSON.stringify(streamData)}`, 'error');
+                    return;
+                }
+                
+                const hlsUrl = streamData.data.link.file;
+                log(`✓ Got stream URL: ${hlsUrl.substring(0, 80)}...`, 'success');
+                
+                // Test if URL is direct or proxied
+                if (hlsUrl.includes('/proxy?url=')) {
+                    log('URL is proxied through API', 'info');
+                } else {
+                    log('URL is direct CDN link', 'info');
+                }
+                
+                // Try to load with HLS.js
+                if (Hls.isSupported()) {
+                    log('HLS.js is supported, loading stream...', 'info');
+                    
+                    if (hls) {
+                        hls.destroy();
+                    }
+                    
+                    hls = new Hls({
+                        debug: false,
+                        enableWorker: true,
+                    });
+                    
+                    hls.loadSource(hlsUrl);
+                    hls.attachMedia(video);
+                    
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        log('✓ Manifest loaded successfully!', 'success');
+                        log('Video is ready to play', 'success');
+                    });
+                    
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        log(`HLS Error: ${data.type} - ${data.details} (fatal: ${data.fatal})`, 'error');
+                        
+                        if (data.fatal) {
+                            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                                log('Fatal network error - CDN may be blocking or URL expired', 'error');
+                            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                                log('Fatal media error - trying to recover...', 'error');
+                                hls.recoverMediaError();
+                            }
+                        }
+                    });
+                    
+                    hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
+                        log(`✓ Fragment loaded: ${data.frag.sn}`, 'success');
+                    });
+                    
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    log('Native HLS support detected', 'info');
+                    video.src = hlsUrl;
+                } else {
+                    log('HLS not supported in this browser', 'error');
+                }
+                
+            } catch (error) {
+                log(`✗ Stream Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-test on load
+        window.onload = () => {
+            log('Page loaded. Click "Test API Connection" to start.', 'info');
+        };
+    </script>
+</body>
+</html>

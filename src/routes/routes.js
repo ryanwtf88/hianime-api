@@ -24,6 +24,7 @@ import randomController from '../controllers/random.controller.js';
 import schedulesController from '../controllers/schedules.controller.js';
 import embedController from '../controllers/embedController.js';
 import proxyController from '../controllers/proxy.controller.js';
+import m3u8ProxyController from '../controllers/m3u8ProxyController.js';
 
 const router = new Hono();
 
@@ -47,6 +48,7 @@ router.get('/servers', handler(serversController));
 router.get('/stream', handler(streamController));
 router.get('/embed/:server/:id/:type', embedController);
 router.get('/embed', embedController);
+router.get('/embed/proxy', m3u8ProxyController);
 router.get('/proxy', proxyController);
 router.options('/proxy', (c) => {
   c.header('Access-Control-Allow-Origin', '*');

@@ -9,9 +9,9 @@ export const extractStream = async ({ selectedServer, id }) => {
 
   const streamingLink = await megacloud({ selectedServer, id });
   
-  // Return direct URL - CDN blocks Cloudflare Workers, but allows browser access
-  // The proxy endpoint is still available for clients that need it
-  // Client can choose to use: /api/v1/proxy?url=ENCODED_URL&referer=https%3A%2F%2Fmegacloud.tv
+  // Return direct CDN URLs - CDN blocks Cloudflare Workers but allows browser access
+  // The M3U8 and TS segments can be fetched directly from the browser with CORS
+  // Your frontend should use these URLs directly without proxying
   
   return streamingLink;
 };
