@@ -37,7 +37,7 @@
     "cheerio": "^1.0.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.7",
-    "hono": "^4.6.5",
+    "hono": "^4.11.8",
     "hono-rate-limiter": "^0.4.2",
     "image-pixels": "^2.2.2",
     "m3u8-parser": "^7.2.0",
