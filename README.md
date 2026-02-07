@@ -24,8 +24,10 @@
   - [Local Setup](#local-setup)
 - [Deployment](#deployment)
   - [Docker Deployment](#docker-deployment)
+  - [Cloudflare Workers Deployment](#cloudflare-workers-deployment)
   - [Vercel Deployment](#vercel-deployment-serverless--recommended)
   - [Replit Deployment](#replit-deployment)
+  - [Proxy Service Deployment](#proxy-service-deployment)
 - [Documentation](#documentation)
   - [Anime Home Page](#1-get-anime-home-page)
   - [Anime Schedule](#2-get-anime-schedule)
@@ -240,6 +242,81 @@ Then run:
 docker-compose up -d
 ```
 
+### Cloudflare Workers Deployment
+
+**Prerequisites:**
+- Cloudflare account ([Sign up](https://dash.cloudflare.com/sign-up))
+- Wrangler CLI installed globally
+
+**Step 1:** Install Wrangler CLI
+
+```bash
+npm install -g wrangler
+```
+
+**Step 2:** Login to Cloudflare
+
+```bash
+wrangler login
+```
+
+**Step 3:** Update `wrangler.toml` with your account ID
+
+```toml
+name = "hianime-api"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+account_id = "YOUR_ACCOUNT_ID"  # Replace with your Cloudflare account ID
+
+[observability]
+enabled = true
+```
+
+**Step 4:** Deploy to Cloudflare Workers
+
+```bash
+npm run deploy:cloudflare
+# or
+bun run deploy:cloudflare
+```
+
+**Step 5:** Test your deployment
+
+Your API will be available at: `https://hianime-api.YOUR_SUBDOMAIN.workers.dev`
+
+**Development Mode:**
+
+```bash
+npm run dev:cloudflare
+# or
+bun run dev:cloudflare
+```
+
+**Why Cloudflare Workers?**
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Edge computing with global distribution
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Extremely fast response times (< 50ms)
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with 100,000 requests/day
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic scaling and DDoS protection
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) No cold starts
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Built-in rate limiting disabled for better performance
+
+**Custom Domain:**
+
+To use a custom domain with Cloudflare Workers:
+
+1. Go to your Cloudflare Workers dashboard
+2. Select your worker
+3. Click "Triggers" tab
+4. Add a custom domain or route
+
+**Environment Variables:**
+
+Cloudflare Workers doesn't use traditional environment variables. All configuration is in `src/config/config.js`.
+
+---
+
 ### Vercel Deployment (Serverless) ![Recommended](https://img.shields.io/badge/Recommended-blue?style=flat-square)
 
 **One-Click Deploy:**
@@ -288,6 +365,67 @@ For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 3. Your API will be available at your Replit URL
 
 For detailed deployment instructions, troubleshooting, and best practices, see the [DEPLOYMENT.md](https://github.com/ryanwtf88/hianime-api/blob/master/DEPLOYMENT.md) guide.
+
+---
+
+### Proxy Service Deployment
+
+This API uses an external proxy service to handle M3U8 stream rewriting and bypass CDN restrictions. The proxy is deployed separately on Cloudflare Workers.
+
+**Proxy Repository:** The proxy service is located in a separate repository/folder.
+
+**Current Proxy URL:** `https://proxy.animo.qzz.io`
+
+**Deploy Your Own Proxy:**
+
+1. Navigate to your proxy folder (if separate repo, clone it)
+2. Update `wrangler.toml` with your Cloudflare account ID:
+
+```toml
+name = "hianime-proxy"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+account_id = "YOUR_ACCOUNT_ID"
+```
+
+3. Deploy to Cloudflare Workers:
+
+```bash
+cd proxy
+wrangler deploy
+```
+
+4. Update the proxy URL in `src/config/config.js`:
+
+```javascript
+proxyUrl: 'https://your-proxy.workers.dev',
+```
+
+**Proxy Features:**
+- M3U8 playlist rewriting for seamless streaming
+- CDN bypass using socket connections for blocked hostnames
+- CORS header management
+- Referer header preservation
+- Supports both video streams and subtitle files
+
+**Supported CDN Hostnames (Socket Fetch):**
+- haildrop.com
+- douvid.com
+- lightningspark.site
+- sunburst.stream
+- rainveil.net
+- fogtwist.com
+- stormshade.xyz
+- sunshinerays.com
+- netmagcdn.com
+
+**Why Separate Proxy?**
+- Better performance with edge computing
+- Independent scaling
+- Easier to update proxy logic without redeploying main API
+- Can be shared across multiple API instances
 
 ---
 
