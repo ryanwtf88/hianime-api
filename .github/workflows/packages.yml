@@ -162,6 +162,21 @@ jobs:
           '
 
       - name: Publish to GitHub Packages
-        run: npm publish
+        run: npm publish 2>&1 | tee publish.log || echo "Publish failed or version exists"
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check publish result
+        run: |
+          if grep -q "Cannot publish over existing version" publish.log; then
+            echo "Version already published, skipping..."
+            exit 0
+          elif grep -q "npm notice" publish.log; then
+            echo "Successfully published!"
+            exit 0
+          else
+            echo "Publish failed with unexpected error"
+            cat publish.log
+            exit 1
+          fi

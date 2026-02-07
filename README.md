@@ -194,7 +194,6 @@ docker run -p 5000:5000 \
 **Multi-platform support:**
 - `linux/amd64` - x86_64 architecture
 - `linux/arm64` - ARM64 architecture (Apple Silicon, AWS Graviton)
-- `linux/arm/v7` - ARM v7 (Raspberry Pi)
 
 #### Build from Source
 
