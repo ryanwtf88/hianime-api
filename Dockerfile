@@ -25,12 +25,28 @@ FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /app/index.js .
 COPY --from=prerelease /app/package.json .
+COPY --from=prerelease /app/src ./src
+
+# Add build arguments for metadata
+ARG VERSION
+ARG BUILD_DATE
+ARG VCS_REF
+
+# Add labels for metadata
+LABEL org.opencontainers.image.title="hianime-api"
+LABEL org.opencontainers.image.description="A RESTful API for HiAnime content"
+LABEL org.opencontainers.image.version="${VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.revision="${VCS_REF}"
+LABEL org.opencontainers.image.source="https://github.com/ryanwtf88/hianime-api"
+LABEL org.opencontainers.image.licenses="MIT"
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 5000
 
 # Set environment to production
 ENV NODE_ENV=production
+ENV PORT=5000
 
 # Run the app
 USER bun

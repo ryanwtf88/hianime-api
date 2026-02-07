@@ -1,15 +1,14 @@
-import config from '../config/config.js';
-
-const hianimeApiDocs = {
+// Function to generate swagger docs with dynamic server URL
+export const getSwaggerDocs = (baseUrl) => ({
   openapi: '3.0.0',
   info: {
     title: 'hianime-api',
-    version: '2.0.0',
+    version: '1.0.4', // Update this when package.json version changes
     description: 'API Documentation For HiAnime Content Endpoints',
   },
   servers: [
     {
-      url: `${config.baseUrl}/api/${config.apiVersion}`,
+      url: `${baseUrl}/api/v1`,
     },
   ],
   paths: {
@@ -432,8 +431,8 @@ const hianimeApiDocs = {
         summary: 'Stream episode',
         parameters: [
           { name: 'id', in: 'query', required: true, schema: { type: 'string' } },
-          { name: 'type', in: 'query', schema: { type: 'string', default: 'sub' } },
-          { name: 'server', in: 'query', schema: { type: 'string', default: 'hd-2' } },
+          { name: 'type', in: 'query', schema: { type: 'string', enum: ['sub', 'dub', 'raw'], default: 'sub' } },
+          { name: 'server', in: 'query', schema: { type: 'string', default: 'hd-1' } },
         ],
         responses: { 200: { description: 'Success' } },
       },
@@ -449,9 +448,7 @@ const hianimeApiDocs = {
       get: {
         summary: 'Get next episode schedule',
         description: 'Fetches the next episode schedule for a specific anime',
-        parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
-        ],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
         responses: { 200: { description: 'Success' } },
       },
     },
@@ -506,10 +503,66 @@ const hianimeApiDocs = {
           {
             name: 'room',
             in: 'query',
-            schema: { type: 'string', enum: ['all', 'on_air', 'scheduled', 'waiting', 'ended'], default: 'all' },
+            schema: {
+              type: 'string',
+              enum: ['all', 'on_air', 'scheduled', 'waiting', 'ended'],
+              default: 'all',
+            },
           },
         ],
         responses: { 200: { description: 'Success' } },
+      },
+    },
+    '/watch2gether/player/{id}': {
+      get: {
+        summary: 'Watch2gether player data',
+        description: 'Returns player data for a watch2gether room including embed URL',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Watch2gether room ID',
+          },
+          {
+            name: 'server',
+            in: 'query',
+            schema: { type: 'string', enum: ['HD-1', 'HD-2', 'HD-3'], default: 'HD-2' },
+            description: 'Server to use for streaming',
+          },
+        ],
+        responses: { 
+          200: { 
+            description: 'Player data with embed URL',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean' },
+                    data: {
+                      type: 'object',
+                      properties: {
+                        roomId: { type: 'string' },
+                        roomTitle: { type: 'string' },
+                        animeId: { type: 'string' },
+                        animeTitle: { type: 'string' },
+                        episode: { type: 'number' },
+                        episodeId: { type: 'string' },
+                        type: { type: 'string', enum: ['sub', 'dub', 'raw'] },
+                        server: { type: 'string' },
+                        embedUrl: { type: 'string' },
+                        createdBy: { type: 'string' },
+                        status: { type: 'string' },
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } 
+        },
       },
     },
     '/embed/{server}/{id}/{type}': {
@@ -517,9 +570,27 @@ const hianimeApiDocs = {
         summary: 'Embedded video player',
         description: 'Returns an embedded video player for the specified episode',
         parameters: [
-          { name: 'server', in: 'path', required: true, schema: { type: 'string', enum: ['hd-1', 'hd-2'], default: 'hd-2' }, description: 'Server ID' },
-          { name: 'id', in: 'path', required: true, schema: { type: 'string' }, description: 'Episode ID' },
-          { name: 'type', in: 'path', required: true, schema: { type: 'string', enum: ['sub', 'dub'], default: 'sub' }, description: 'Audio type' },
+          {
+            name: 'server',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', enum: ['hd-1', 'hd-2', 'hd-3'], default: 'hd-1' },
+            description: 'Server ID',
+          },
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Episode ID',
+          },
+          {
+            name: 'type',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', enum: ['sub', 'dub', 'raw'], default: 'sub' },
+            description: 'Audio type',
+          },
         ],
         responses: { 200: { description: 'HTML video player page' } },
       },
@@ -529,9 +600,25 @@ const hianimeApiDocs = {
         summary: 'Embedded video player (query params)',
         description: 'Returns an embedded video player using query parameters',
         parameters: [
-          { name: 'id', in: 'query', required: true, schema: { type: 'string' }, description: 'Episode ID' },
-          { name: 'server', in: 'query', schema: { type: 'string', enum: ['hd-1', 'hd-2'], default: 'hd-2' }, description: 'Server ID' },
-          { name: 'type', in: 'query', schema: { type: 'string', enum: ['sub', 'dub'], default: 'sub' }, description: 'Audio type' },
+          {
+            name: 'id',
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Episode ID',
+          },
+          {
+            name: 'server',
+            in: 'query',
+            schema: { type: 'string', enum: ['hd-1', 'hd-2', 'hd-3'], default: 'hd-1' },
+            description: 'Server ID',
+          },
+          {
+            name: 'type',
+            in: 'query',
+            schema: { type: 'string', enum: ['sub', 'dub', 'raw'], default: 'sub' },
+            description: 'Audio type',
+          },
         ],
         responses: { 200: { description: 'HTML video player page' } },
       },
@@ -539,10 +626,22 @@ const hianimeApiDocs = {
     '/proxy': {
       get: {
         summary: 'Proxy video streams and subtitles',
-        description: 'Proxies video streams and subtitles with proper headers to bypass CORS restrictions',
+        description:
+          'Proxies video streams and subtitles with proper headers to bypass CORS restrictions',
         parameters: [
-          { name: 'url', in: 'query', required: true, schema: { type: 'string' }, description: 'URL to proxy (video stream or subtitle file)' },
-          { name: 'referer', in: 'query', schema: { type: 'string', default: 'https://megacloud.tv' }, description: 'Referer header value' },
+          {
+            name: 'url',
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+            description: 'URL to proxy (video stream or subtitle file)',
+          },
+          {
+            name: 'referer',
+            in: 'query',
+            schema: { type: 'string', default: 'https://megacloud.tv' },
+            description: 'Referer header value',
+          },
         ],
         responses: {
           200: { description: 'Proxied content (video stream or subtitle file)' },
@@ -558,30 +657,7 @@ const hianimeApiDocs = {
         responses: { 200: { description: 'Success' } },
       },
     },
-    '/admin/clear-cache': {
-      get: {
-        summary: 'Clear Redis cache',
-        description: 'Clears all cached data from Redis. Returns the number of keys cleared.',
-        responses: {
-          200: {
-            description: 'Cache cleared successfully',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    success: { type: 'boolean' },
-                    message: { type: 'string' },
-                    keysCleared: { type: 'integer' },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
   },
-};
+});
 
-export default hianimeApiDocs;
+export default getSwaggerDocs;

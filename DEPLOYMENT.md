@@ -78,26 +78,28 @@ Vercel provides the best serverless deployment experience with automatic scaling
 
 Add these in Vercel Dashboard → Project Settings → Environment Variables:
 
-| Variable | Value | Required | Description |
-|----------|-------|----------|-------------|
-| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | **Yes** | Redis connection URL |
-| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | **Yes** | Redis auth token |
-| `ORIGIN` | `*` or your domain | No | CORS allowed origins |
-| `RATE_LIMIT_ENABLED` | `true` | No | Enable rate limiting |
-| `RATE_LIMIT_WINDOW_MS` | `60000` | No | Rate limit window (ms) |
-| `RATE_LIMIT_LIMIT` | `100` | No | Max requests per window |
-| `LOG_LEVEL` | `INFO` | No | Logging level |
-| `ENABLE_LOGGING` | `true` | No | Enable request logging |
+| Variable                   | Value                    | Required | Description             |
+| -------------------------- | ------------------------ | -------- | ----------------------- |
+| `UPSTASH_REDIS_REST_URL`   | Your Upstash Redis URL   | **Yes**  | Redis connection URL    |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | **Yes**  | Redis auth token        |
+| `ORIGIN`                   | `*` or your domain       | No       | CORS allowed origins    |
+| `RATE_LIMIT_ENABLED`       | `true`                   | No       | Enable rate limiting    |
+| `RATE_LIMIT_WINDOW_MS`     | `60000`                  | No       | Rate limit window (ms)  |
+| `RATE_LIMIT_LIMIT`         | `100`                    | No       | Max requests per window |
+| `LOG_LEVEL`                | `INFO`                   | No       | Logging level           |
+| `ENABLE_LOGGING`           | `true`                   | No       | Enable request logging  |
 
 ### Redis Setup with Upstash
 
 Redis caching is **required** for Vercel deployment to improve performance and reduce API calls.
 
 **Step 1: Create Upstash Account**
+
 1. Go to [Upstash Console](https://console.upstash.com/)
 2. Sign up with GitHub (free)
 
 **Step 2: Create Redis Database**
+
 1. Click "Create Database"
 2. **Name**: `hianime-api-cache`
 3. **Type**: Regional (faster) or Global (more reliable)
@@ -106,6 +108,7 @@ Redis caching is **required** for Vercel deployment to improve performance and r
 6. Click "Create"
 
 **Step 3: Get Credentials**
+
 1. Go to database details
 2. Scroll to "REST API" section
 3. Copy:
@@ -113,12 +116,14 @@ Redis caching is **required** for Vercel deployment to improve performance and r
    - `UPSTASH_REDIS_REST_TOKEN`
 
 **Step 4: Add to Vercel**
+
 1. Go to Vercel Project Settings
 2. Navigate to "Environment Variables"
 3. Add both variables
 4. Redeploy your project
 
 **Verify Redis is Working:**
+
 ```bash
 # Test cache endpoint
 curl https://your-api.vercel.app/api/v1/home
@@ -161,11 +166,13 @@ The `vercel.json` file configures serverless deployment:
 ### Monitoring
 
 **View logs:**
+
 - Go to Deployments tab
 - Click on deployment
 - View "Functions" logs
 
 **Monitor performance:**
+
 - Analytics tab shows request metrics
 - Speed Insights for performance data
 
@@ -190,11 +197,13 @@ docker images | grep hianime-api
 ### Running the Container
 
 **Basic run:**
+
 ```bash
 docker run -p 3030:3030 hianime-api
 ```
 
 **With environment variables:**
+
 ```bash
 docker run -p 3030:3030 \
   -e NODE_ENV=production \
@@ -205,6 +214,7 @@ docker run -p 3030:3030 \
 ```
 
 **Detached mode (background):**
+
 ```bash
 docker run -d \
   -p 3030:3030 \
@@ -214,6 +224,7 @@ docker run -d \
 ```
 
 **View logs:**
+
 ```bash
 docker logs -f hianime-api
 ```
@@ -230,7 +241,7 @@ services:
     build: .
     container_name: hianime-api
     ports:
-      - "3030:3030"
+      - '3030:3030'
     environment:
       - NODE_ENV=production
       - PORT=3030
@@ -238,19 +249,20 @@ services:
       - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3030/ping"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3030/ping']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 ```
 
 **Commands:**
+
 ```bash
 # Start
 docker-compose up -d
@@ -292,6 +304,7 @@ Railway offers excellent Docker support with generous free tier.
    - Settings → Generate Domain or add custom
 
 **Benefits:**
+
 - $5 free credit/month
 - Excellent Docker support
 - Auto-deploy on git push
@@ -312,9 +325,10 @@ Good for testing and development.
 
 2. **Configure:**
    - Create `.replit` file:
+
    ```toml
    run = "bun run start"
-   
+
    [nix]
    channel = "stable-22_11"
    ```
@@ -328,6 +342,7 @@ Good for testing and development.
    - Access via Replit URL
 
 **Limitations:**
+
 - Free tier sleeps after inactivity
 - Limited resources
 - Better for development than production
@@ -338,29 +353,30 @@ Good for testing and development.
 
 ### Required Variables
 
-| Variable | Example | Description |
-|----------|---------|-------------|
-| `UPSTASH_REDIS_REST_URL` | `https://your-db.upstash.io` | Upstash Redis URL |
-| `UPSTASH_REDIS_REST_TOKEN` | `AXaEAAInc...` | Upstash Redis token |
+| Variable                   | Example                      | Description         |
+| -------------------------- | ---------------------------- | ------------------- |
+| `UPSTASH_REDIS_REST_URL`   | `https://your-db.upstash.io` | Upstash Redis URL   |
+| `UPSTASH_REDIS_REST_TOKEN` | `AXaEAAInc...`               | Upstash Redis token |
 
 ### Optional Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `5000` | Server port |
-| `NODE_ENV` | `development` | Environment mode |
-| `ORIGIN` | `*` | CORS allowed origins |
-| `RATE_LIMIT_ENABLED` | `true` | Enable rate limiting |
-| `RATE_LIMIT_WINDOW_MS` | `60000` | Rate limit window (1 min) |
-| `RATE_LIMIT_LIMIT` | `1000000000` | Max requests per window |
-| `LOG_LEVEL` | `INFO` | Log level (ERROR, WARN, INFO, DEBUG) |
-| `ENABLE_LOGGING` | `false` | Enable request logging |
-| `HIANIME_BASE_URL` | `https://hianime.to` | Source website URL |
-| `BASE_URL` | Auto-detected | API base URL |
+| Variable               | Default              | Description                          |
+| ---------------------- | -------------------- | ------------------------------------ |
+| `PORT`                 | `5000`               | Server port                          |
+| `NODE_ENV`             | `development`        | Environment mode                     |
+| `ORIGIN`               | `*`                  | CORS allowed origins                 |
+| `RATE_LIMIT_ENABLED`   | `true`               | Enable rate limiting                 |
+| `RATE_LIMIT_WINDOW_MS` | `60000`              | Rate limit window (1 min)            |
+| `RATE_LIMIT_LIMIT`     | `1000000000`         | Max requests per window              |
+| `LOG_LEVEL`            | `INFO`               | Log level (ERROR, WARN, INFO, DEBUG) |
+| `ENABLE_LOGGING`       | `false`              | Enable request logging               |
+| `HIANIME_BASE_URL`     | `https://hianime.to` | Source website URL                   |
+| `BASE_URL`             | Auto-detected        | API base URL                         |
 
 ### Setting Environment Variables
 
 **Vercel:**
+
 ```bash
 # Via CLI
 vercel env add UPSTASH_REDIS_REST_URL
@@ -369,6 +385,7 @@ vercel env add UPSTASH_REDIS_REST_URL
 ```
 
 **Docker:**
+
 ```bash
 # Via command line
 docker run -e VAR_NAME=value ...
@@ -378,6 +395,7 @@ docker run --env-file .env ...
 ```
 
 **Railway:**
+
 - Dashboard → Variables tab → Add variable
 
 ---
@@ -394,14 +412,17 @@ docker run --env-file .env ...
 ### Cache Strategy
 
 **Cached Endpoints:**
+
 - `/api/v1/home` - 24 hours
 - `/api/v1/anime/:id` - 24 hours
 
 **Cache Keys:**
+
 - `home` - Homepage data
 - `anime:{id}` - Anime details
 
 **TTL (Time To Live):**
+
 - Default: 24 hours (86400 seconds)
 - Configurable in code
 
@@ -415,6 +436,7 @@ curl https://your-api.vercel.app/api/v1/admin/clear-cache
 ### Monitor Cache Performance
 
 Check logs for:
+
 - `Cache HIT: key` - Data served from cache (fast)
 - `Cache MISS: key` - Data fetched from source (slow)
 - `Cache SET: key (TTL: 86400s)` - Data cached
@@ -426,23 +448,27 @@ Check logs for:
 ### Vercel Issues
 
 **Build fails:**
+
 - Check build logs in deployment details
 - Verify `package.json` has all dependencies
 - Ensure `bun.lockb` is committed
 - Check `vercel.json` syntax
 
 **Function timeout:**
+
 - Vercel has 10s timeout on Hobby plan
 - Implement caching to reduce response time
 - Upgrade to Pro for 60s timeout
 
 **Redis connection fails:**
+
 - Verify environment variables are set
 - Check Upstash database is active
 - Test Redis URL with curl
 - Ensure region is correct
 
 **CORS errors:**
+
 - Set `ORIGIN` environment variable
 - Check allowed origins in `config.js`
 - Verify request headers
@@ -450,6 +476,7 @@ Check logs for:
 ### Docker Issues
 
 **Port already in use:**
+
 ```bash
 # Find process
 lsof -i :3030  # macOS/Linux
@@ -460,6 +487,7 @@ docker run -p 3031:3030 hianime-api
 ```
 
 **Container exits immediately:**
+
 ```bash
 # Check logs
 docker logs hianime-api
@@ -469,6 +497,7 @@ docker run -it hianime-api /bin/sh
 ```
 
 **Build fails:**
+
 ```bash
 # Clear cache and rebuild
 docker build --no-cache -t hianime-api .
@@ -480,6 +509,7 @@ docker build --progress=plain -t hianime-api .
 ### General Issues
 
 **API not responding:**
+
 1. Check service is running
 2. Verify correct port
 3. Test health endpoint: `/ping`
@@ -487,12 +517,14 @@ docker build --progress=plain -t hianime-api .
 5. Review application logs
 
 **Slow responses:**
+
 1. Verify Redis is configured
 2. Check cache hit rate in logs
 3. Monitor source website speed
 4. Consider upgrading instance
 
 **Rate limiting errors:**
+
 1. Implement request caching
 2. Add delays between requests
 3. Respect source website limits
@@ -527,11 +559,13 @@ await withCache('key', fetchFunction, 60 * 60 * 24); // 24 hours
 ### 4. Monitor Performance
 
 **Vercel Analytics:**
+
 - Enable in Project Settings
 - View response times
 - Identify slow endpoints
 
 **Upstash Metrics:**
+
 - Monitor cache hit rate
 - Track memory usage
 - Optimize eviction policy
@@ -558,7 +592,7 @@ rateLimit: {
 ✅ **Enable rate limiting**  
 ✅ **Keep dependencies updated**: `bun update`  
 ✅ **Rotate Redis credentials** regularly  
-✅ **Use environment variables** for secrets  
+✅ **Use environment variables** for secrets
 
 ### Monitoring
 
@@ -566,7 +600,7 @@ rateLimit: {
 ✅ **Enable error tracking** (Sentry, LogRocket)  
 ✅ **Monitor cache performance**  
 ✅ **Track API response times**  
-✅ **Set up alerts** for downtime  
+✅ **Set up alerts** for downtime
 
 ### Scaling
 
@@ -574,7 +608,7 @@ rateLimit: {
 ✅ **Monitor resource usage**  
 ✅ **Scale when needed** (Vercel auto-scales)  
 ✅ **Use caching** to reduce load  
-✅ **Implement request queuing** for high traffic  
+✅ **Implement request queuing** for high traffic
 
 ### Maintenance
 
@@ -582,13 +616,14 @@ rateLimit: {
 ✅ **Test updates in staging**  
 ✅ **Use semantic versioning**  
 ✅ **Backup configurations**  
-✅ **Document deployment process**  
+✅ **Document deployment process**
 
 ---
 
 ## Additional Resources
 
 ### Official Documentation
+
 - [Vercel Documentation](https://vercel.com/docs)
 - [Upstash Documentation](https://docs.upstash.com/)
 - [Docker Documentation](https://docs.docker.com/)
@@ -596,12 +631,14 @@ rateLimit: {
 - [Bun Documentation](https://bun.sh/docs)
 
 ### Project Resources
+
 - [GitHub Repository](https://github.com/ryanwtf88/hianime-api)
 - [API Documentation](https://github.com/ryanwtf88/hianime-api#documentation)
 - [Issues Tracker](https://github.com/ryanwtf88/hianime-api/issues)
 - [Discussions](https://github.com/ryanwtf88/hianime-api/discussions)
 
 ### Support
+
 - [Report Bug](https://github.com/ryanwtf88/hianime-api/issues/new)
 - [Request Feature](https://github.com/ryanwtf88/hianime-api/issues/new)
 - [Ask Question](https://github.com/ryanwtf88/hianime-api/discussions)

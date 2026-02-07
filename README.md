@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Bun](https://img.shields.io/badge/bun-%23000000.svg?style=flat&logo=bun&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat&logo=typescript&logoColor=white)
@@ -63,7 +63,8 @@
   - [Special](#34-get-special)
   - [Events](#35-get-events)
   - [Anime News](#37-get-anime-news)
-  - [Watch2gether](#38-get-watch2gether-rooms)
+  - [Watch2gether Rooms](#38-get-watch2gether-rooms)
+  - [Watch2gether Player](#381-get-watch2gether-player-data)
   - [Random Anime](#39-get-random-anime)
   - [Clear Cache](#36-clear-redis-cache)
 - [Development](#development)
@@ -165,6 +166,36 @@ The server will be running at [http://localhost:3030](http://localhost:3030)
 **Prerequisites:**
 - Docker installed ([Install Docker](https://docs.docker.com/get-docker/))
 
+#### Using Pre-built Image from GitHub Container Registry
+
+**Pull and run the latest image:**
+
+```bash
+docker pull ghcr.io/ryanwtf88/hianime-api:latest
+docker run -p 5000:5000 ghcr.io/ryanwtf88/hianime-api:latest
+```
+
+**Run with environment variables:**
+
+```bash
+docker run -p 5000:5000 \
+  -e NODE_ENV=production \
+  -e PORT=5000 \
+  ghcr.io/ryanwtf88/hianime-api:latest
+```
+
+**Available tags:**
+- `latest` - Latest stable build from master branch
+- `v1.0.4` - Specific version
+- `master` - Latest commit from master branch
+
+**Multi-platform support:**
+- `linux/amd64` - x86_64 architecture
+- `linux/arm64` - ARM64 architecture (Apple Silicon, AWS Graviton)
+- `linux/arm/v7` - ARM v7 (Raspberry Pi)
+
+#### Build from Source
+
 **Build the Docker image:**
 
 ```bash
@@ -174,19 +205,10 @@ docker build -t hianime-api .
 **Run the container:**
 
 ```bash
-docker run -p 3030:3030 hianime-api
+docker run -p 5000:5000 hianime-api
 ```
 
-**With environment variables:**
-
-```bash
-docker run -p 3030:3030 \
-  -e NODE_ENV=production \
-  -e PORT=3030 \
-  hianime-api
-```
-
-**Using Docker Compose:**
+#### Using Docker Compose
 
 Create a `docker-compose.yml` file:
 
@@ -195,15 +217,17 @@ version: '3.8'
 
 services:
   hianime-api:
-    build: .
+    image: ghcr.io/ryanwtf88/hianime-api:latest
+    # Or build from source:
+    # build: .
     ports:
-      - "3030:3030"
+      - "5000:5000"
     environment:
       - NODE_ENV=production
-      - PORT=3030
+      - PORT=5000
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3030/"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/v1/home"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -1567,17 +1591,71 @@ console.log(data);
   "data": {
     "rooms": [
       {
-        "id": "room-id",
-        "animeTitle": "One Piece",
-        "roomTitle": "Watch One Piece together",
-        "status": "On-air",
+        "id": "1518869",
+        "animeId": "1518869",
+        "animeTitle": "Fullmetal Alchemist: Brotherhood",
+        "roomTitle": "Watch Fullmetal Alchemist: Brotherhood together",
+        "poster": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/...",
+        "episode": "Episode 1",
         "type": "SUB",
-        "episode": "Episode 1"
+        "status": "🤟 Waiting",
+        "createdBy": "John",
+        "createdAt": "15 minutes ago",
+        "url": "/watch2gether/1518869",
+        "playerUrl": "http://localhost:5000/api/v1/watch2gether/player/1518869"
       }
-    ]
+    ],
+    "total": 10
   }
 }
 ```
+
+---
+
+### 38.1. GET Watch2gether Player Data
+
+Get player data for a specific watch2gether room including anime info and embed URL.
+
+**Endpoint:**
+```
+GET /api/v1/watch2gether/player/:id?server=:server
+```
+
+**Parameters:**
+- `id` (path, required): Watch2gether room ID
+- `server` (query, optional): Server to use (HD-1, HD-2, HD-3), default: HD-2
+
+**Request Example:**
+
+```javascript
+const resp = await fetch('/api/v1/watch2gether/player/1518869?server=HD-2');
+const data = await resp.json();
+console.log(data);
+```
+
+**Response Schema:**
+
+```javascript
+{
+  "success": true,
+  "data": {
+    "roomId": "1518869",
+    "roomTitle": "Watch Fullmetal Alchemist: Brotherhood together",
+    "animeId": "fullmetal-alchemist-brotherhood-1",
+    "animeTitle": "Fullmetal Alchemist: Brotherhood",
+    "episode": 1,
+    "episodeId": "1",
+    "type": "sub",
+    "server": "HD-2",
+    "embedUrl": "http://localhost:5000/api/v1/embed/HD-2/fullmetal-alchemist-brotherhood-1?ep=1&type=sub",
+    "createdBy": "John",
+    "status": "35"
+  }
+}
+```
+
+**Usage:**
+Use the `embedUrl` to embed the video player in your frontend application. The endpoint automatically detects the anime, episode, and type (sub/dub/raw) from the watch2gether room.
 
 ---
 

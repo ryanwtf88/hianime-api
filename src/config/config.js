@@ -1,45 +1,64 @@
+/**
+ * Configuration for HiAnime API
+ *
+ * All settings are configured directly in this file.
+ * Modify the values below to customize the API for your deployment.
+ *
+ * Platform-specific settings:
+ * - Local/Docker: All settings work as-is
+ * - Vercel: Set rateLimit.enabled to true, redis can be enabled with Upstash
+ * - Cloudflare Workers: Set rateLimit.enabled to false (use CF's built-in rate limiting)
+ *                       Redis not supported (use KV storage instead if needed)
+ */
+
 const config = {
-  baseurl: process.env.HIANIME_BASE_URL || 'https://hianime.to',
-  baseurl_v2: process.env.HIANIME_BASE_URL_V2 || 'https://aniwatchtv.to',
-  baseUrl: process.env.BASE_URL || 'https://api-animo.vercel.app',
-  origin: process.env.ORIGIN || '*',
-  port: process.env.PORT || 5000,
+  // HiAnime source URL
+  baseurl: 'https://hianime.to',
+  
+  baseurl2: 'https://aniwatchtv.to',
 
-  apiVersion: 'v1',
+  // CORS origin (* for all, or comma-separated URLs)
+  origin: '*',
 
-  documentation: {
-    githubUrl: 'https://github.com/ryanwtf88/hianime-api/blob/main/README.md',
-  },
+  // Server port (used for local/Docker deployments)
+  port: 5000,
 
+  // External proxy URL for streaming
+  proxyUrl: 'https://proxy.animo.qzz.io',
+
+  // Redis configuration (leave empty to disable caching)
   redis: {
-    url: process.env.UPSTASH_REDIS_REST_URL || 'https://easy-dassie-30340.upstash.io',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || 'AXaEAAIncDJlNTY5YWM4NWQ5ZGE0Mzg1YTljY2ZiOThiZTA3YzE0MHAyMzAzNDA',
-    enabled: true,
+    url: '',
+    token: '',
+    enabled: false,
   },
 
+  // External provider URLs
   providers: {
-    megacloud: process.env.MEGACLOUD_URL || 'https://megacloud.blog',
-    megaplay: process.env.MEGAPLAY_URL || 'https://megaplay.buzz',
-    vidwish: process.env.VIDWISH_URL || 'https://vidwish.live',
-
+    megacloud: 'https://megacloud.blog',
   },
 
+  // Rate limiting settings
+  // Note: Disable for Cloudflare Workers (use Cloudflare's built-in rate limiting instead)
   rateLimit: {
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60000,
-    limit: parseInt(process.env.RATE_LIMIT_LIMIT) || 1000000000,
-    enabled: process.env.RATE_LIMIT_ENABLED !== 'false',
+    windowMs: 60000, // 1 minute
+    limit: 1000000000, // requests per window
+    enabled: false, // Set to true for local/Vercel, false for Cloudflare Workers
   },
 
+  // HTTP headers
   headers: {
-    'User-Agent': process.env.USER_AGENT || 'Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0',
   },
 
-  logLevel: process.env.LOG_LEVEL?.toUpperCase() || 'INFO',
-  enableLogging: process.env.ENABLE_LOGGING === 'true',
+  // Logging settings
+  logLevel: 'INFO',
+  enableLogging: false,
 
-  isProduction: process.env.NODE_ENV === 'production',
-  isDevelopment: process.env.NODE_ENV === 'development',
-  isVercel: Boolean(process.env.VERCEL),
+  // Environment detection
+  isProduction: true,
+  isDevelopment: false,
+  isVercel: false, // Set to true if deploying to Vercel
 };
 
 export default config;

@@ -7,7 +7,7 @@ const saveHtml = async (html, fileName) => {
     const fullPath = path.join(import.meta.dir + '../../../htmls/' + fileName);
 
     console.log(fullPath);
-    
+
     await Bun.write(fullPath, html);
   } catch (error) {
     console.log('something went wrong' + error.message);

@@ -34,7 +34,19 @@ const watch2getherController = async (c) => {
                     throw new validationError('Failed to fetch watch2gether data');
                 }
 
-                return extractWatch2gether(response.data.html);
+                const roomsData = extractWatch2gether(response.data.html);
+
+                // Add player URLs to each room
+                const protocol = c.req.header('x-forwarded-proto') || 'http';
+                const host = c.req.header('host') || 'localhost:5000';
+                const baseUrl = `${protocol}://${host}`;
+
+                roomsData.rooms = roomsData.rooms.map(room => ({
+                    ...room,
+                    playerUrl: `${baseUrl}/api/v1/watch2gether/player/${room.id}`,
+                }));
+
+                return roomsData;
             } catch (error) {
                 console.error('Watch2gether fetch failed:', error.message);
                 throw new validationError(error.message);

@@ -8,16 +8,16 @@ const streamController = async (c) => {
   if (!id) throw new validationError('id is required');
 
   server = server.toUpperCase();
-
-  // Validate that id contains episode information
-  // if (!id.includes('?ep=') && !id.includes('&ep=')) {
-  //   throw new validationError('episode parameter is not valid - id must contain episode information (ep=)');
-  // }
-
+  
   const servers = await getServers(id);
 
+  // Check if type exists in servers
+  if (!servers[type] || servers[type].length === 0) {
+    throw new validationError('invalid type or no servers available', { type, availableTypes: Object.keys(servers).filter(k => k !== 'episode' && servers[k].length > 0) });
+  }
+
   const selectedServer = servers[type].find((el) => el.name === server);
-  if (!selectedServer) throw new validationError('invalid or server not found', { server });
+  if (!selectedServer) throw new validationError('invalid or server not found', { server, availableServers: servers[type].map(s => s.name) });
 
   const response = await extractStream({ selectedServer, id });
   return response;

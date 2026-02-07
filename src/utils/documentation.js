@@ -1,9 +1,7 @@
-import config from '../config/config.js';
-
-const apiDocumentation = {
+// Function to generate API documentation with dynamic base URL
+export const getApiDocumentation = (baseUrl) => ({
   generalInfo: {
-    baseUrl: `${config.baseUrl}/api/${config.apiVersion}`,
-    documentationUrl: config.documentation.githubUrl,
+    baseUrl: `${baseUrl}/api/v1`,
   },
   endpoints: [
     {
@@ -349,9 +347,9 @@ const apiDocumentation = {
       hasParams: false,
       hasQueries: true,
       queriesList: ['id', 'type', 'server'],
-      defaultQueries: { type: 'sub', server: 'hd-2' },
-      example: '/stream?type=sub&server=hd-2&id=102994',
-      description: 'fetches episode source based on episode id.',
+      defaultQueries: { type: 'sub', server: 'hd-1' },
+      example: '/stream?type=sub&server=hd-1&id=102994',
+      description: 'fetches episode source based on episode id. Type can be: sub, dub, or raw',
     },
     {
       name: 'schedules',
@@ -377,8 +375,8 @@ const apiDocumentation = {
       hasParams: true,
       hasQueries: false,
       paramsList: ['server', 'id', 'type'],
-      example: '/embed/hd-2/102994/sub',
-      description: 'Returns an embedded video player for the specified episode.',
+      example: '/embed/hd-1/102994/sub',
+      description: 'Returns an embedded video player for the specified episode. Type can be: sub, dub, or raw',
     },
     {
       name: 'embed (query params)',
@@ -386,9 +384,9 @@ const apiDocumentation = {
       hasParams: false,
       hasQueries: true,
       queriesList: ['id', 'server', 'type'],
-      defaultQueries: { server: 'hd-2', type: 'sub' },
-      example: '/embed?id=102994&server=hd-2&type=sub',
-      description: 'Returns an embedded video player using query parameters.',
+      defaultQueries: { server: 'hd-1', type: 'sub' },
+      example: '/embed?id=102994&server=hd-1&type=sub',
+      description: 'Returns an embedded video player using query parameters. Type can be: sub, dub, or raw',
     },
     {
       name: 'proxy',
@@ -405,9 +403,23 @@ const apiDocumentation = {
       endpoint: '/filter',
       hasParams: false,
       hasQueries: true,
-      queriesList: ['keyword', 'type', 'status', 'rated', 'score', 'season', 'language', 'start_date', 'end_date', 'sort', 'genres', 'page'],
+      queriesList: [
+        'keyword',
+        'type',
+        'status',
+        'rated',
+        'score',
+        'season',
+        'language',
+        'start_date',
+        'end_date',
+        'sort',
+        'genres',
+        'page',
+      ],
       defaultQueries: { page: 1 },
-      example: '/filter?type=tv&status=finished-airing&rated=r&score=good&season=fall&language=sub&sort=most-popular&genres=action,adventure&page=1',
+      example:
+        '/filter?type=tv&status=finished-airing&rated=r&score=good&season=fall&language=sub&sort=most-popular&genres=action,adventure&page=1',
       description: 'Filters anime based on multiple criteria.',
     },
     {
@@ -416,7 +428,8 @@ const apiDocumentation = {
       hasParams: false,
       hasQueries: false,
       example: '/filter/options',
-      description: 'Returns all available filter options (types, statuses, ratings, scores, seasons, languages, sorts, genres).',
+      description:
+        'Returns all available filter options (types, statuses, ratings, scores, seasons, languages, sorts, genres).',
     },
     {
       name: 'genres',
@@ -445,6 +458,14 @@ const apiDocumentation = {
       description: 'Returns watch2gether room information.',
     },
     {
+      name: 'watch2gether player',
+      endpoint: '/watch2gether/player/:id',
+      hasParams: true,
+      hasQueries: true,
+      example: '/watch2gether/player/1518877?server=HD-2',
+      description: 'Returns player data for a watch2gether room including anime info and embed URL.',
+    },
+    {
       name: 'random',
       endpoint: '/random',
       hasParams: false,
@@ -453,5 +474,6 @@ const apiDocumentation = {
       description: 'Returns a random anime.',
     },
   ],
-};
-export default apiDocumentation;
+});
+
+export default getApiDocumentation;

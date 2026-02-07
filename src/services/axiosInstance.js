@@ -4,7 +4,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 const TIMEOUT = 10000;
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
   const url = config.baseurl + endpoint;
@@ -19,27 +19,27 @@ export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
       }
 
       console.log(`Fetching (attempt ${attempt + 1}/${retries}): ${url}`);
-      
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
-      
+
       const response = await fetch(url, {
         headers: {
           ...(config.headers || {}),
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
           'Accept-Encoding': 'gzip, deflate, br',
-          'Connection': 'keep-alive',
+          Connection: 'keep-alive',
           'Upgrade-Insecure-Requests': '1',
           'Cache-Control': 'max-age=0',
         },
         signal: controller.signal,
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       console.log(`Response status: ${response.status}`);
-     
+
       if (response.status === 429) {
         const retryAfter = response.headers.get('retry-after');
         const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : RETRY_DELAY * 2;
@@ -51,27 +51,30 @@ export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
       if (response.status >= 500 && response.status < 600) {
         throw new Error(`Server error: HTTP ${response.status}`);
       }
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       const data = await response.text();
-      
+
       if (!data || data.length === 0) {
         throw new Error('Empty response received');
       }
-      
+
       console.log(`Success: Received data length: ${data.length}`);
-      
+
       return {
         success: true,
         data,
       };
     } catch (error) {
       lastError = error;
-      console.error(`Fetch error (attempt ${attempt + 1}/${retries}) for ${endpoint}:`, error.message);
-      
+      console.error(
+        `Fetch error (attempt ${attempt + 1}/${retries}) for ${endpoint}:`,
+        error.message
+      );
+
       if (error.name === 'AbortError') {
         lastError = new Error('Request timeout - the external API took too long to respond');
       }
@@ -85,7 +88,7 @@ export const axiosInstance = async (endpoint, retries = MAX_RETRIES) => {
       }
     }
   }
-  
+
   return {
     success: false,
     message: lastError?.message || 'Unknown error occurred',

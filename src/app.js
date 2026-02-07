@@ -5,14 +5,16 @@ import { swaggerUI } from '@hono/swagger-ui';
 import hiAnimeRoutes from './routes/routes.js';
 import { AppError } from './utils/errors.js';
 import { fail } from './utils/response.js';
-import hianimeApiDocs from './utils/swaggerUi.js';
+import getSwaggerDocs from './utils/swaggerUi.js';
 import { logger } from 'hono/logger';
 import config from './config/config.js';
 
 const app = new Hono();
 const origins = config.origin.includes(',')
-  ? config.origin.split(',').map(o => o.trim())
-  : (config.origin === '*' ? '*' : [config.origin]);
+  ? config.origin.split(',').map((o) => o.trim())
+  : config.origin === '*'
+    ? '*'
+    : [config.origin];
 
 app.use(
   '*',
@@ -75,7 +77,13 @@ app.route('/api/v1', hiAnimeRoutes);
 app.get('/api', (c) => {
   return c.redirect('/');
 });
-app.get('/docs', (c) => c.json(hianimeApiDocs));
+app.get('/docs', (c) => {
+  const protocol = c.req.header('x-forwarded-proto') || 'http';
+  const host = c.req.header('host');
+  const baseUrl = `${protocol}://${host}`;
+
+  return c.json(getSwaggerDocs(baseUrl));
+});
 app.get('/', swaggerUI({ url: '/docs' }));
 app.onError((err, c) => {
   if (err instanceof AppError) {

@@ -9,7 +9,10 @@ export default defineConfig([
     plugins: { js },
     extends: ['js/recommended'],
   },
-  { files: ['**/*.{js,mjs,cjs,ts}'], languageOptions: { globals: { ...globals.node, Bun: 'readonly' } } },
+  {
+    files: ['**/*.{js,mjs,cjs,ts}'],
+    languageOptions: { globals: { ...globals.node, Bun: 'readonly' } },
+  },
   {
     plugins: {
       eslintPluginPrettier,

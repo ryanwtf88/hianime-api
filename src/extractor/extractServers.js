@@ -9,7 +9,7 @@ export const extractServers = (html) => {
     const servers = [];
     $(block)
       .find('.server-item')
-      .each((i, element) => {
+      .each((_, element) => {
         const serverType = $(element).attr('data-type');
         const serverId = $(element).attr('data-id');
         const serverName = $(element).find('a').text().trim();
@@ -21,22 +21,17 @@ export const extractServers = (html) => {
           name: serverName,
         });
       });
-    servers.push({
-      index: null,
-      type: block.includes('sub') ? 'sub' : 'dub',
-      id: null,
-      name: 'HD-4',
-    });
     return servers;
   };
 
   const subServers = extractServerList('.servers-sub .ps__-list');
-
   const dubServers = extractServerList('.servers-dub .ps__-list');
+  const rawServers = extractServerList('.servers-raw .ps__-list');
 
   return {
     episode: Number(episode),
     sub: subServers,
     dub: dubServers,
+    raw: rawServers,
   };
 };

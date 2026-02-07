@@ -1,7 +1,7 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
-import config from '../../config/config.js';
-import extractToken from '../helper/token.helper.js';
+import config from '../config/config.js';
+import extractToken from './token.helper.js';
 
 const { baseurl } = config;
 
@@ -82,11 +82,11 @@ async function decryptPrimarySource(baseUrl, sourceId, key) {
       try {
         // Try standard decryption first (passphrase)
         decrypted = CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
-      } catch (e) {
+      } catch {
         console.log('Standard decryption failed, trying Hex key...');
         try {
           decrypted = CryptoJS.AES.decrypt(encrypted, CryptoJS.enc.Hex.parse(key)).toString(CryptoJS.enc.Utf8);
-        } catch (e2) {
+        } catch {
           console.log('Hex decryption failed too.');
         }
       }
@@ -107,78 +107,7 @@ async function decryptPrimarySource(baseUrl, sourceId, key) {
   }
 }
 
-/**
- * Attempt fallback sources
- */
-async function getFallbackSource(epID, serverType, serverName) {
-  const fallbackProviders = [
-    { name: 'megaplay', domain: 'megaplay.buzz' },
-    { name: 'vidwish', domain: 'vidwish.live' },
 
-  ];
-
-  // Select primary fallback based on server name
-  const primaryFallback = serverName.toLowerCase() === 'hd-1'
-    ? fallbackProviders[0]
-    : fallbackProviders[1];
-
-  // Try primary fallback first, then others
-  const orderedProviders = [
-    primaryFallback,
-    ...fallbackProviders.filter(p => p.domain !== primaryFallback.domain)
-  ];
-
-  for (const provider of orderedProviders) {
-    try {
-      console.log(`Trying fallback provider: ${provider.name} (${provider.domain})`);
-
-      const { data: html } = await axios.get(
-        `https://${provider.domain}/stream/s-2/${epID}/${serverType}`,
-        {
-          headers: {
-            'Referer': `https://${provider.domain}/`,
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          },
-          timeout: TIMEOUT,
-        }
-      );
-
-      const dataIdMatch = html.match(/data-id=["'](\d+)["']/);
-      const realId = dataIdMatch?.[1];
-
-      if (!realId) {
-        console.log(`Could not extract data-id from ${provider.name}`);
-        continue;
-      }
-
-      console.log(`Fetching sources from ${provider.name} with id: ${realId}`);
-      const { data: fallbackData } = await axios.get(
-        `https://${provider.domain}/stream/getSources?id=${realId}`,
-        {
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Referer': `https://${provider.domain}/`,
-          },
-          timeout: TIMEOUT,
-        }
-      );
-
-      if (fallbackData?.sources?.file) {
-        console.log(`Successfully got fallback source from ${provider.name}`);
-        return {
-          sources: [{ file: fallbackData.sources.file }],
-          rawData: fallbackData,
-          provider: provider.name,
-        };
-      }
-    } catch (error) {
-      console.error(`Fallback ${provider.name} failed:`, error.message);
-      continue;
-    }
-  }
-
-  throw new Error('All fallback providers failed');
-}
 
 /**
  * Main megacloud decryption function
@@ -223,28 +152,12 @@ export async function megacloud({ selectedServer, id }, retryCount = 0) {
 
     let decryptedSources = null;
     let rawSourceData = {};
-    let usedFallback = false;
 
     // Try primary decryption method
-    try {
-      const result = await decryptPrimarySource(baseUrl, sourceId, key);
-      decryptedSources = result.sources;
-      rawSourceData = result.rawData;
-      console.log('Primary decryption successful');
-    } catch (primaryError) {
-      console.log('Primary method failed, trying fallback...');
-
-      // Try fallback sources
-      try {
-        const fallbackResult = await getFallbackSource(epID, selectedServer.type, selectedServer.name);
-        decryptedSources = fallbackResult.sources;
-        rawSourceData = fallbackResult.rawData;
-        usedFallback = true;
-        console.log(`Fallback successful using ${fallbackResult.provider}`);
-      } catch (fallbackError) {
-        throw new Error(`Both primary and fallback failed. Primary: ${primaryError.message}, Fallback: ${fallbackError.message}`);
-      }
-    }
+    const decryptResult = await decryptPrimarySource(baseUrl, sourceId, key);
+    decryptedSources = decryptResult.sources;
+    rawSourceData = decryptResult.rawData;
+    console.log('Primary decryption successful');
 
     // Validate we have sources
     if (!decryptedSources || !decryptedSources[0]?.file) {
@@ -262,7 +175,6 @@ export async function megacloud({ selectedServer, id }, retryCount = 0) {
       intro: rawSourceData.intro ?? null,
       outro: rawSourceData.outro ?? null,
       server: selectedServer.name,
-      usedFallback,
     };
 
     console.log('=== Megacloud Decryption Success ===\n');

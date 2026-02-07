@@ -1,0 +1,11 @@
+name = "hianime-api"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+account_id = "cd4ab75cca150f63177325a6bb1c355f"
+
+[env.production]
+name = "hianime-api-production"
+
+[env.staging]
+name = "hianime-api-staging"

@@ -16,14 +16,13 @@ import allGenresController from '../controllers/allGenres.controller.js';
 import nextEpisodeScheduleController from '../controllers/nextEpisodeSchedule.controller.js';
 import filterController from '../controllers/filter.controller.js';
 import filterOptions from '../utils/filter.js';
-import clearCacheController from '../controllers/clearCache.controller.js';
 import newsController from '../controllers/news.controller.js';
 import watch2getherController from '../controllers/watch2gether.controller.js';
+import watch2getherPlayerController from '../controllers/watch2getherPlayer.controller.js';
 import randomController from '../controllers/random.controller.js';
 
 import schedulesController from '../controllers/schedules.controller.js';
 import embedController from '../controllers/embedController.js';
-import proxyController from '../controllers/proxy.controller.js';
 
 const router = new Hono();
 
@@ -47,11 +46,10 @@ router.get('/servers', handler(serversController));
 router.get('/stream', handler(streamController));
 router.get('/embed/:server/:id/:type', embedController);
 router.get('/embed', embedController);
-router.get('/proxy', proxyController);
 router.get('/genres', handler(allGenresController));
 router.get('/news', handler(newsController));
 router.get('/watch2gether', handler(watch2getherController));
+router.get('/watch2gether/player/:id', handler(watch2getherPlayerController));
 router.get('/random', handler(randomController));
-router.get('/admin/clear-cache', handler(clearCacheController));
 
 export default router;
