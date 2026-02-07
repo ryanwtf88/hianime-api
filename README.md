@@ -24,9 +24,9 @@
   - [Local Setup](#local-setup)
 - [Deployment](#deployment)
   - [Docker Deployment](#docker-deployment)
-  - [Cloudflare Workers Deployment](#cloudflare-workers-deployment)
   - [Vercel Deployment](#vercel-deployment-serverless--recommended)
   - [Replit Deployment](#replit-deployment)
+  - [Cloudflare Workers Deployment](#cloudflare-workers-deployment)
   - [Proxy Service Deployment](#proxy-service-deployment)
 - [Documentation](#documentation)
   - [Anime Home Page](#1-get-anime-home-page)
@@ -241,7 +241,62 @@ Then run:
 docker-compose up -d
 ```
 
+### Vercel Deployment (Serverless) ![Recommended](https://img.shields.io/badge/Recommended-blue?style=flat-square)
+
+**One-Click Deploy:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ryanwtf88/hianime-api)
+
+**Manual Deployment:**
+
+1. Fork or clone the repository to your GitHub account
+2. Sign up at [Vercel](https://vercel.com)
+3. Create a new project and import your repository
+4. Configure environment variables in Vercel Dashboard:
+   - `UPSTASH_REDIS_REST_URL` (Required - Get from [Upstash](https://upstash.com))
+   - `UPSTASH_REDIS_REST_TOKEN` (Required)
+   - `ORIGIN=*` (or your frontend domain)
+   - `RATE_LIMIT_ENABLED=true`
+   - `RATE_LIMIT_WINDOW_MS=60000`
+   - `RATE_LIMIT_LIMIT=100`
+5. Click "Deploy"
+
+**Why Vercel?**
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Serverless architecture with automatic scaling
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Global CDN for fast response times
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with generous limits
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic HTTPS and custom domains
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Git-based deployments (auto-deploy on push)
+- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Built-in Redis support via Upstash
+
+**Environment Variables:**
+
+| Key | Value | Required |
+|-----|-------|----------|
+| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Yes |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Yes |
+| `ORIGIN` | `*` or your domain | No |
+| `RATE_LIMIT_ENABLED` | `true` | No |
+| `RATE_LIMIT_WINDOW_MS` | `60000` | No |
+| `RATE_LIMIT_LIMIT` | `100` | No |
+
+For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+### Replit Deployment
+
+1. Import this repository into Replit
+2. Click the Run button
+3. Your API will be available at your Replit URL
+
+For detailed deployment instructions, troubleshooting, and best practices, see the [DEPLOYMENT.md](https://github.com/ryanwtf88/hianime-api/blob/master/DEPLOYMENT.md) guide.
+
+---
+
 ### Cloudflare Workers Deployment
+
+![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white)
+
+Deploy this API to Cloudflare Workers for edge computing with global distribution.
 
 **Prerequisites:**
 - Cloudflare account ([Sign up](https://dash.cloudflare.com/sign-up))
@@ -294,12 +349,12 @@ bun run dev:cloudflare
 ```
 
 **Why Cloudflare Workers?**
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Edge computing with global distribution
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Extremely fast response times (< 50ms)
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with 100,000 requests/day
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic scaling and DDoS protection
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) No cold starts
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Built-in rate limiting disabled for better performance
+- Edge computing with global distribution
+- Extremely fast response times (< 50ms)
+- Free tier with 100,000 requests/day
+- Automatic scaling and DDoS protection
+- No cold starts
+- Built-in rate limiting disabled for better performance
 
 **Custom Domain:**
 
@@ -316,69 +371,30 @@ Cloudflare Workers doesn't use traditional environment variables. All configurat
 
 ---
 
-### Vercel Deployment (Serverless) ![Recommended](https://img.shields.io/badge/Recommended-blue?style=flat-square)
-
-**One-Click Deploy:**
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ryanwtf88/hianime-api)
-
-**Manual Deployment:**
-
-1. Fork or clone the repository to your GitHub account
-2. Sign up at [Vercel](https://vercel.com)
-3. Create a new project and import your repository
-4. Configure environment variables in Vercel Dashboard:
-   - `UPSTASH_REDIS_REST_URL` (Required - Get from [Upstash](https://upstash.com))
-   - `UPSTASH_REDIS_REST_TOKEN` (Required)
-   - `ORIGIN=*` (or your frontend domain)
-   - `RATE_LIMIT_ENABLED=true`
-   - `RATE_LIMIT_WINDOW_MS=60000`
-   - `RATE_LIMIT_LIMIT=100`
-5. Click "Deploy"
-
-**Why Vercel?**
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Serverless architecture with automatic scaling
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Global CDN for fast response times
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with generous limits
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Automatic HTTPS and custom domains
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Git-based deployments (auto-deploy on push)
-- ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Built-in Redis support via Upstash
-
-**Environment Variables:**
-
-| Key | Value | Required |
-|-----|-------|----------|
-| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Yes |
-| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Yes |
-| `ORIGIN` | `*` or your domain | No |
-| `RATE_LIMIT_ENABLED` | `true` | No |
-| `RATE_LIMIT_WINDOW_MS` | `60000` | No |
-| `RATE_LIMIT_LIMIT` | `100` | No |
-
-For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
-
-### Replit Deployment
-
-1. Import this repository into Replit
-2. Click the Run button
-3. Your API will be available at your Replit URL
-
-For detailed deployment instructions, troubleshooting, and best practices, see the [DEPLOYMENT.md](https://github.com/ryanwtf88/hianime-api/blob/master/DEPLOYMENT.md) guide.
-
----
-
 ### Proxy Service Deployment
 
-This API uses an external proxy service to handle M3U8 stream rewriting and bypass CDN restrictions. The proxy is deployed separately on Cloudflare Workers.
+![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white)
 
-**Proxy Repository:** The proxy service is located in a separate repository/folder.
+This API requires an external proxy service to handle M3U8 stream rewriting and bypass CDN restrictions. The proxy must be deployed separately on Cloudflare Workers.
 
-**Current Proxy URL:** `https://proxy.animo.qzz.io`
+**Proxy Repository:** [https://github.com/ryanwtf88/hianime-proxy](https://github.com/ryanwtf88/hianime-proxy)
 
 **Deploy Your Own Proxy:**
 
-1. Navigate to your proxy folder (if separate repo, clone it)
-2. Update `wrangler.toml` with your Cloudflare account ID:
+1. Clone the proxy repository:
+
+```bash
+git clone https://github.com/ryanwtf88/hianime-proxy.git
+cd hianime-proxy
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Update `wrangler.toml` with your Cloudflare account ID:
 
 ```toml
 name = "hianime-proxy"
@@ -389,14 +405,13 @@ compatibility_flags = ["nodejs_compat"]
 account_id = "YOUR_ACCOUNT_ID"
 ```
 
-3. Deploy to Cloudflare Workers:
+4. Deploy to Cloudflare Workers:
 
 ```bash
-cd proxy
 wrangler deploy
 ```
 
-4. Update the proxy URL in `src/config/config.js`:
+5. Update the proxy URL in this API's `src/config/config.js`:
 
 ```javascript
 proxyUrl: 'https://your-proxy.workers.dev',
