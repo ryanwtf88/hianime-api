@@ -1143,14 +1143,18 @@ const embedController = async (c) => {
 
 
 
-// Provided by server (VERY IMPORTANT)
-const VIDEO_ID = "${id}"; // injected by server
-
+// 1. Inject the server-side 'id' into a client-side 'VIDEO_ID'
+const VIDEO_ID = "${id}";
+console.log(VIDEO_ID)
+console.log(${id})
 /* =========================================================
    LOCAL STORAGE
    ========================================================= */
 
-const STORAGE_KEY = watchtime_${VIDEO_ID};
+// 2. Use backticks with a backslash to escape them for the browser
+
+const STORAGE_KEY = \`watchtime_\${VIDEO_ID}\`; 
+
 let lastSavedTime = 0;
 let videoEndedSent = false;
 
