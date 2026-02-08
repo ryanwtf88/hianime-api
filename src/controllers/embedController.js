@@ -1143,104 +1143,126 @@ const embedController = async (c) => {
 
 
 
-//AUTO SKIP INTRO OUTRO  FUNCTION
+// Provided by server (VERY IMPORTANT)
+const VIDEO_ID = "${id}"; // injected by server
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+const STORAGE_KEY = watchtime_${VIDEO_ID};
+let lastSavedTime = 0;
+let videoEndedSent = false;
+
+/* =========================================================
+   AUTO SKIP CONTROL
+   ========================================================= */
+
 let autoSkipIntroOutro = true; // default
 let inIntroZone = false;
 let inOutroZone = false;
 
-// Receive messages from parent
-window.addEventListener('message', (event) => {
-    // Optional: restrict allowed origins
-    // if (event.origin !== "https://your-parent-domain.com") return;
-    
-    const data = event.data;
-    if (data?.type === "SET_AUTO_SKIP") {
-        autoSkipIntroOutro = !!data.value;
-        console.log("Auto skip changed by parent:", autoSkipIntroOutro);
+// Parent iframe control
+window.addEventListener("message", (event) => {
+    if (event.data?.type === "SET_AUTO_SKIP") {
+        autoSkipIntroOutro = !!event.data.value;
+        console.log("Auto skip set:", autoSkipIntroOutro);
     }
 });
 
-// Skip buttons
-skipIntroBtn.onclick = () => video.currentTime = intro.end;
-skipOutroBtn.onclick = () => video.currentTime = video.duration;
+/* =========================================================
+   BUTTON ACTIONS
+   ========================================================= */
 
-// Timeupdate logic
-video.addEventListener('timeupdate', () => {
-    const t = video.currentTime;
-    
-    const nowInIntro = intro.end > 0 && t >= intro.start && t < intro.end;
-    if (nowInIntro) {
-        if (!autoSkipIntroOutro) skipIntroBtn.classList.add('visible');
-        if (autoSkipIntroOutro && !inIntroZone) video.currentTime = intro.end;
-    } else skipIntroBtn.classList.remove('visible');
-    inIntroZone = nowInIntro;
-    
-    const nowInOutro = outro.start > 0 && t >= outro.start;
-    if (nowInOutro) {
-        if (!autoSkipIntroOutro) skipOutroBtn.classList.add('visible');
-        // clear saved time
-        localStorage.removeItem(STORAGE_KEY);
-        
-        if (autoSkipIntroOutro && !inOutroZone) video.currentTime = video.duration;
-        // clear saved time
-        localStorage.removeItem(STORAGE_KEY);
-        
-    } else skipOutroBtn.classList.remove('visible');
-    // clear saved time
-    localStorage.removeItem(STORAGE_KEY);
-    
-    inOutroZone = nowInOutro;
-});
+skipIntroBtn.onclick = () => {
+    video.currentTime = intro.end;
+};
 
-//VIDEO END MESSAGES
-const video = document.getElementById('video');
+skipOutroBtn.onclick = () => {
+    video.currentTime = video.duration;
+};
 
-// 🔐 unique key per video
-const STORAGE_KEY = watchtime_${VIDEO_ID};
+/* =========================================================
+   RESUME WATCH TIME
+   ========================================================= */
 
-let lastSavedTime = 0;
-let videoEndedSent = false;
-
-/* ---------------- RESUME ---------------- */
-video.addEventListener('loadedmetadata', () => {
+video.addEventListener("loadedmetadata", () => {
     const savedTime = parseFloat(localStorage.getItem(STORAGE_KEY));
     
     if (
         !isNaN(savedTime) &&
-        savedTime > 1 &&
-        savedTime < video.duration - 2
+        savedTime > 2 &&
+        savedTime < video.duration - 3
     ) {
         video.currentTime = savedTime;
-        console.log('Resumed from:', savedTime);
+        console.log("Resumed from:", savedTime);
     }
     
     videoEndedSent = false;
 });
 
-/* ---------------- SAVE TIME ---------------- */
-video.addEventListener('timeupdate', () => {
+/* =========================================================
+   MAIN TIMEUPDATE LOGIC
+   ========================================================= */
+
+video.addEventListener("timeupdate", () => {
     const t = video.currentTime;
     
-    // save every ~2 seconds
+    /* ---------- SAVE WATCH TIME ---------- */
     if (Math.abs(t - lastSavedTime) > 2) {
         localStorage.setItem(STORAGE_KEY, t);
         lastSavedTime = t;
     }
     
-    // fallback end detection
+    /* ---------- INTRO ---------- */
+    const nowInIntro =
+        intro.end > 0 && t >= intro.start && t < intro.end;
+    
+    if (nowInIntro) {
+        if (!autoSkipIntroOutro) {
+            skipIntroBtn.classList.add("visible");
+        } else if (!inIntroZone) {
+            video.currentTime = intro.end;
+        }
+    } else {
+        skipIntroBtn.classList.remove("visible");
+    }
+    
+    inIntroZone = nowInIntro;
+    
+    /* ---------- OUTRO ---------- */
+    const nowInOutro =
+        outro.start > 0 && t >= outro.start;
+    
+    if (nowInOutro) {
+        if (!autoSkipIntroOutro) {
+            skipOutroBtn.classList.add("visible");
+        } else if (!inOutroZone) {
+            video.currentTime = video.duration;
+        }
+    } else {
+        skipOutroBtn.classList.remove("visible");
+    }
+    
+    inOutroZone = nowInOutro;
+    
+    /* ---------- END FALLBACK ---------- */
     if (video.duration && t >= video.duration - 0.2) {
         notifyVideoEnded();
     }
 });
 
-/* ---------------- VIDEO END ---------------- */
-video.addEventListener('ended', notifyVideoEnded);
+/* =========================================================
+   VIDEO END HANDLING
+   ========================================================= */
+
+video.addEventListener("ended", notifyVideoEnded);
 
 function notifyVideoEnded() {
     if (videoEndedSent) return;
     videoEndedSent = true;
     
-    console.log('video end');
+    console.log("video end");
     
     // clear resume data
     localStorage.removeItem(STORAGE_KEY);
@@ -1248,10 +1270,10 @@ function notifyVideoEnded() {
     // notify parent iframe
     window.parent.postMessage(
         {
-            type: 'VIDEO_ENDED',
+            type: "VIDEO_ENDED",
             videoId: VIDEO_ID
         },
-        '*'
+        "*"
     );
 }
     </script>
