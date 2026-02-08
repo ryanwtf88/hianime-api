@@ -1142,23 +1142,55 @@ const embedController = async (c) => {
 
         
 
-        video.addEventListener('timeupdate', () => {
-            const t = video.currentTime;
-            
-            if (intro.end > 0 && t >= intro.start && t < intro.end) {
-                skipIntroBtn.classList.add('visible');
-                skipIntroBtn.onclick = () => video.currentTime = intro.end;
-            } else {
-                skipIntroBtn.classList.remove('visible');
-            }
+//AUTO SKIP INTRO OUTRO  FUNCTION
+let autoSkipIntroOutro = false; // default
+let inIntroZone = false;
+let inOutroZone = false;
 
-            if (outro.end > 0 && t >= outro.start && t < outro.end) {
-                skipOutroBtn.classList.add('visible');
-                skipOutroBtn.onclick = () => video.currentTime = outro.end;
-            } else {
-                skipOutroBtn.classList.remove('visible');
-            }
-        });
+// Receive messages from parent
+window.addEventListener('message', (event) => {
+    // Optional: restrict allowed origins
+    // if (event.origin !== "https://your-parent-domain.com") return;
+    
+    const data = event.data;
+    if (data?.type === "SET_AUTO_SKIP") {
+        autoSkipIntroOutro = !!data.value;
+        console.log("Auto skip changed by parent:", autoSkipIntroOutro);
+    }
+});
+
+// Skip buttons
+skipIntroBtn.onclick = () => video.currentTime = intro.end;
+skipOutroBtn.onclick = () => video.currentTime = video.duration;
+
+// Timeupdate logic
+video.addEventListener('timeupdate', () => {
+    const t = video.currentTime;
+    
+    const nowInIntro = intro.end > 0 && t >= intro.start && t < intro.end;
+    if (nowInIntro) {
+        if (!autoSkipIntroOutro) skipIntroBtn.classList.add('visible');
+        if (autoSkipIntroOutro && !inIntroZone) video.currentTime = intro.end;
+    } else skipIntroBtn.classList.remove('visible');
+    inIntroZone = nowInIntro;
+    
+    const nowInOutro = outro.start > 0 && t >= outro.start;
+    if (nowInOutro) {
+        if (!autoSkipIntroOutro) skipOutroBtn.classList.add('visible');
+        if (autoSkipIntroOutro && !inOutroZone) video.currentTime = video.duration;
+    } else skipOutroBtn.classList.remove('visible');
+    inOutroZone = nowInOutro;
+});
+
+video.addEventListener('ended', () => {
+    console.log('video end');
+});
+
+video.addEventListener('timeupdate', () => {
+    if (video.duration && video.currentTime >= video.duration - 0.2) {
+        console.log('video end');
+    }
+});
     </script>
 </body>
 </html>
