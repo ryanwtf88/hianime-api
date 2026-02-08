@@ -416,7 +416,7 @@ const embedController = async (c) => {
             position: absolute !important;
             height: 100% !important;
             top: 0 !important;
-            background-color: rgba(59, 130, 246, 0.85) !important;
+           background-color: #ffc006 !important;
             pointer-events: none !important;
             z-index: 16;
         }
@@ -892,7 +892,7 @@ const embedController = async (c) => {
                     const widthPercent = ((end - start) / duration) * 100;
                     introDiv.style.left = startPercent + '%';
                     introDiv.style.width = widthPercent + '%';
-                    introDiv.style.backgroundColor = 'rgba(59, 130, 246, 0.85)';
+                    introDiv.style.backgroundColor = '#ffc006';
                     highlightsContainer.appendChild(introDiv);
                 }
             }
@@ -908,7 +908,7 @@ const embedController = async (c) => {
                     const widthPercent = ((end - start) / duration) * 100;
                     outroDiv.style.left = startPercent + '%';
                     outroDiv.style.width = widthPercent + '%';
-                    outroDiv.style.backgroundColor = 'rgba(59, 130, 246, 0.85)';
+                    outroDiv.style.backgroundColor = '#ffc006';
                     highlightsContainer.appendChild(outroDiv);
                 }
             }
@@ -1140,10 +1140,11 @@ const embedController = async (c) => {
             }
         });
 
-        
+
+
 
 //AUTO SKIP INTRO OUTRO  FUNCTION
-let autoSkipIntroOutro = false; // default
+let autoSkipIntroOutro = true; // default
 let inIntroZone = false;
 let inOutroZone = false;
 
@@ -1177,20 +1178,82 @@ video.addEventListener('timeupdate', () => {
     const nowInOutro = outro.start > 0 && t >= outro.start;
     if (nowInOutro) {
         if (!autoSkipIntroOutro) skipOutroBtn.classList.add('visible');
+        // clear saved time
+        localStorage.removeItem(STORAGE_KEY);
+        
         if (autoSkipIntroOutro && !inOutroZone) video.currentTime = video.duration;
+        // clear saved time
+        localStorage.removeItem(STORAGE_KEY);
+        
     } else skipOutroBtn.classList.remove('visible');
+    // clear saved time
+    localStorage.removeItem(STORAGE_KEY);
+    
     inOutroZone = nowInOutro;
 });
 
-video.addEventListener('ended', () => {
-    console.log('video end');
+//VIDEO END MESSAGES
+const video = document.getElementById('video');
+
+// 🔐 unique key per video
+const STORAGE_KEY = watchtime_${VIDEO_ID};
+
+let lastSavedTime = 0;
+let videoEndedSent = false;
+
+/* ---------------- RESUME ---------------- */
+video.addEventListener('loadedmetadata', () => {
+    const savedTime = parseFloat(localStorage.getItem(STORAGE_KEY));
+    
+    if (
+        !isNaN(savedTime) &&
+        savedTime > 1 &&
+        savedTime < video.duration - 2
+    ) {
+        video.currentTime = savedTime;
+        console.log('Resumed from:', savedTime);
+    }
+    
+    videoEndedSent = false;
 });
 
+/* ---------------- SAVE TIME ---------------- */
 video.addEventListener('timeupdate', () => {
-    if (video.duration && video.currentTime >= video.duration - 0.2) {
-        console.log('video end');
+    const t = video.currentTime;
+    
+    // save every ~2 seconds
+    if (Math.abs(t - lastSavedTime) > 2) {
+        localStorage.setItem(STORAGE_KEY, t);
+        lastSavedTime = t;
+    }
+    
+    // fallback end detection
+    if (video.duration && t >= video.duration - 0.2) {
+        notifyVideoEnded();
     }
 });
+
+/* ---------------- VIDEO END ---------------- */
+video.addEventListener('ended', notifyVideoEnded);
+
+function notifyVideoEnded() {
+    if (videoEndedSent) return;
+    videoEndedSent = true;
+    
+    console.log('video end');
+    
+    // clear resume data
+    localStorage.removeItem(STORAGE_KEY);
+    
+    // notify parent iframe
+    window.parent.postMessage(
+        {
+            type: 'VIDEO_ENDED',
+            videoId: VIDEO_ID
+        },
+        '*'
+    );
+}
     </script>
 </body>
 </html>
