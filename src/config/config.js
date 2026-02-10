@@ -24,7 +24,7 @@ const config = {
   port: 5000,
 
   // External proxy URL for streaming
-  proxyUrl: 'https://proxy.animo.qzz.io',
+  proxyUrl: 'https://xeanimeproxy.howtoopengemail.workers.dev',
 
   // Redis configuration (leave empty to disable caching)
   redis: {
@@ -43,7 +43,7 @@ const config = {
   rateLimit: {
     windowMs: 60000, // 1 minute
     limit: 1000000000, // requests per window
-    enabled: false, // Set to true for local/Vercel, false for Cloudflare Workers
+    enabled: true, // Set to true for local/Vercel, false for Cloudflare Workers
   },
 
   // HTTP headers
@@ -58,7 +58,7 @@ const config = {
   // Environment detection
   isProduction: true,
   isDevelopment: false,
-  isVercel: false, // Set to true if deploying to Vercel
+  isVercel: true, // Set to true if deploying to Vercel
 };
 
 export default config;

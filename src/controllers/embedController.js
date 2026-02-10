@@ -416,7 +416,7 @@ const embedController = async (c) => {
             position: absolute !important;
             height: 100% !important;
             top: 0 !important;
-            background-color: rgba(59, 130, 246, 0.85) !important;
+           background-color: #ffc006 !important;
             pointer-events: none !important;
             z-index: 16;
         }
@@ -615,6 +615,34 @@ const embedController = async (c) => {
                 max-width: 320px;
             }
         }
+        
+               @keyframes fadeOut {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+ 
+/* Ensure the video doesn't have default browser controls interfering */
+video::-webkit-media-controls {
+    display:none !important;
+}
+/* If the media-controller is in an inactive state, hide the menu */
+media-controller[user-inactive] #custom-settings-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    pointer-events: none;
+    /* Prevents clicking the menu while it's hidden */
+    transition: opacity 0.3s ease, visibility 0.3s, transform 0.3s ease;
+}
+
+/* When active, keep it visible ONLY if it has the 'active' class from JS */
+media-controller:not([user-inactive]) #custom-settings-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
     </style>
 </head>
 <body>
@@ -640,14 +668,15 @@ const embedController = async (c) => {
             </div>
         </div>
 
-        <div id="custom-settings-menu" class="custom-menu"></div>
 
-        <div id="progress-highlights" class="progress-highlights"></div>
-
-        <media-time-range id="time-range">
-          <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
-          <media-preview-time-display slot="preview"></media-preview-time-display>
-        </media-time-range>
+<div class="timeline-container">
+    <div id="progress-highlights" class="progress-highlights"></div>
+    <div id="custom-settings-menu" class="custom-menu"></div>
+    <media-time-range id="time-range">
+        <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+        <media-preview-time-display slot="preview"></media-preview-time-display>
+    </media-time-range>
+</div>
 
         <media-control-bar>
           <media-mute-button class="yt-button">
@@ -892,7 +921,7 @@ const embedController = async (c) => {
                     const widthPercent = ((end - start) / duration) * 100;
                     introDiv.style.left = startPercent + '%';
                     introDiv.style.width = widthPercent + '%';
-                    introDiv.style.backgroundColor = 'rgba(59, 130, 246, 0.85)';
+                    introDiv.style.backgroundColor = '#ffc006';
                     highlightsContainer.appendChild(introDiv);
                 }
             }
@@ -908,7 +937,7 @@ const embedController = async (c) => {
                     const widthPercent = ((end - start) / duration) * 100;
                     outroDiv.style.left = startPercent + '%';
                     outroDiv.style.width = widthPercent + '%';
-                    outroDiv.style.backgroundColor = 'rgba(59, 130, 246, 0.85)';
+                    outroDiv.style.backgroundColor = '#ffc006';
                     highlightsContainer.appendChild(outroDiv);
                 }
             }
@@ -1140,25 +1169,240 @@ const embedController = async (c) => {
             }
         });
 
-        
+/* =========================================================
+   YOUTUBE-STYLE TAP CONTROLS
+   ========================================================= */
+let lastTap = 0;
+const seekBackward = document.querySelector('media-seek-backward-button');
+const seekForward = document.querySelector('media-seek-forward-button');
 
-        video.addEventListener('timeupdate', () => {
-            const t = video.currentTime;
+video.addEventListener('click', function(e) {
+    const now = Date.now();
+    const timesince = now - lastTap;
+    
+    const rect = video.getBoundingClientRect();
+    const x = e.clientX - rect.left; 
+    const width = rect.width;
+    
+    // Find the media-controller parent
+    const controller = video.closest('media-controller');
+
+    if (timesince < 300 && timesince > 0) {
+        if (x < width * 0.3) {
+            // Seek Backward 10s
+            controller.dispatchEvent(new CustomEvent('mediaseekrequest', {
+                detail: video.currentTime - 10
+            }));
+            showVisualFeedback('rewind');
+        } else if (x > width * 0.7) {
+            // Seek Forward 10s
+            controller.dispatchEvent(new CustomEvent('mediaseekrequest', {
+                detail: video.currentTime + 10
+            }));
+            showVisualFeedback('forward');
+        }
+    }
+    lastTap = now;
+});
+
+// Helper to show the existing SVGs briefly in the center (optional flare)
+function showVisualFeedback(type) {
+    const feedback = document.createElement('div');
+    feedback.innerHTML = SVGs[type];
+    feedback.style.cssText = \`
+            position: absolute; 
+            top: 50%; 
+            left: \${type === 'rewind' ? '25%' : '75%'};
+            transform: translate(-50%, -50%); 
+            width: 60px; 
+            height: 60px;
+            border-radius: 50%; 
+            padding: 10px;
+            pointer-events: none; 
+            z-index: 1000; 
+            animation: fadeOut 0.5s forwards;
+        \`;
+        document.querySelector('media-controller').appendChild(feedback);
+        setTimeout(() => feedback.remove(), 500);
+    }
+
+
+//UI SOME EXTRA MENUE FUNCTION 
+const controller = document.querySelector('media-controller');
+; // Change to your icon's ID
+// 3. Hide Menu when Media Chrome goes inactive
+controller.addEventListener('userinactivechange', () => {
+    if (controller.userInactive) {
+        settingsMenu.classList.remove('active');
+    }
+});
+
+
+
+// 1. Inject the server-side 'id' into a client-side 'VIDEO_ID'
+const VIDEO_ID = "${id}";
+console.log(VIDEO_ID)
+console.log(${id})
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+// 2. Use backticks with a backslash to escape them for the browser
+
+const STORAGE_KEY = \`watchtime_\${VIDEO_ID}\`; 
+
+let lastSavedTime = 0;
+let videoEndedSent = false;
+
+/* =========================================================
+   AUTO SKIP CONTROL
+   ========================================================= */
+
+let autoSkipIntroOutro = true; // default
+let inIntroZone = false;
+let inOutroZone = false;
+
+// Parent iframe control
+window.addEventListener("message", (event) => {
+    if (event.data?.type === "SET_AUTO_SKIP") {
+        autoSkipIntroOutro = !!event.data.value;
+        console.log("Auto skip set:", autoSkipIntroOutro);
+    }
+});
+
+/* =========================================================
+   BUTTON ACTIONS
+   ========================================================= */
+
+skipIntroBtn.onclick = () => {
+    video.currentTime = intro.end;
+};
+
+skipOutroBtn.onclick = () => {
+    video.currentTime = video.duration;
+};
+
+/* =========================================================
+   RESUME WATCH TIME
+   ========================================================= */
+
+video.addEventListener("loadedmetadata", () => {
+    const savedTime = parseFloat(localStorage.getItem(STORAGE_KEY));
+    
+    if (
+        !isNaN(savedTime) &&
+        savedTime > 2 &&
+        savedTime < video.duration - 3
+    ) {
+        video.currentTime = savedTime;
+        console.log("Resumed from:", savedTime);
+    }
+    
+    videoEndedSent = false;
+});
+
+/* =========================================================
+   MAIN TIMEUPDATE LOGIC
+   ========================================================= */
+
+video.addEventListener("timeupdate", () => {
+    const t = video.currentTime;
+    
+    /* ---------- SAVE WATCH TIME ---------- */
+    if (Math.abs(t - lastSavedTime) > 2) {
+        localStorage.setItem(STORAGE_KEY, t);
+        lastSavedTime = t;
+    }
+    
+    /* ---------- INTRO ---------- */
+    const nowInIntro =
+        intro.end > 0 && t >= intro.start && t < intro.end;
+    
+    if (nowInIntro) {
+        if (!autoSkipIntroOutro) {
+            skipIntroBtn.classList.add("visible");
+        } else if (!inIntroZone) {
+            video.currentTime = intro.end;
             
-            if (intro.end > 0 && t >= intro.start && t < intro.end) {
-                skipIntroBtn.classList.add('visible');
-                skipIntroBtn.onclick = () => video.currentTime = intro.end;
-            } else {
-                skipIntroBtn.classList.remove('visible');
-            }
+        }
+    } else {
+        skipIntroBtn.classList.remove("visible");
+    }
+    
+    inIntroZone = nowInIntro;
+    
+    /* ---------- OUTRO ---------- */
+    const nowInOutro =
+        outro.start > 0 && t >= outro.start;
+    
+    if (nowInOutro) {
+        if (!autoSkipIntroOutro) {
+            skipOutroBtn.classList.add("visible");
+        } else if (!inOutroZone) {
+            video.currentTime = video.duration;
+            localStorage.removeItem(STORAGE_KEY);
+        }
+    } else {
+        skipOutroBtn.classList.remove("visible");
+    }
+    
+    inOutroZone = nowInOutro;
+    
+    /* ---------- END FALLBACK ---------- */
+    if (video.duration && t >= video.duration - 0.2) {
+        notifyVideoEnded();
+    }
+});
 
-            if (outro.end > 0 && t >= outro.start && t < outro.end) {
-                skipOutroBtn.classList.add('visible');
-                skipOutroBtn.onclick = () => video.currentTime = outro.end;
-            } else {
-                skipOutroBtn.classList.remove('visible');
-            }
-        });
+/* =========================================================
+   VIDEO END HANDLING
+   ========================================================= */
+
+video.addEventListener("ended", notifyVideoEnded);
+
+function notifyVideoEnded() {
+    if (videoEndedSent) return;
+    videoEndedSent = true;
+    
+    console.log("video end");
+    
+    // clear resume data
+    localStorage.removeItem(STORAGE_KEY);
+    
+    // notify parent iframe
+    window.parent.postMessage(
+        {
+            type: "VIDEO_ENDED",
+            videoId: VIDEO_ID
+        },
+        "*"
+    );
+}
+const player = document.querySelector('media-controller');
+
+// Function to lock orientation
+async function lockLandscape() {
+    try {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+            // This forces the phone into landscape mode
+            await screen.orientation.lock('landscape');
+        }
+    } catch (err) {
+        console.warn("Orientation lock failed: ", err);
+    }
+}
+
+// Listen for the player entering fullscreen
+player.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        lockLandscape();
+    } else {
+        // Unlock when exiting fullscreen so the user can use portrait again
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
+    }
+});
     </script>
 </body>
 </html>
