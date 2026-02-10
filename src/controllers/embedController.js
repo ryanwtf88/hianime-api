@@ -615,6 +615,34 @@ const embedController = async (c) => {
                 max-width: 320px;
             }
         }
+        
+               @keyframes fadeOut {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+ 
+/* Ensure the video doesn't have default browser controls interfering */
+video::-webkit-media-controls {
+    display:none !important;
+}
+/* If the media-controller is in an inactive state, hide the menu */
+media-controller[user-inactive] #custom-settings-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    pointer-events: none;
+    /* Prevents clicking the menu while it's hidden */
+    transition: opacity 0.3s ease, visibility 0.3s, transform 0.3s ease;
+}
+
+/* When active, keep it visible ONLY if it has the 'active' class from JS */
+media-controller:not([user-inactive]) #custom-settings-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
     </style>
 </head>
 <body>
@@ -640,14 +668,15 @@ const embedController = async (c) => {
             </div>
         </div>
 
-        <div id="custom-settings-menu" class="custom-menu"></div>
 
-        <div id="progress-highlights" class="progress-highlights"></div>
-
-        <media-time-range id="time-range">
-          <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
-          <media-preview-time-display slot="preview"></media-preview-time-display>
-        </media-time-range>
+<div class="timeline-container">
+    <div id="progress-highlights" class="progress-highlights"></div>
+    <div id="custom-settings-menu" class="custom-menu"></div>
+    <media-time-range id="time-range">
+        <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+        <media-preview-time-display slot="preview"></media-preview-time-display>
+    </media-time-range>
+</div>
 
         <media-control-bar>
           <media-mute-button class="yt-button">
@@ -1140,6 +1169,74 @@ const embedController = async (c) => {
             }
         });
 
+/* =========================================================
+   YOUTUBE-STYLE TAP CONTROLS
+   ========================================================= */
+let lastTap = 0;
+const seekBackward = document.querySelector('media-seek-backward-button');
+const seekForward = document.querySelector('media-seek-forward-button');
+
+video.addEventListener('click', function(e) {
+    const now = Date.now();
+    const timesince = now - lastTap;
+    
+    const rect = video.getBoundingClientRect();
+    const x = e.clientX - rect.left; 
+    const width = rect.width;
+    
+    // Find the media-controller parent
+    const controller = video.closest('media-controller');
+
+    if (timesince < 300 && timesince > 0) {
+        if (x < width * 0.3) {
+            // Seek Backward 10s
+            controller.dispatchEvent(new CustomEvent('mediaseekrequest', {
+                detail: video.currentTime - 10
+            }));
+            showVisualFeedback('rewind');
+        } else if (x > width * 0.7) {
+            // Seek Forward 10s
+            controller.dispatchEvent(new CustomEvent('mediaseekrequest', {
+                detail: video.currentTime + 10
+            }));
+            showVisualFeedback('forward');
+        }
+    }
+    lastTap = now;
+});
+
+// Helper to show the existing SVGs briefly in the center (optional flare)
+function showVisualFeedback(type) {
+    const feedback = document.createElement('div');
+    feedback.innerHTML = SVGs[type];
+    feedback.style.cssText = \`
+            position: absolute; 
+            top: 50%; 
+            left: \${type === 'rewind' ? '25%' : '75%'};
+            transform: translate(-50%, -50%); 
+            width: 60px; 
+            height: 60px;
+            background: rgba(0,0,0,0.5); 
+            border-radius: 50%; 
+            padding: 10px;
+            pointer-events: none; 
+            z-index: 1000; 
+            animation: fadeOut 0.5s forwards;
+        \`;
+        document.querySelector('media-controller').appendChild(feedback);
+        setTimeout(() => feedback.remove(), 500);
+    }
+
+
+//UI SOME EXTRA MENUE FUNCTION 
+const controller = document.querySelector('media-controller');
+; // Change to your icon's ID
+// 3. Hide Menu when Media Chrome goes inactive
+controller.addEventListener('userinactivechange', () => {
+    if (controller.userInactive) {
+        settingsMenu.classList.remove('active');
+    }
+});
 
 
 
@@ -1227,6 +1324,7 @@ video.addEventListener("timeupdate", () => {
             skipIntroBtn.classList.add("visible");
         } else if (!inIntroZone) {
             video.currentTime = intro.end;
+            
         }
     } else {
         skipIntroBtn.classList.remove("visible");
@@ -1243,6 +1341,7 @@ video.addEventListener("timeupdate", () => {
             skipOutroBtn.classList.add("visible");
         } else if (!inOutroZone) {
             video.currentTime = video.duration;
+            localStorage.removeItem(STORAGE_KEY);
         }
     } else {
         skipOutroBtn.classList.remove("visible");
