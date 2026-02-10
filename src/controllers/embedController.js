@@ -1379,6 +1379,31 @@ function notifyVideoEnded() {
         "*"
     );
 }
+const player = document.querySelector('media-controller');
+
+// Function to lock orientation
+async function lockLandscape() {
+    try {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+            // This forces the phone into landscape mode
+            await screen.orientation.lock('landscape');
+        }
+    } catch (err) {
+        console.warn("Orientation lock failed: ", err);
+    }
+}
+
+// Listen for the player entering fullscreen
+player.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        lockLandscape();
+    } else {
+        // Unlock when exiting fullscreen so the user can use portrait again
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
+    }
+});
     </script>
 </body>
 </html>
