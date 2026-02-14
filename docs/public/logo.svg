@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- Play button icon -->
+  <g transform="translate(85, 15)">
+    <circle cx="15" cy="15" r="14" fill="#3B82F6"/>
+    <polygon points="12,10 12,20 20,15" fill="white"/>
+  </g>
+  
+  <!-- HiAnime text -->
+  <text x="10" y="40" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#1F2937">Hi</text>
+  <text x="115" y="40" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#1F2937">nime</text>
+  
+  <!-- API text -->
+  <text x="140" y="55" font-family="Arial, sans-serif" font-size="18" font-weight="600" fill="#6B7280">API</text>
+</svg>

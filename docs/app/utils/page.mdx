@@ -13,10 +13,27 @@ Get a random anime recommendation.
 curl http://localhost:3030/api/v1/random
 \`\`\`
 
+**Response Schema**
+
+\`\`\`yaml
+success: true
+data:
+  title: Attack on Titan
+  alternativeTitle: Shingeki no Kyojin
+  id: attack-on-titan-112
+  poster: https://cdn.noitatnemucod.net/thumbnail/300x400/100/...
+  episodes:
+    sub: 25
+    dub: 25
+    eps: 25
+  type: TV
+  duration: 24m
+\`\`\`
+
 ---
 
 ## Watch2Gether
-Get Watch2Gether rooms.
+Get available Watch2Gether rooms.
 
 **Endpoint**
 
@@ -28,15 +45,39 @@ Get Watch2Gether rooms.
 curl http://localhost:3030/api/v1/watch2gether
 \`\`\`
 
+**Response Schema**
+
+\`\`\`yaml
+success: true
+data:
+  - id: room-id-1
+    title: One Piece Episode 1120
+    episodeId: one-piece-100?ep=1120
+    users: 5
+    createdAt: 2024-01-01T10:00:00Z
+\`\`\`
+
+---
+
 ## Watch2Gether Player
-Get player information for a Watch2Gether room.
+Get player page for a Watch2Gether room.
 
 **Endpoint**
 
 \`GET /watch2gether/player/:id\`
 
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | The room ID |
+
 **Example**
 
 \`\`\`bash
-curl http://localhost:3030/api/v1/watch2gether/player/12345
+curl http://localhost:3030/api/v1/watch2gether/player/room-id-1
 \`\`\`
+
+**Response**
+
+Returns an HTML page with the Watch2Gether player interface, allowing multiple users to watch anime together in sync.

@@ -22,6 +22,13 @@ data:
     slug: action
   - name: Adventure
     slug: adventure
+  - name: Comedy
+    slug: comedy
+  - name: Drama
+    slug: drama
+  - name: Fantasy
+    slug: fantasy
+  # ... more genres
 \`\`\`
 
 ---
@@ -32,6 +39,12 @@ Get characters for a specific anime.
 **Endpoint**
 
 \`GET /characters/:id\`
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | The anime ID (e.g., 'one-piece-100') |
 
 **Example**
 
@@ -44,10 +57,16 @@ curl http://localhost:3030/api/v1/characters/one-piece-100
 \`\`\`yaml
 success: true
 data:
-  - id: eren-yeager
-    name: Eren Yeager
+  - id: luffy
+    name: Monkey D. Luffy
     role: Main
     image: https://cdn.noitatnemucod.net/thumbnail/100x100/100/...
+    cast: Mayumi Tanaka
+  - id: zoro
+    name: Roronoa Zoro
+    role: Main
+    image: https://cdn.noitatnemucod.net/thumbnail/100x100/100/...
+    cast: Kazuya Nakai
 \`\`\`
 
 ---
@@ -58,6 +77,12 @@ Get detailed information about a character.
 **Endpoint**
 
 \`GET /character/:id\`
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | The character ID |
 
 **Example**
 
@@ -70,17 +95,19 @@ curl http://localhost:3030/api/v1/character/luffy
 \`\`\`yaml
 success: true
 data:
-  id: eren-yeager
-  name: Eren Yeager
-  image: ...
-  about: ...
-  voiceActors: []
+  id: luffy
+  name: Monkey D. Luffy
+  image: https://cdn.noitatnemucod.net/thumbnail/300x400/100/...
+  about: Monkey D. Luffy is the main protagonist...
+  voiceActors:
+    - name: Mayumi Tanaka
+      image: ...
 \`\`\`
 
 ---
 
 ## News
-Get latest anime news.
+Get latest anime news and updates.
 
 **Endpoint**
 
@@ -97,8 +124,10 @@ curl http://localhost:3030/api/v1/news
 \`\`\`yaml
 success: true
 data:
-  - id: news-id
-    title: News Title
-    image: ...
-    time: ...
+  - id: news-123
+    title: "New Season Announcement: Attack on Titan Final Season"
+    image: https://cdn.noitatnemucod.net/thumbnail/300x400/100/...
+    description: The final season of Attack on Titan...
+    uploadedAt: 2 days ago
+    category: Anime News
 \`\`\`

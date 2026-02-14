@@ -1,57 +1,181 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer base {
+
+  /* Base styles with mobile-first approach */
   body {
-    @apply text-gray-800 bg-gray-50;
+    @apply text-gray-800 bg-gray-50 antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Responsive typography */
   h1 {
-    @apply text-3xl font-bold mb-6 text-gray-900;
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-5 lg:mb-6 text-gray-900;
   }
 
   h2 {
-    @apply text-2xl font-semibold mt-8 mb-4 text-gray-800 border-b pb-2;
+    @apply text-xl sm:text-2xl lg:text-3xl font-semibold mt-8 sm:mt-10 mb-3 sm:mb-4 text-gray-800 border-b border-gray-200 pb-2 sm:pb-3;
   }
 
   h3 {
-    @apply text-xl font-medium mt-6 mb-3 text-gray-800;
+    @apply text-lg sm:text-xl lg:text-2xl font-medium mt-6 sm:mt-8 mb-2 sm:mb-3 text-gray-800;
+  }
+
+  h4 {
+    @apply text-base sm:text-lg font-medium mt-4 mb-2 text-gray-800;
   }
 
   p {
-    @apply mb-4 leading-relaxed;
+    @apply mb-3 sm:mb-4 leading-relaxed text-gray-700 text-sm sm:text-base;
   }
 
+  /* Lists with better mobile spacing */
   ul,
   ol {
-    @apply mb-4 ml-6 list-disc;
+    @apply mb-3 sm:mb-4 ml-4 sm:ml-6 space-y-1 sm:space-y-2;
   }
 
+  ul {
+    @apply list-disc;
+  }
+
+  ol {
+    @apply list-decimal;
+  }
+
+  li {
+    @apply text-gray-700 text-sm sm:text-base;
+  }
+
+  /* Code blocks - responsive sizing */
   code {
-    @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-pink-600;
+    @apply bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs sm:text-sm font-mono text-pink-600 border border-gray-200;
+    word-break: break-word;
   }
 
   pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-6;
+    @apply bg-gray-900 text-gray-100 p-3 sm:p-4 lg:p-6 rounded-lg overflow-x-auto mb-4 sm:mb-6 shadow-lg;
+    -webkit-overflow-scrolling: touch;
   }
 
   pre code {
-    @apply bg-transparent text-gray-100 p-0 text-sm;
+    @apply bg-transparent text-gray-100 p-0 text-xs sm:text-sm border-0;
+    word-break: normal;
   }
 
+  /* Links with better touch targets */
   a {
-    @apply text-blue-600 hover:underline;
+    @apply text-blue-600 hover:text-blue-700 hover:underline transition-colors;
+    min-height: 44px;
+    /* iOS touch target */
   }
 
+  /* Responsive tables */
   table {
-    @apply w-full border-collapse mb-6;
+    @apply w-full border-collapse mb-4 sm:mb-6 shadow-sm overflow-hidden rounded-lg text-sm sm:text-base;
   }
 
   th,
   td {
-    @apply border border-gray-300 px-4 py-2 text-left;
+    @apply border border-gray-300 px-2 sm:px-3 lg:px-4 py-2 sm:py-3 text-left;
   }
 
   th {
-    @apply bg-gray-100 font-semibold;
+    @apply bg-gray-100 font-semibold text-gray-900;
+  }
+
+  td {
+    @apply bg-white;
+  }
+
+  /* Better mobile table scrolling */
+  @media (max-width: 640px) {
+    table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  blockquote {
+    @apply border-l-4 border-blue-500 pl-3 sm:pl-4 italic text-gray-600 my-3 sm:my-4 text-sm sm:text-base;
+  }
+
+  hr {
+    @apply my-6 sm:my-8 border-gray-200;
+  }
+
+  /* Smooth scrolling */
+  html {
+    @apply scroll-smooth;
+  }
+
+  /* Focus styles - larger for mobile */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-blue-500;
+  }
+
+  /* Better tap highlight for mobile */
+  * {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Prose improvements */
+.prose {
+  @apply max-w-none;
+}
+
+.not-prose {
+  all: unset;
+  display: block;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Scrollbar styling for webkit browsers */
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}
+
+/* Utility classes for responsive design */
+.container-responsive {
+  @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Safe area insets for mobile devices (notch support) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
   }
 }
