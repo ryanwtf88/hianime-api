@@ -30,14 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={inter.className}>
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen bg-gray-50 dark:bg-slate-950">
           <Sidebar />
           <main className="flex-1 w-full lg:ml-64">
-            {/* Mobile: account for hamburger button */}
             <div className="pt-16 lg:pt-0 px-4 sm:px-6 md:px-8 lg:px-12 py-6 md:py-8 lg:py-10">
-              <div className="max-w-4xl mx-auto w-full">{children}</div>
+              <div className="max-w-5xl mx-auto w-full">{children}</div>
             </div>
           </main>
         </div>

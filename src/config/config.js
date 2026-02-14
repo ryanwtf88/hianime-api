@@ -26,11 +26,11 @@ const config = {
   },
 
   // Rate limiting settings
-  // Note: Disable for Cloudflare Workers (use Cloudflare's built-in rate limiting instead)
+  // DISABLED for Cloudflare Workers (use Cloudflare's built-in rate limiting instead)
   rateLimit: {
     windowMs: 60000, // 1 minute
-    limit: 1000000000, // requests per window
-    enabled: true, // Set to true for local/Vercel, false for Cloudflare Workers
+    limit: 100, // requests per window
+    enabled: false, // Disabled for Cloudflare Workers compatibility
   },
 
   // HTTP headers
@@ -45,7 +45,7 @@ const config = {
   // Environment detection
   isProduction: true,
   isDevelopment: false,
-  isVercel: true, // Set to true if deploying to Vercel
+  isVercel: false, // Set to false for Cloudflare Workers
 };
 
 export default config;

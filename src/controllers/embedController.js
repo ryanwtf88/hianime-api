@@ -4,20 +4,10 @@ import { fail } from '../utils/response.js';
 import fs from 'fs';
 import path from 'path';
 
-/**
- * embedController.js
- * Purpose: Handles the video player embed request, processes stream extraction,
- *          and serves the player HTML with injected configuration.
- * Interaction: Receives request, calls extractStream, loads external HTML/CSS,
- *              injects data, and returns the final HTML response.
- */
-
-// SECTION: Functionality
 export const embedController = async (c) => {
   try {
     let { id, server, type } = c.req.param();
 
-    // SECTION: Icons Definition
     const icons = {
       back: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>',
       check:
@@ -76,8 +66,12 @@ export const embedController = async (c) => {
 
     let selectedServer = null;
 
+    // Server normalization for compatibility
+    const sn = (s) => (['HD-1', 'HD-3'].includes(s) ? 'HD-2' : s);
+    const ns = sn(server);
+
     // 1. Direct match by name (Priority)
-    selectedServer = servers[type].find((s) => s.name.toUpperCase() === server);
+    selectedServer = servers[type].find((s) => s.name.toUpperCase() === ns);
 
     // 2. Handle specific MegaCloud mapping index 1 or 4 if server is MEGACLOUD or S-1 (Legacy)
     if (!selectedServer && (server === 'MEGACLOUD' || server === 'S-1')) {

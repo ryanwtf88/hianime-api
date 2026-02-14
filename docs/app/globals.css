@@ -2,38 +2,52 @@
 
 @layer base {
 
-  /* Base styles with mobile-first approach */
+  /* Modern color scheme with dark mode */
+  :root {
+    --color-primary: 59 130 246;
+    /* blue-600 */
+    --color-primary-dark: 37 99 235;
+    /* blue-700 */
+    --color-accent: 139 92 246;
+    /* purple-600 */
+    --color-success: 16 185 129;
+    /* green-500 */
+  }
+
+  /* Base styles */
   body {
-    @apply text-gray-800 bg-gray-50 antialiased;
+    @apply text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-slate-950 antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Responsive typography */
+  /* Enhanced typography */
   h1 {
-    @apply text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-5 lg:mb-6 text-gray-900;
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-gray-900 dark:text-white;
+    letter-spacing: -0.02em;
   }
 
   h2 {
-    @apply text-xl sm:text-2xl lg:text-3xl font-semibold mt-8 sm:mt-10 mb-3 sm:mb-4 text-gray-800 border-b border-gray-200 pb-2 sm:pb-3;
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold mt-12 mb-6 text-gray-900 dark:text-white;
+    letter-spacing: -0.01em;
   }
 
   h3 {
-    @apply text-lg sm:text-xl lg:text-2xl font-medium mt-6 sm:mt-8 mb-2 sm:mb-3 text-gray-800;
+    @apply text-xl sm:text-2xl lg:text-3xl font-semibold mt-8 mb-4 text-gray-900 dark:text-white;
   }
 
   h4 {
-    @apply text-base sm:text-lg font-medium mt-4 mb-2 text-gray-800;
+    @apply text-lg sm:text-xl font-semibold mt-6 mb-3 text-gray-800 dark:text-gray-200;
   }
 
   p {
-    @apply mb-3 sm:mb-4 leading-relaxed text-gray-700 text-sm sm:text-base;
+    @apply mb-4 leading-relaxed text-gray-700 dark:text-gray-300 text-base sm:text-lg;
   }
 
-  /* Lists with better mobile spacing */
+  /* Lists */
   ul,
   ol {
-    @apply mb-3 sm:mb-4 ml-4 sm:ml-6 space-y-1 sm:space-y-2;
+    @apply mb-6 ml-6 space-y-2;
   }
 
   ul {
@@ -45,51 +59,51 @@
   }
 
   li {
-    @apply text-gray-700 text-sm sm:text-base;
+    @apply text-gray-700 dark:text-gray-300 leading-relaxed;
   }
 
-  /* Code blocks - responsive sizing */
-  code {
-    @apply bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs sm:text-sm font-mono text-pink-600 border border-gray-200;
+  /* Inline code */
+  :not(pre)>code {
+    @apply bg-blue-50 dark:bg-blue-950/50 px-2 py-1 rounded-md text-sm font-mono text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900;
     word-break: break-word;
   }
 
+  /* Code blocks */
   pre {
-    @apply bg-gray-900 text-gray-100 p-3 sm:p-4 lg:p-6 rounded-lg overflow-x-auto mb-4 sm:mb-6 shadow-lg;
+    @apply bg-slate-900 dark:bg-black text-gray-100 p-4 sm:p-6 rounded-xl overflow-x-auto mb-6 shadow-2xl border border-slate-800;
     -webkit-overflow-scrolling: touch;
   }
 
   pre code {
-    @apply bg-transparent text-gray-100 p-0 text-xs sm:text-sm border-0;
+    @apply bg-transparent text-gray-100 p-0 text-sm sm:text-base border-0 font-mono;
     word-break: normal;
   }
 
-  /* Links with better touch targets */
+  /* Links */
   a {
-    @apply text-blue-600 hover:text-blue-700 hover:underline transition-colors;
+    @apply text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors;
     min-height: 44px;
-    /* iOS touch target */
   }
 
-  /* Responsive tables */
+  /* Tables */
   table {
-    @apply w-full border-collapse mb-4 sm:mb-6 shadow-sm overflow-hidden rounded-lg text-sm sm:text-base;
+    @apply w-full border-collapse mb-6 shadow-lg overflow-hidden rounded-xl text-sm sm:text-base bg-white dark:bg-slate-900;
   }
 
   th,
   td {
-    @apply border border-gray-300 px-2 sm:px-3 lg:px-4 py-2 sm:py-3 text-left;
+    @apply border border-gray-200 dark:border-slate-700 px-4 py-3 text-left;
   }
 
   th {
-    @apply bg-gray-100 font-semibold text-gray-900;
+    @apply bg-gray-100 dark:bg-slate-800 font-semibold text-gray-900 dark:text-white;
   }
 
   td {
-    @apply bg-white;
+    @apply bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-300;
   }
 
-  /* Better mobile table scrolling */
+  /* Mobile table scrolling */
   @media (max-width: 640px) {
     table {
       display: block;
@@ -98,12 +112,14 @@
     }
   }
 
+  /* Blockquotes */
   blockquote {
-    @apply border-l-4 border-blue-500 pl-3 sm:pl-4 italic text-gray-600 my-3 sm:my-4 text-sm sm:text-base;
+    @apply border-l-4 border-blue-500 dark:border-blue-600 pl-4 italic text-gray-600 dark:text-gray-400 my-6 bg-blue-50 dark:bg-blue-950/30 py-4 rounded-r-lg;
   }
 
+  /* Horizontal rules */
   hr {
-    @apply my-6 sm:my-8 border-gray-200;
+    @apply my-8 border-gray-200 dark:border-slate-800;
   }
 
   /* Smooth scrolling */
@@ -111,12 +127,12 @@
     @apply scroll-smooth;
   }
 
-  /* Focus styles - larger for mobile */
+  /* Focus styles */
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-blue-500;
+    @apply outline-2 outline-offset-2 outline-blue-500 dark:outline-blue-400;
   }
 
-  /* Better tap highlight for mobile */
+  /* Tap highlight */
   * {
     -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
   }
@@ -132,7 +148,13 @@
   display: block;
 }
 
-/* Custom animations */
+/* Grid background pattern */
+.bg-grid-white\/\[0\.05\] {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -147,35 +169,87 @@
   animation: fadeIn 0.2s ease-in-out;
 }
 
-/* Scrollbar styling for webkit browsers */
-@media (min-width: 1024px) {
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
 
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gray-400 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Utility classes for responsive design */
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Scrollbar styling */
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-slate-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 dark:bg-slate-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500 dark:bg-slate-600;
+  }
+}
+
+/* Utility classes */
 .container-responsive {
   @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
 }
 
-/* Safe area insets for mobile devices (notch support) */
+/* Gradient text */
+.gradient-text {
+  @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+}
+
+/* Safe area insets */
 @supports (padding: max(0px)) {
   body {
     padding-left: max(0px, env(safe-area-inset-left));
     padding-right: max(0px, env(safe-area-inset-right));
   }
+}
+
+/* Custom badge styles */
+.badge-get {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
+}
+
+.badge-post {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
+}
+
+.badge-put {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400;
+}
+
+.badge-delete {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-slate-700 transition-all;
 }
