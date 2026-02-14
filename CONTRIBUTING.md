@@ -22,18 +22,21 @@ Thank you for your interest in contributing to HiAnime API! This document provid
 ### Setup Instructions
 
 1. **Fork and Clone**
+
    ```bash
    git clone https://github.com/ryanwtf88/hianime-api.git
    cd hianime-api
    ```
 
 2. **Install Dependencies**
+
    ```bash
    bun install
    cd docs && npm install && cd ..
    ```
 
 3. **Run Development Server**
+
    ```bash
    bun run dev
    ```
@@ -48,6 +51,7 @@ Thank you for your interest in contributing to HiAnime API! This document provid
 ### Branch Naming
 
 Use descriptive branch names following this pattern:
+
 - `feature/description` - New features
 - `fix/description` - Bug fixes
 - `docs/description` - Documentation updates
@@ -55,6 +59,7 @@ Use descriptive branch names following this pattern:
 - `test/description` - Test additions/updates
 
 **Examples:**
+
 - `feature/add-genre-filter`
 - `fix/episode-title-display`
 - `docs/update-api-examples`
@@ -72,6 +77,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -81,6 +87,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```bash
 git commit -m "feat(api): add character details endpoint"
 git commit -m "fix(embed): resolve episode title extraction"
@@ -94,6 +101,7 @@ git commit -m "docs(readme): update installation instructions"
 This project uses ESLint and Prettier for code quality and formatting.
 
 **Before committing:**
+
 ```bash
 # Check for lint errors
 npm run lint
@@ -171,6 +179,7 @@ bun test --watch
 - Mock external dependencies
 
 **Example:**
+
 ```javascript
 import { describe, it, expect } from 'bun:test';
 import { getAnimeDetails } from './animeController';
@@ -199,6 +208,7 @@ describe('getAnimeDetails', () => {
    - Include code examples where applicable
 
 2. **Run Quality Checks**
+
    ```bash
    npm run lint        # Check for lint errors
    bun test           # Run tests
@@ -212,6 +222,7 @@ describe('getAnimeDetails', () => {
 ### Submitting a Pull Request
 
 1. **Push to Your Fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -223,22 +234,27 @@ describe('getAnimeDetails', () => {
    - Include screenshots for UI changes
 
 3. **PR Template**
+
    ```markdown
    ## Description
+
    Brief description of changes
 
    ## Type of Change
+
    - [ ] Bug fix
    - [ ] New feature
    - [ ] Documentation update
    - [ ] Refactoring
 
    ## Testing
+
    - [ ] Tests pass locally
    - [ ] Added new tests (if applicable)
    - [ ] Documentation updated
 
    ## Related Issues
+
    Closes #(issue number)
    ```
 

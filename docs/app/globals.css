@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 
 @layer base {
-
   /* Modern color scheme with dark mode */
   :root {
     --color-primary: 59 130 246;
@@ -63,7 +62,7 @@
   }
 
   /* Inline code */
-  :not(pre)>code {
+  :not(pre) > code {
     @apply bg-blue-50 dark:bg-blue-950/50 px-2 py-1 rounded-md text-sm font-mono text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900;
     word-break: break-word;
   }
@@ -150,7 +149,8 @@
 
 /* Grid background pattern */
 .bg-grid-white\/\[0\.05\] {
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 

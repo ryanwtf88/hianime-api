@@ -111,6 +111,7 @@ The server will be running at [http://localhost:3030](http://localhost:3030)
 ### Docker Deployment
 
 **Prerequisites:**
+
 - Docker installed ([Install Docker](https://docs.docker.com/get-docker/))
 
 #### Using Pre-built Image from GitHub Container Registry
@@ -132,11 +133,13 @@ docker run -p 3030:3030 \
 ```
 
 **Available tags:**
+
 - `latest` - Latest stable build from master branch
 - `v1.0.4` - Specific version
 - `master` - Latest commit from master branch
 
 **Multi-platform support:**
+
 - `linux/amd64` - x86_64 architecture
 - `linux/arm64` - ARM64 architecture (Apple Silicon, AWS Graviton)
 
@@ -167,13 +170,13 @@ services:
     # Or build from source:
     # build: .
     ports:
-      - "3030:3030"
+      - '3030:3030'
     environment:
       - NODE_ENV=production
       - PORT=3030
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3030/api/v1/home"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3030/api/v1/home']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -207,6 +210,7 @@ docker-compose up -d
 5. Click "Deploy"
 
 **Why Vercel?**
+
 - ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Serverless architecture with automatic scaling
 - ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Global CDN for fast response times
 - ![Supported](https://img.shields.io/badge/Supported-brightgreen?style=flat-square) Free tier with generous limits
@@ -216,14 +220,14 @@ docker-compose up -d
 
 **Environment Variables:**
 
-| Key | Value | Required |
-|-----|-------|----------|
-| `UPSTASH_REDIS_REST_URL` | Your Upstash Redis URL | Yes |
-| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Yes |
-| `ORIGIN` | `*` or your domain | No |
-| `RATE_LIMIT_ENABLED` | `true` | No |
-| `RATE_LIMIT_WINDOW_MS` | `60000` | No |
-| `RATE_LIMIT_LIMIT` | `100` | No |
+| Key                        | Value                    | Required |
+| -------------------------- | ------------------------ | -------- |
+| `UPSTASH_REDIS_REST_URL`   | Your Upstash Redis URL   | Yes      |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Upstash Redis Token | Yes      |
+| `ORIGIN`                   | `*` or your domain       | No       |
+| `RATE_LIMIT_ENABLED`       | `true`                   | No       |
+| `RATE_LIMIT_WINDOW_MS`     | `60000`                  | No       |
+| `RATE_LIMIT_LIMIT`         | `100`                    | No       |
 
 For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
@@ -244,6 +248,7 @@ For detailed deployment instructions, troubleshooting, and best practices, see t
 Deploy this API to Cloudflare Workers for edge computing with global distribution.
 
 **Prerequisites:**
+
 - Cloudflare account ([Sign up](https://dash.cloudflare.com/sign-up))
 - Wrangler CLI installed globally
 
@@ -294,6 +299,7 @@ bun run dev:cloudflare
 ```
 
 **Why Cloudflare Workers?**
+
 - Edge computing with global distribution
 - Extremely fast response times (< 50ms)
 - Free tier with 100,000 requests/day
@@ -363,6 +369,7 @@ proxyUrl: 'https://your-proxy.workers.dev',
 ```
 
 **Proxy Features:**
+
 - M3U8 playlist rewriting for seamless streaming
 - CDN bypass using socket connections for blocked hostnames
 - CORS header management
@@ -370,6 +377,7 @@ proxyUrl: 'https://your-proxy.workers.dev',
 - Supports both video streams and subtitle files
 
 **Why Separate Proxy?**
+
 - Better performance with edge computing
 - Independent scaling
 - Easier to update proxy logic without redeploying main API
@@ -387,7 +395,6 @@ bun install
 bun run dev
 ```
 
-
 ## Contributors
 
 Thanks to the following people for keeping this project alive and relevant:
@@ -403,6 +410,7 @@ Want to contribute? Check out our [contribution guidelines](https://github.com/r
 ## Acknowledgments
 
 Special thanks to the following projects for inspiration and reference:
+
 - [hianime-api](https://github.com/ryanwtf88/hianime-api)
 - [consumet.ts](https://github.com/consumet/consumet.ts)
 - [api.consumet.org](https://github.com/consumet/api.consumet.org)

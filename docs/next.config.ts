@@ -1,9 +1,9 @@
-import type { NextConfig } from "next";
-import createMDX from "@next/mdx";
+import type { NextConfig } from 'next';
+import createMDX from '@next/mdx';
 
 const nextConfig: NextConfig = {
   // Configure existing Next.js config here
-  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   // Enable static export for GitHub Pages
   output: 'export',
   // Configure for GitHub Pages subdirectory deployment

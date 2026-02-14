@@ -1,6 +1,7 @@
 # Home & Schedules
 
 ## Home Page
+
 Get the content for the home page, including spotlights, trending anime, latest episodes, etc.
 
 **Endpoint**
@@ -18,25 +19,26 @@ curl http://localhost:3030/api/v1/home
 \`\`\`yaml
 success: true
 data:
-  spotlight: []
-  trending: []
-  topAiring: []
-  mostPopular: []
-  mostFavorite: []
-  latestCompleted: []
-  latestEpisode: []
-  newAdded: []
-  topUpcoming: []
-  top10:
-    today: []
-    week: []
-    month: []
-  genres: []
+spotlight: []
+trending: []
+topAiring: []
+mostPopular: []
+mostFavorite: []
+latestCompleted: []
+latestEpisode: []
+newAdded: []
+topUpcoming: []
+top10:
+today: []
+week: []
+month: []
+genres: []
 \`\`\`
 
 ---
 
 ## Schedules
+
 Get the anime release schedule for a specific date.
 
 **Endpoint**
@@ -45,9 +47,9 @@ Get the anime release schedule for a specific date.
 
 **Query Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| date | string | No | Format: YYYY-MM-DD. Defaults to today. |
+| Parameter | Type   | Required | Description                            |
+| --------- | ------ | -------- | -------------------------------------- |
+| date      | string | No       | Format: YYYY-MM-DD. Defaults to today. |
 
 **Example**
 
@@ -60,15 +62,15 @@ curl http://localhost:3030/api/v1/schedules?date=2024-01-01
 \`\`\`yaml
 success: true
 data:
-  2024-01-01:
-    - id: anime-id
-      time: "10:30"
-      title: Anime Title
-      jname: Japanese Title
-      episode: 12
+2024-01-01: - id: anime-id
+time: "10:30"
+title: Anime Title
+jname: Japanese Title
+episode: 12
 \`\`\`
 
 ## Next Episode Schedule
+
 Get the schedule for next episode.
 
 **Endpoint**
@@ -86,7 +88,7 @@ curl http://localhost:3030/api/v1/schedule/next/one-piece-100
 \`\`\`yaml
 success: true
 data:
-  nextEpisode:
-    episodeNumber: 1120
-    releaseDate: "2024-12-15"
+nextEpisode:
+episodeNumber: 1120
+releaseDate: "2024-12-15"
 \`\`\`
