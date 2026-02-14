@@ -8,6 +8,7 @@ import { fail } from './utils/response.js';
 import getSwaggerDocs from './utils/swaggerUi.js';
 import { logger } from 'hono/logger';
 import config from './config/config.js';
+import { jwplayerBase64 } from './controllers/jwplayerJS.js';
 
 const app = new Hono();
 const origins = config.origin.includes(',')
@@ -59,7 +60,7 @@ app.get('/ui', (c) => {
     swagger: '/',
     docs: '/docs',
     health: '/ping',
-    version: '1.0.0',
+    version: '1.0.6',
     environment: config.isVercel ? 'vercel' : 'self-hosted',
     redis: config.redis.enabled ? 'enabled' : 'disabled',
   });
@@ -73,16 +74,25 @@ app.get('/ping', (c) => {
   });
 });
 
-app.get('/jwplayer/jwplayer.js', async (c) => {
+app.get('/jwplayer/jwplayer.js', (c) => {
   try {
-    const script = await Bun.file('src/jwplayer/jwplayer.js').text();
-    return c.body(script, 200, {
-      'Content-Type': 'application/javascript',
-      'Cache-Control': 'public, max-age=31536000',
-    });
-  } catch {
-    return c.text('Script not found', 404);
+    const binaryString = atob(jwplayerBase64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    c.header('Content-Type', 'application/javascript');
+    c.header('Cache-Control', 'public, max-age=31536000');
+    return c.body(bytes);
+  } catch (err) {
+    console.error('Error serving jwplayer.js:', err);
+    return c.text('Internal Server Error', 500);
   }
+});
+
+app.get('/favicon.ico', (c) => {
+  return c.body(null, 204);
 });
 
 app.route('/api/v1', hiAnimeRoutes);

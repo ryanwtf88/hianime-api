@@ -1,8 +1,7 @@
 import { getServers } from './serversController.js';
 import { extractStream } from '../extractor/extractStream.js';
 import { fail } from '../utils/response.js';
-import fs from 'fs';
-import path from 'path';
+import { htmlTemplate, cssTemplate } from './embedTemplates.js';
 
 export const embedController = async (c) => {
   try {
@@ -137,77 +136,27 @@ export const embedController = async (c) => {
     }
 
     // SECTION: HTML Preparation
-    // Helper for global replacement
+
     const inject = (content, placeholder, value) => {
       if (!content) return '';
       return content.split(placeholder).join(value);
     };
 
-    // Read templates
-    let htmlTemplate = '';
-    let cssTemplate = '';
-    try {
-      htmlTemplate = fs.readFileSync(
-        path.join(process.cwd(), 'src/controllers/embedCollector.html'),
-        'utf8'
-      );
-      cssTemplate = fs.readFileSync(
-        path.join(process.cwd(), 'src/controllers/embedCollector.css'),
-        'utf8'
-      );
-    } catch (err) {
-      console.error('Error reading embed templates:', err);
-      return fail(c, 'Failed to load player templates', 500);
-    }
-
-    // Inject Styles
+    // Use inlined templates for Cloudflare Workers compatibility
     let htmlContent = htmlTemplate;
     htmlContent = inject(htmlContent, '{{STYLES}}', cssTemplate);
-
-    // Inject Icons
-    htmlContent = inject(htmlContent, '{{ICONS_BUFFER}}', icons.buffer);
-    htmlContent = inject(htmlContent, '{{ICONS_PLAY}}', icons.play);
-    htmlContent = inject(htmlContent, '{{ICONS_REWIND}}', icons.rewind);
-    htmlContent = inject(htmlContent, '{{ICONS_FORWARD}}', icons.forward);
-    htmlContent = inject(htmlContent, '{{ICONS_VOLUME100}}', icons.volume100);
-    htmlContent = inject(htmlContent, '{{ICONS_GEAR}}', icons.gear);
-    htmlContent = inject(htmlContent, '{{ICONS_PIPOFF}}', icons.pipOff);
-    htmlContent = inject(htmlContent, '{{ICONS_FULLSCREEN}}', icons.fullscreen);
-    htmlContent = inject(htmlContent, '{{ICONS_BACK}}', icons.back);
-
-    // Generate Client ID
-    const clientId =
-      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-
-    // Inject Data & Configuration
-    htmlContent = inject(htmlContent, '{{ICONS_JSON}}', JSON.stringify(icons));
-    htmlContent = inject(
-      htmlContent,
-      '{{INTRO_JSON}}',
-      JSON.stringify(intro || { start: 0, end: 0 })
-    );
-    htmlContent = inject(
-      htmlContent,
-      '{{OUTRO_JSON}}',
-      JSON.stringify(outro || { start: 0, end: 0 })
-    );
-    htmlContent = inject(
-      htmlContent,
-      '{{SUBTITLES_JSON}}',
-      JSON.stringify((tracks || []).filter((t) => t && t.label && t.file))
-    );
+    htmlContent = inject(htmlContent, '{{M3U8_URL}}', m3u8Url);
+    htmlContent = inject(htmlContent, '{{SUBTITLES_JSON}}', JSON.stringify((tracks || []).filter((t) => t && t.label && t.file)));
+    htmlContent = inject(htmlContent, '{{INTRO_JSON}}', JSON.stringify(intro || { start: 0, end: 0 }));
+    htmlContent = inject(htmlContent, '{{OUTRO_JSON}}', JSON.stringify(outro || { start: 0, end: 0 }));
     htmlContent = inject(htmlContent, '{{AUTOPLAY}}', c.req.query('autoplay') === 'true');
     htmlContent = inject(htmlContent, '{{SKIP_INTRO}}', c.req.query('skipIntro') === 'true');
-    htmlContent = inject(htmlContent, '{{M3U8_URL}}', m3u8Url);
     htmlContent = inject(htmlContent, '{{EPISODE_TITLE}}', episodeTitle);
-    // Add metadata placeholders to avoid nulls
     htmlContent = inject(htmlContent, '{{MEDIA_ID}}', id || 'unknown');
-    htmlContent = inject(htmlContent, '{{CLIENT_ID}}', clientId);
 
     return c.html(htmlContent);
   } catch (_e) {
     console.error('Embed Controller Error');
-    // If it's a validation error, it will have statusCode
     const statusCode = _e.statusCode || 500;
     return fail(c, _e.message || 'Internal Server Error', statusCode, _e.details);
   }

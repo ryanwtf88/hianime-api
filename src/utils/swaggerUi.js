@@ -3,7 +3,7 @@ export const getSwaggerDocs = (baseUrl) => ({
   openapi: '3.0.0',
   info: {
     title: 'hianime-api',
-    version: '1.0.5', // Update this when package.json version changes
+    version: '1.0.6', // Update this when package.json version changes
     description: 'API Documentation For HiAnime Content Endpoints',
   },
   servers: [

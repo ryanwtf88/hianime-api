@@ -1,6 +1,6 @@
 {
   "name": "hianime-api",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "RY4N",
   "bin": {
     "hianime-api": "./index.js"

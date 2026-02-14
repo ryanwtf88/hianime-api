@@ -10,7 +10,7 @@ export default function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
-            <span className="text-white text-sm font-medium">API v1.0.5 • Production Ready</span>
+            <span className="text-white text-sm font-medium">API v1.0.6 • Production Ready</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">

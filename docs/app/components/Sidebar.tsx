@@ -231,7 +231,7 @@ export default function Sidebar() {
                                     </svg>
                                     <div>
                                         <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">API Version</p>
-                                        <p className="text-xs text-blue-700 dark:text-blue-400">v1.0.5 • Production</p>
+                                        <p className="text-xs text-blue-700 dark:text-blue-400">v1.0.6 • Production</p>
                                     </div>
                                 </div>
                             </div>
