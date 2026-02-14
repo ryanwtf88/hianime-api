@@ -22,9 +22,9 @@ export const getServers = async (id, useAlternative = false) => {
     const response = extractServers(data.html);
 
     // Map servers for both sources
-    ['sub', 'dub', 'raw'].forEach(type => {
+    ['sub', 'dub', 'raw'].forEach((type) => {
       if (response[type]) {
-        response[type] = response[type].map(server => {
+        response[type] = response[type].map((server) => {
           if (useAlternative) {
             // AniWatch: Keep MegaCloud (ID 1) as is for HD-3 mapping later
             return server;
@@ -72,26 +72,26 @@ const serversController = async (c) => {
     raw: [],
   };
 
-  ['sub', 'dub', 'raw'].forEach(type => {
+  ['sub', 'dub', 'raw'].forEach((type) => {
     // Add HD-1 from HiAnime
-    const hianimeHD1 = hianimeServers[type]?.find(s => s.name === 'HD-1');
+    const hianimeHD1 = hianimeServers[type]?.find((s) => s.name === 'HD-1');
     if (hianimeHD1) {
       mergedServers[type].push({ ...hianimeHD1, source: 'hianime' });
     }
 
     // Add HD-2 from HiAnime
-    const hianimeHD2 = hianimeServers[type]?.find(s => s.name === 'HD-2');
+    const hianimeHD2 = hianimeServers[type]?.find((s) => s.name === 'HD-2');
     if (hianimeHD2) {
       mergedServers[type].push({ ...hianimeHD2, source: 'hianime' });
     }
 
     // Add HD-3 from AniWatch (MegaCloud)
-    const aniwatchMegaCloud = aniwatchServers[type]?.find(s => s.index === 1);
+    const aniwatchMegaCloud = aniwatchServers[type]?.find((s) => s.index === 1);
     if (aniwatchMegaCloud) {
       mergedServers[type].push({
         ...aniwatchMegaCloud,
         name: 'HD-3',
-        source: 'aniwatchtv'
+        source: 'aniwatchtv',
       });
     }
   });

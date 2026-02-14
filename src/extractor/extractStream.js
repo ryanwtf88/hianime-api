@@ -15,22 +15,30 @@ export const extractStream = async ({ selectedServer, id }) => {
     streamingLink.link.file = proxiedUrl;
     streamingLink.link.proxyUrl = proxiedUrl;
 
-    if (selectedServer.type === 'dub' && (!streamingLink.tracks || streamingLink.tracks.filter(t => t.kind === 'captions').length === 0)) {
+    if (
+      selectedServer.type === 'dub' &&
+      (!streamingLink.tracks ||
+        streamingLink.tracks.filter((t) => t.kind === 'captions').length === 0)
+    ) {
       try {
         console.log('DUB episode has no subtitles, attempting to fetch from SUB version...');
         const allServers = await getServers(id);
 
-        const subServer = allServers.sub.find(s => s.name === selectedServer.name || s.index === selectedServer.index);
+        const subServer = allServers.sub.find(
+          (s) => s.name === selectedServer.name || s.index === selectedServer.index
+        );
 
         if (subServer && subServer.id) {
           console.log('Found matching SUB server, fetching subtitles...');
           const subStreamData = await megacloud({ selectedServer: subServer, id });
 
           if (subStreamData && subStreamData.tracks) {
-            const subTitles = subStreamData.tracks.filter(t => t.kind === 'captions' || t.kind === 'subtitles');
+            const subTitles = subStreamData.tracks.filter(
+              (t) => t.kind === 'captions' || t.kind === 'subtitles'
+            );
 
             if (subTitles.length > 0) {
-              console.log(`Found ${subTitles.length} subtitle tracks from SUB version`)
+              console.log(`Found ${subTitles.length} subtitle tracks from SUB version`);
               streamingLink.tracks = [...(streamingLink.tracks || []), ...subTitles];
             }
           }

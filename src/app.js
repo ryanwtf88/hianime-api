@@ -80,7 +80,7 @@ app.get('/jwplayer/jwplayer.js', async (c) => {
       'Content-Type': 'application/javascript',
       'Cache-Control': 'public, max-age=31536000',
     });
-  } catch (error) {
+  } catch {
     return c.text('Script not found', 404);
   }
 });

@@ -4,22 +4,24 @@
 Get a list of all anime genres.
 
 **Endpoint**
+
 \`GET /genres\`
 
 **Example**
+
 \`\`\`bash
 curl http://localhost:3030/api/v1/genres
 \`\`\`
 
 **Response Schema**
-\`\`\`json
-{
-  "success": true,
-  "data": [
-    { "name": "Action", "slug": "action" },
-    { "name": "Adventure", "slug": "adventure" }
-  ]
-}
+
+\`\`\`yaml
+success: true
+data:
+  - name: Action
+    slug: action
+  - name: Adventure
+    slug: adventure
 \`\`\`
 
 ---
@@ -28,26 +30,24 @@ curl http://localhost:3030/api/v1/genres
 Get characters for a specific anime.
 
 **Endpoint**
+
 \`GET /characters/:id\`
 
 **Example**
+
 \`\`\`bash
 curl http://localhost:3030/api/v1/characters/one-piece-100
 \`\`\`
 
 **Response Schema**
-\`\`\`json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "eren-yeager",
-      "name": "Eren Yeager",
-      "role": "Main",
-      "image": "https://cdn.noitatnemucod.net/thumbnail/100x100/100/..."
-    }
-  ]
-}
+
+\`\`\`yaml
+success: true
+data:
+  - id: eren-yeager
+    name: Eren Yeager
+    role: Main
+    image: https://cdn.noitatnemucod.net/thumbnail/100x100/100/...
 \`\`\`
 
 ---
@@ -56,25 +56,25 @@ curl http://localhost:3030/api/v1/characters/one-piece-100
 Get detailed information about a character.
 
 **Endpoint**
+
 \`GET /character/:id\`
 
 **Example**
+
 \`\`\`bash
 curl http://localhost:3030/api/v1/character/luffy
 \`\`\`
 
 **Response Schema**
-\`\`\`json
-{
-  "success": true,
-  "data": {
-    "id": "eren-yeager",
-    "name": "Eren Yeager",
-    "image": "...",
-    "about": "...",
-    "voiceActors": [...]
-  }
-}
+
+\`\`\`yaml
+success: true
+data:
+  id: eren-yeager
+  name: Eren Yeager
+  image: ...
+  about: ...
+  voiceActors: []
 \`\`\`
 
 ---
@@ -83,24 +83,22 @@ curl http://localhost:3030/api/v1/character/luffy
 Get latest anime news.
 
 **Endpoint**
+
 \`GET /news\`
 
 **Example**
+
 \`\`\`bash
 curl http://localhost:3030/api/v1/news
 \`\`\`
 
 **Response Schema**
-\`\`\`json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "news-id",
-      "title": "News Title",
-      "image": "...",
-      "time": "..."
-    }
-  ]
-}
+
+\`\`\`yaml
+success: true
+data:
+  - id: news-id
+    title: News Title
+    image: ...
+    time: ...
 \`\`\`

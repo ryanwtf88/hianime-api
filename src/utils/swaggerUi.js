@@ -431,7 +431,11 @@ export const getSwaggerDocs = (baseUrl) => ({
         summary: 'Stream episode',
         parameters: [
           { name: 'id', in: 'query', required: true, schema: { type: 'string' } },
-          { name: 'type', in: 'query', schema: { type: 'string', enum: ['sub', 'dub', 'raw'], default: 'sub' } },
+          {
+            name: 'type',
+            in: 'query',
+            schema: { type: 'string', enum: ['sub', 'dub', 'raw'], default: 'sub' },
+          },
           { name: 'server', in: 'query', schema: { type: 'string', default: 'hd-1' } },
         ],
         responses: { 200: { description: 'Success' } },
@@ -532,8 +536,8 @@ export const getSwaggerDocs = (baseUrl) => ({
             description: 'Server to use for streaming',
           },
         ],
-        responses: { 
-          200: { 
+        responses: {
+          200: {
             description: 'Player data with embed URL',
             content: {
               'application/json': {
@@ -555,13 +559,13 @@ export const getSwaggerDocs = (baseUrl) => ({
                         embedUrl: { type: 'string' },
                         createdBy: { type: 'string' },
                         status: { type: 'string' },
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          } 
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },

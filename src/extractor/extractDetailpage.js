@@ -151,7 +151,7 @@ export const extractDetailpage = (html) => {
         obj.moreSeasons.push(innerObj);
       });
   }
-  
+
   const extractRelatedAndMostPopular = (index, array) => {
     relatedAndMostPopular
       .eq(index)

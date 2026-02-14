@@ -1,22 +1,36 @@
 import js from '@eslint/js';
 import globals from 'globals';
-import { defineConfig } from 'eslint/config';
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 
-export default defineConfig([
+export default [
   {
-    files: ['**/*.{js,mjs,cjs}'],
-    plugins: { js },
-    extends: ['js/recommended'],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      'src/jwplayer/jwplayer.js',
+      'docs/.next/**',
+      'docs/out/**',
+      'docs/*.config.ts',
+      'docs/*.config.js',
+      '.next/**',
+      'out/**',
+    ],
   },
+  js.configs.recommended,
   {
     files: ['**/*.{js,mjs,cjs,ts}'],
-    languageOptions: { globals: { ...globals.node, Bun: 'readonly' } },
-  },
-  {
-    plugins: {
-      eslintPluginPrettier,
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        Bun: 'readonly',
+      },
     },
   },
-  { rules: {} },
-]);
+  eslintPluginPrettier,
+  {
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+];

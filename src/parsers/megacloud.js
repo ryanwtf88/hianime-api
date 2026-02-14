@@ -18,7 +18,7 @@ async function getDecryptionKey() {
   const now = Date.now();
 
   // Return cached key if still valid
-  if (cachedKey && (now - keyLastFetched) < KEY_CACHE_DURATION) {
+  if (cachedKey && now - keyLastFetched < KEY_CACHE_DURATION) {
     console.log('Using cached decryption key');
     return cachedKey;
   }
@@ -58,16 +58,13 @@ async function decryptPrimarySource(baseUrl, sourceId, key) {
     }
 
     console.log('Fetching sources with token...');
-    const { data } = await axios.get(
-      `${baseUrl}/getSources?id=${sourceId}&_k=${token}`,
-      {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'Referer': `${baseUrl}/${sourceId}`,
-        },
-        timeout: TIMEOUT,
-      }
-    );
+    const { data } = await axios.get(`${baseUrl}/getSources?id=${sourceId}&_k=${token}`, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Referer: `${baseUrl}/${sourceId}`,
+      },
+      timeout: TIMEOUT,
+    });
 
     const encrypted = data?.sources;
     if (!encrypted) {
@@ -85,7 +82,9 @@ async function decryptPrimarySource(baseUrl, sourceId, key) {
       } catch {
         console.log('Standard decryption failed, trying Hex key...');
         try {
-          decrypted = CryptoJS.AES.decrypt(encrypted, CryptoJS.enc.Hex.parse(key)).toString(CryptoJS.enc.Utf8);
+          decrypted = CryptoJS.AES.decrypt(encrypted, CryptoJS.enc.Hex.parse(key)).toString(
+            CryptoJS.enc.Utf8
+          );
         } catch {
           console.log('Hex decryption failed too.');
         }
@@ -107,8 +106,6 @@ async function decryptPrimarySource(baseUrl, sourceId, key) {
   }
 }
 
-
-
 /**
  * Main megacloud decryption function
  */
@@ -116,8 +113,12 @@ export async function megacloud({ selectedServer, id }, retryCount = 0) {
   const epID = id.split('ep=').pop();
 
   try {
-    console.log(`\n=== Megacloud Decryption Start (attempt ${retryCount + 1}/${MAX_RETRIES + 1}) ===`);
-    console.log(`Episode ID: ${epID}, Server: ${selectedServer.name}, Type: ${selectedServer.type}`);
+    console.log(
+      `\n=== Megacloud Decryption Start (attempt ${retryCount + 1}/${MAX_RETRIES + 1}) ===`
+    );
+    console.log(
+      `Episode ID: ${epID}, Server: ${selectedServer.name}, Type: ${selectedServer.type}`
+    );
 
     const isAniwatch = selectedServer.source === 'aniwatchtv';
     const activeBaseUrl = isAniwatch ? config.baseurl2 : config.baseurl;
@@ -182,14 +183,13 @@ export async function megacloud({ selectedServer, id }, retryCount = 0) {
 
     console.log('=== Megacloud Decryption Success ===\n');
     return result;
-
   } catch (error) {
     console.error(`Megacloud decryption error (attempt ${retryCount + 1}):`, error.message);
 
     // Retry logic
     if (retryCount < MAX_RETRIES) {
       console.log(`Retrying... (${retryCount + 2}/${MAX_RETRIES + 1})`);
-      await new Promise(resolve => setTimeout(resolve, 2000 * (retryCount + 1)));
+      await new Promise((resolve) => setTimeout(resolve, 2000 * (retryCount + 1)));
       return megacloud({ selectedServer, id }, retryCount + 1);
     }
 

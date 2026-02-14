@@ -4,35 +4,34 @@
 Get the content for the home page, including spotlights, trending anime, latest episodes, etc.
 
 **Endpoint**
+
 \`GET /home\`
 
 **Example**
+
 \`\`\`bash
 curl http://localhost:3030/api/v1/home
 \`\`\`
 
 **Response Schema**
-\`\`\`json
-{
-  "success": true,
-  "data": {
-    "spotlight": [...],
-    "trending": [...],
-    "topAiring": [...],
-    "mostPopular": [...],
-    "mostFavorite": [...],
-    "latestCompleted": [...],
-    "latestEpisode": [...],
-    "newAdded": [...],
-    "topUpcoming": [...],
-    "top10": {
-      "today": [...],
-      "week": [...],
-      "month": [...]
-    },
-    "genres": [...]
-  }
-}
+
+\`\`\`yaml
+success: true
+data:
+  spotlight: []
+  trending: []
+  topAiring: []
+  mostPopular: []
+  mostFavorite: []
+  latestCompleted: []
+  latestEpisode: []
+  newAdded: []
+  topUpcoming: []
+  top10:
+    today: []
+    week: []
+    month: []
+  genres: []
 \`\`\`
 
 ---
@@ -41,56 +40,53 @@ curl http://localhost:3030/api/v1/home
 Get the anime release schedule for a specific date.
 
 **Endpoint**
+
 \`GET /schedules?date=YYYY-MM-DD\`
 
 **Query Parameters**
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | date | string | No | Format: YYYY-MM-DD. Defaults to today. |
 
 **Example**
+
 \`\`\`bash
 curl http://localhost:3030/api/v1/schedules?date=2024-01-01
 \`\`\`
 
 **Response Schema**
-\`\`\`json
-{
-  "success": true,
-  "data": {
-    "2024-01-01": [
-      {
-        "id": "anime-id",
-        "time": "10:30",
-        "title": "Anime Title",
-        "jname": "Japanese Title",
-        "episode": 12
-      }
-    ]
-  }
-}
+
+\`\`\`yaml
+success: true
+data:
+  2024-01-01:
+    - id: anime-id
+      time: "10:30"
+      title: Anime Title
+      jname: Japanese Title
+      episode: 12
 \`\`\`
 
 ## Next Episode Schedule
 Get the schedule for next episode.
 
 **Endpoint**
+
 \`GET /schedule/next/:id\`
 
 **Example**
+
 \`\`\`bash
 curl http://localhost:3030/api/v1/schedule/next/one-piece-100
 \`\`\`
 
 **Response Schema**
-\`\`\`json
-{
-  "success": true,
-  "data": {
-    "nextEpisode": {
-      "episodeNumber": 1120,
-      "releaseDate": "2024-12-15"
-    }
-  }
-}
+
+\`\`\`yaml
+success: true
+data:
+  nextEpisode:
+    episodeNumber: 1120
+    releaseDate: "2024-12-15"
 \`\`\`

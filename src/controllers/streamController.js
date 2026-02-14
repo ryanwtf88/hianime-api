@@ -13,11 +13,18 @@ const streamController = async (c) => {
 
   // Check if type exists in servers
   if (!servers[type] || servers[type].length === 0) {
-    throw new validationError('invalid type or no servers available', { type, availableTypes: Object.keys(servers).filter(k => k !== 'episode' && servers[k].length > 0) });
+    throw new validationError('invalid type or no servers available', {
+      type,
+      availableTypes: Object.keys(servers).filter((k) => k !== 'episode' && servers[k].length > 0),
+    });
   }
 
   const selectedServer = servers[type].find((el) => el.name === server);
-  if (!selectedServer) throw new validationError('invalid or server not found', { server, availableServers: servers[type].map(s => s.name) });
+  if (!selectedServer)
+    throw new validationError('invalid or server not found', {
+      server,
+      availableServers: servers[type].map((s) => s.name),
+    });
 
   const response = await extractStream({ selectedServer, id });
   return response;

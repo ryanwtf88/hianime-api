@@ -376,7 +376,8 @@ export const getApiDocumentation = (baseUrl) => ({
       hasQueries: false,
       paramsList: ['server', 'id', 'type'],
       example: '/embed/hd-1/102994/sub',
-      description: 'Returns an embedded video player for the specified episode. Type can be: sub, dub, or raw',
+      description:
+        'Returns an embedded video player for the specified episode. Type can be: sub, dub, or raw',
     },
     {
       name: 'embed (query params)',
@@ -386,7 +387,8 @@ export const getApiDocumentation = (baseUrl) => ({
       queriesList: ['id', 'server', 'type'],
       defaultQueries: { server: 'hd-1', type: 'sub' },
       example: '/embed?id=102994&server=hd-1&type=sub',
-      description: 'Returns an embedded video player using query parameters. Type can be: sub, dub, or raw',
+      description:
+        'Returns an embedded video player using query parameters. Type can be: sub, dub, or raw',
     },
     {
       name: 'proxy',
@@ -463,7 +465,8 @@ export const getApiDocumentation = (baseUrl) => ({
       hasParams: true,
       hasQueries: true,
       example: '/watch2gether/player/1518877?server=HD-2',
-      description: 'Returns player data for a watch2gether room including anime info and embed URL.',
+      description:
+        'Returns player data for a watch2gether room including anime info and embed URL.',
     },
     {
       name: 'random',

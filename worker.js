@@ -1,6 +1,6 @@
 /**
  * Cloudflare Workers entry point for HiAnime API
- * 
+ *
  * This file adapts the Hono app to work with Cloudflare Workers.
  * It handles incoming requests and routes them through the main app.
  */

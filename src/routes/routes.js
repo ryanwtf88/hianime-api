@@ -52,6 +52,4 @@ router.get('/watch2gether', handler(watch2getherController));
 router.get('/watch2gether/player/:id', handler(watch2getherPlayerController));
 router.get('/random', handler(randomController));
 
-
-
 export default router;

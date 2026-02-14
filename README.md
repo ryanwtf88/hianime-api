@@ -15,17 +15,11 @@
 
 ---
 
-## Table of Contents
-
 - [Overview](#overview)
 - [Important Notice](#important-notice)
 - [Installation](#installation)
 - [Deployment](#deployment)
-- [Documentation](#documentation)
 - [Development](#development)
-- [Contributors](#contributors)
-- [Acknowledgments](#acknowledgments)
-- [Support](#support)
 
 ---
 
@@ -375,17 +369,6 @@ proxyUrl: 'https://your-proxy.workers.dev',
 - Referer header preservation
 - Supports both video streams and subtitle files
 
-**Supported CDN Hostnames (Socket Fetch):**
-- haildrop.com
-- douvid.com
-- lightningspark.site
-- sunburst.stream
-- rainveil.net
-- fogtwist.com
-- stormshade.xyz
-- sunshinerays.com
-- netmagcdn.com
-
 **Why Separate Proxy?**
 - Better performance with edge computing
 - Independent scaling
@@ -393,12 +376,6 @@ proxyUrl: 'https://your-proxy.workers.dev',
 - Can be shared across multiple API instances
 
 ---
-
-## Documentation
-
-The full documentation for this API is available in the `docs` folder or at the deployed documentation site.
-
-[View Documentation](./docs/README.md)
 
 ## Development
 
@@ -410,15 +387,40 @@ bun install
 bun run dev
 ```
 
+
 ## Contributors
 
-Thank you to all the contributors!
+Thanks to the following people for keeping this project alive and relevant:
+
+<a href="https://github.com/ryanwtf88/hianime-api/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ryanwtf88/hianime-api" alt="Contributors" />
+</a>
+
+Want to contribute? Check out our [contribution guidelines](https://github.com/ryanwtf88/hianime-api/blob/master/CONTRIBUTING.md) and feel free to submit a pull request!
+
+---
 
 ## Acknowledgments
 
-- [hianime.to](https://hianime.to) for the content
-- [Hono](https://hono.dev/) for the framework
+Special thanks to the following projects for inspiration and reference:
+- [hianime-api](https://github.com/ryanwtf88/hianime-api)
+- [consumet.ts](https://github.com/consumet/consumet.ts)
+- [api.consumet.org](https://github.com/consumet/api.consumet.org)
+
+---
 
 ## Support
 
-If you like this project, give it a ⭐!
+If you find this project useful, please consider giving it a star on GitHub!
+
+[![GitHub stars](https://img.shields.io/github/stars/ryanwtf88/hianime-api?style=social)](https://github.com/ryanwtf88/hianime-api/stargazers)
+
+---
+
+<div align="center">
+
+**Made by RY4N**
+
+[Report Bug](https://github.com/ryanwtf88/hianime-api/issues) • [Request Feature](https://github.com/ryanwtf88/hianime-api/issues)
+
+</div>
