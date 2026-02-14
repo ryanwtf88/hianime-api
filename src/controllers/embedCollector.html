@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MEGACLOUD</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/jwplayer/jwplayer.js"></script>
+    <style>{{STYLES}}</style>
+</head>
+<body>
+    <div id="player"></div>
+    
+    <button id="skip-intro-btn" class="skip-button" style="display: none;">Skip Intro</button>
+    <button id="skip-outro-btn" class="skip-button" style="display: none;">Skip Outro</button>
+    
+    <script>
+        // Anti-debugging and inspection protection
+        (function() {
+            const devtools = /./;
+            devtools.toString = function() {
+                this.opened = true;
+            };
+            const checkDevTools = setInterval(function() {
+                if (devtools.opened) {
+                    window.location.reload();
+                }
+            }, 1000);
+            
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            document.addEventListener('keydown', e => {
+                if (e.keyCode === 123 || 
+                    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+                    (e.ctrlKey && e.keyCode === 85)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Override console methods
+            if (typeof console !== 'undefined') {
+                console.log = console.warn = console.error = console.info = console.debug = function() {};
+            }
+        })();
+        
+        const m3u8Url = '{{M3U8_URL}}';
+        const subtitles = {{SUBTITLES_JSON}};
+        const intro = {{INTRO_JSON}};
+        const outro = {{OUTRO_JSON}};
+        const autoPlay = {{AUTOPLAY}};
+        const autoSkipIntro = {{SKIP_INTRO}};
+        const episodeTitle = '{{EPISODE_TITLE}}';
+        
+        // Prepare tracks
+        const tracks = subtitles.map((track, index) => ({
+            file: track.file,
+            label: track.label,
+            kind: 'captions'
+        }));
+        
+        // Initialize JW Player
+        const player = jwplayer('player');
+        
+        player.setup({
+            file: m3u8Url,
+            type: 'hls',
+            title: episodeTitle || 'Episode',
+            mediaid: '{{MEDIA_ID}}',
+            tracks: tracks,
+            autostart: autoPlay,
+            width: '100%',
+            height: '100%',
+            stretching: 'uniform',
+            preload: 'auto',
+            controls: true,
+            displaytitle: true,
+            displaydescription: false,
+            hlshtml: true,
+            primary: 'html5',
+            cast: {},
+            sharing: false,
+            related: {
+                displayMode: 'none'
+            },
+            playbackRateControls: [0.5, 0.75, 1, 1.25, 1.5, 2],
+            renderCaptionsNatively: false,
+            // Realistic quality labels (240p to 1080p only)
+            qualityLabels: {
+                '1080': '1080p',
+                '720': '720p',
+                '480': '480p',
+                '360': '360p',
+                '240': '240p'
+            },
+            // Prefer higher quality
+            defaultQuality: 'auto',
+            // Optimized buffering and bandwidth settings
+            hlsjsdefault: {
+                maxBufferLength: 30,
+                maxMaxBufferLength: 600,
+                maxBufferSize: 60 * 1000 * 1000,
+                maxBufferHole: 0.5,
+                lowBufferWatchdogPeriod: 0.5,
+                highBufferWatchdogPeriod: 3,
+                nudgeOffset: 0.1,
+                nudgeMaxRetry: 3,
+                maxFragLookUpTolerance: 0.25,
+                liveSyncDurationCount: 3,
+                liveMaxLatencyDurationCount: 10,
+                enableWorker: true,
+                enableSoftwareAES: true,
+                startLevel: -1,
+                autoStartLoad: true,
+                // Optimized bandwidth estimation
+                abrEwmaDefaultEstimate: 500000,
+                abrBandWidthFactor: 0.95,
+                abrBandWidthUpFactor: 0.7,
+                abrMaxWithRealBitrate: true,
+                maxStarvationDelay: 4,
+                maxLoadingDelay: 4,
+                minAutoBitrate: 0
+            },
+            // Enhanced visual quality
+            aspectratio: '16:9',
+            skin: {
+                name: 'seven'
+            }
+        });
+        
+        let introSkipped = false;
+        let outroSkipped = false;
+        
+        const skipIntroBtn = document.getElementById('skip-intro-btn');
+        const skipOutroBtn = document.getElementById('skip-outro-btn');
+        
+        if (intro && intro.end > 0) {
+            skipIntroBtn.onclick = function() {
+                player.seek(intro.end);
+                introSkipped = true;
+                skipIntroBtn.style.display = 'none';
+            };
+        }
+        
+        if (outro && outro.end > 0) {
+            skipOutroBtn.onclick = function() {
+                player.seek(outro.end);
+                outroSkipped = true;
+                skipOutroBtn.style.display = 'none';
+            };
+        }
+        
+        player.on('ready', function() {
+            setTimeout(addProgressBarHighlights, 500);
+            setTimeout(addForwardButton, 1000);
+        });
+        
+        player.on('play', function() {});
+        
+        player.on('pause', function() {});
+        
+        player.on('firstFrame', function() {
+            addProgressBarHighlights();
+            addForwardButton();
+        });
+        
+        player.on('buffer', function() {});
+        
+        player.on('playlistItem', function() {
+            setTimeout(addForwardButton, 500);
+        });
+        
+        player.on('levels', function(e) {});
+        
+        player.on('levelsChanged', function(e) {});
+        
+        player.on('time', function(e) {
+            const currentTime = e.position;
+            
+            if (intro && intro.end > 0 && !introSkipped) {
+                if (currentTime >= intro.start && currentTime < intro.end) {
+                    if (autoSkipIntro) {
+                        player.seek(intro.end);
+                        introSkipped = true;
+                    } else {
+                        skipIntroBtn.style.display = 'block';
+                    }
+                } else {
+                    skipIntroBtn.style.display = 'none';
+                }
+            }
+            
+            if (outro && outro.end > 0 && !outroSkipped) {
+                if (currentTime >= outro.start && currentTime < outro.end) {
+                    skipOutroBtn.style.display = 'block';
+                } else {
+                    skipOutroBtn.style.display = 'none';
+                }
+            }
+            
+            window.parent.postMessage({
+                type: 'TIME_UPDATE',
+                currentTime: currentTime,
+                duration: e.duration
+            }, '*');
+        });
+        
+        player.on('complete', function() {
+            window.parent.postMessage({
+                type: 'NEXT_EPISODE'
+            }, '*');
+        });
+        
+        player.on('error', function(e) {});
+        
+        function addProgressBarHighlights() {
+            if ((!intro || intro.end <= 0) && (!outro || outro.end <= 0)) {
+                return;
+            }
+            
+            const progressBar = document.querySelector('.jw-progress');
+            if (!progressBar) {
+                setTimeout(addProgressBarHighlights, 500);
+                return;
+            }
+            
+            const existingHighlights = document.querySelector('.jw-progress-highlights');
+            if (existingHighlights) {
+                existingHighlights.remove();
+            }
+            
+            const duration = player.getDuration();
+            if (!duration || duration === 0) {
+                setTimeout(addProgressBarHighlights, 500);
+                return;
+            }
+            
+            const highlightsContainer = document.createElement('div');
+            highlightsContainer.className = 'jw-progress-highlights';
+            progressBar.appendChild(highlightsContainer);
+            
+            if (intro && intro.end > 0 && intro.start >= 0) {
+                const introHighlight = document.createElement('div');
+                introHighlight.className = 'jw-progress-highlight intro-highlight';
+                const startPercent = (intro.start / duration) * 100;
+                const widthPercent = ((intro.end - intro.start) / duration) * 100;
+                introHighlight.style.left = startPercent + '%';
+                introHighlight.style.width = widthPercent + '%';
+                highlightsContainer.appendChild(introHighlight);
+            }
+            
+            if (outro && outro.end > 0 && outro.start >= 0) {
+                const outroHighlight = document.createElement('div');
+                outroHighlight.className = 'jw-progress-highlight outro-highlight';
+                const startPercent = (outro.start / duration) * 100;
+                const widthPercent = ((outro.end - outro.start) / duration) * 100;
+                outroHighlight.style.left = startPercent + '%';
+                outroHighlight.style.width = widthPercent + '%';
+                highlightsContainer.appendChild(outroHighlight);
+            }
+        }
+        
+        function addForwardButton() {
+            if (document.querySelector('.jw-icon-forward-custom')) {
+                return;
+            }
+            
+            const rewindButton = document.querySelector('.jw-controlbar .jw-icon-rewind');
+            
+            if (!rewindButton) {
+                setTimeout(addForwardButton, 500);
+                return;
+            }
+            
+            const forwardButton = document.createElement('div');
+            forwardButton.className = 'jw-icon jw-icon-inline jw-button-color jw-reset jw-icon-forward-custom';
+            forwardButton.setAttribute('role', 'button');
+            forwardButton.setAttribute('tabindex', '0');
+            forwardButton.setAttribute('aria-label', 'Forward 10 Seconds');
+            forwardButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" focusable="false"><path d="M146.8,131.078a21.589,21.589,0,0,1,17.7-10.6,21.589,21.589,0,0,1,17.7,10.6,44.769,44.769,0,0,1,0,46.3,21.589,21.589,0,0,1-17.7,10.6,21.589,21.589,0,0,1-17.7-10.6,44.769,44.769,0,0,1,0-46.3Zm17.7,47.2c7.8,0,14.4-11,14.4-24.1s-6.6-24.1-14.4-24.1-14.4,11-14.4,24.1S156.6,178.278,164.5,178.278ZM128.1,187.978v-51l-4.8,4.8-6.8-6.8,13-13a4.8,4.8,0,0,1,8.2,3.4v62.7l-9.6-.1ZM25.9,57.778v125.3a4.867,4.867,0,0,0,4.8,4.8h62.7v-19.3H45.2v-96.4h125.3v19.3c0,5.3,3.6,7.2,8,4.3l41.8-27.9a6.013,6.013,0,0,0,2.7-8,5.887,5.887,0,0,0-2.7-2.7l-41.8-27.9c-4.4-2.9-8-1-8,4.3v19.3H30.8A4.974,4.974,0,0,0,25.9,57.778Z"/></svg>';
+            
+            forwardButton.onclick = function() {
+                const currentTime = player.getPosition();
+                player.seek(currentTime + 10);
+            };
+            
+            if (rewindButton.parentNode) {
+                rewindButton.parentNode.insertBefore(forwardButton, rewindButton.nextSibling);
+            }
+        }
+    </script>
+</body>
+</html>

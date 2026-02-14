@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import config from '../config/config.js';
 import extractToken from './token.helper.js';
 
-const { baseurl } = config;
+// const { baseurl } = config;
 
 const MAX_RETRIES = 2;
 const TIMEOUT = 15000; // 15 seconds
@@ -119,9 +119,12 @@ export async function megacloud({ selectedServer, id }, retryCount = 0) {
     console.log(`\n=== Megacloud Decryption Start (attempt ${retryCount + 1}/${MAX_RETRIES + 1}) ===`);
     console.log(`Episode ID: ${epID}, Server: ${selectedServer.name}, Type: ${selectedServer.type}`);
 
+    const isAniwatch = selectedServer.source === 'aniwatchtv';
+    const activeBaseUrl = isAniwatch ? config.baseurl2 : config.baseurl;
+
     // Fetch sources data and decryption key in parallel
     const [{ data: sourcesData }, key] = await Promise.all([
-      axios.get(`${baseurl}/ajax/v2/episode/sources?id=${selectedServer.id}`, {
+      axios.get(`${activeBaseUrl}/ajax/v2/episode/sources?id=${selectedServer.id}`, {
         timeout: TIMEOUT,
       }),
       getDecryptionKey(),

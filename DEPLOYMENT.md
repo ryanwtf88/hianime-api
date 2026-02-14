@@ -362,7 +362,7 @@ Good for testing and development.
 
 | Variable               | Default              | Description                          |
 | ---------------------- | -------------------- | ------------------------------------ |
-| `PORT`                 | `5000`               | Server port                          |
+| `PORT`                 | `3030`               | Server port                          |
 | `NODE_ENV`             | `development`        | Environment mode                     |
 | `ORIGIN`               | `*`                  | CORS allowed origins                 |
 | `RATE_LIMIT_ENABLED`   | `true`               | Enable rate limiting                 |

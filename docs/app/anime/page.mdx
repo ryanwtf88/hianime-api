@@ -1,0 +1,270 @@
+# Anime & Search
+
+## Anime Details
+Get detailed information about a specific anime.
+
+**Endpoint**
+\`GET /anime/:id\`
+
+**Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | The anime ID (e.g., \`one-piece-100\`) |
+
+**Example**
+\`\`\`bash
+curl http://localhost:3030/api/v1/anime/one-piece-100
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "title": "Attack on Titan",
+    "alternativeTitle": "Shingeki no Kyojin",
+    "japanese": "進撃の巨人",
+    "id": "attack-on-titan-112",
+    "poster": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/...",
+    "rating": "R",
+    "type": "TV",
+    "episodes": {
+      "sub": 25,
+      "dub": 25,
+      "eps": 25
+    },
+    "synopsis": "...",
+    "synonyms": "AoT",
+    "aired": {
+      "from": "Apr 7, 2013",
+      "to": "Sep 29, 2013"
+    },
+    "premiered": "Spring 2013",
+    "duration": "24m",
+    "status": "Finished Airing",
+    "MAL_score": "8.52",
+    "genres": [...],
+    "studios": ["wit-studio"],
+    "producers": [...],
+    "moreSeasons": [...],
+    "related": [...],
+    "mostPopular": [...],
+    "recommended": [...]
+  }
+}
+\`\`\`
+
+---
+
+## Search
+Search for anime.
+
+**Endpoint**
+\`GET /search?q=:query&page=:page\`
+
+**Query Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| q | string | Yes | Search query |
+| page | number | No | Page number (default: 1) |
+
+**Example**
+\`\`\`bash
+curl "http://localhost:3030/api/v1/search?q=one%20piece&page=1"
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "pageInfo": {
+      "totalPages": 5,
+      "currentPage": 1,
+      "hasNextPage": true
+    },
+    "animes": [
+      {
+        "title": "One Piece",
+        "alternativeTitle": "One Piece",
+        "id": "one-piece-100",
+        "poster": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/...",
+        "episodes": {
+          "sub": 1100,
+          "dub": 1050,
+          "eps": 1100
+        },
+        "type": "TV",
+        "duration": "24m"
+      }
+    ]
+  }
+}
+\`\`\`
+
+---
+
+## Anime List (Category/Genre)
+Get lists of anime by category or genre.
+
+**Endpoint**
+1. General Collections:
+\`GET /animes/:collection?page=:page\`
+
+2. By Genre/Producer:
+\`GET /animes/:collection/:slug?page=:page\`
+
+**Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| collection | string | Yes | Collection name (e.g., \`most-popular\`, \`movie\`, \`genre\`, \`producer\`) |
+| slug | string | No | Required if collection is \`genre\` or \`producer\` (e.g., \`action\`, \`wit-studio\`) |
+| page | number | No | Page number (via query param) |
+
+**Examples**
+\`\`\`bash
+# General Collection
+curl "http://localhost:3030/api/v1/animes/most-popular?page=1"
+
+# By Genre
+curl "http://localhost:3030/api/v1/animes/genre/action?page=1"
+
+# By Producer
+curl "http://localhost:3030/api/v1/animes/producer/toei-animation?page=1"
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "pageInfo": {
+      "totalPages": 10,
+      "currentPage": 1,
+      "hasNextPage": true
+    },
+    "animes": [
+      {
+        "title": "Attack on Titan",
+        "alternativeTitle": "Shingeki no Kyojin",
+        "id": "attack-on-titan-112",
+        "poster": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/...",
+        "episodes": {
+          "sub": 25,
+          "dub": 25,
+          "eps": 25
+        },
+        "type": "TV",
+        "duration": "24m"
+      }
+    ]
+  }
+}
+\`\`\`
+
+---
+
+## Filter Options
+Get available options for filtering anime.
+
+**Endpoint**
+\`GET /filter/options\`
+
+**Example**
+\`\`\`bash
+curl http://localhost:3030/api/v1/filter/options
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "genres": ["action", "adventure", ...],
+    "types": ["tv", "movie", ...],
+    "status": ["finished-airing", ...],
+    "ratings": ["g", "pg", ...],
+    "score": ["good", "very-good", ...],
+    "season": ["spring", "summer", ...],
+    "language": ["sub", "dub", ...],
+    "sort": ["default", "score", ...]
+  }
+}
+\`\`\`
+
+---
+
+## Advanced Search (Filter)
+Filter anime based on various criteria.
+
+**Endpoint**
+\`GET /filter\`
+
+**Query Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| type | string | No | Anime type (e.g., `movie`, `tv`) |
+| status | string | No | Anime status (e.g., `finished-airing`, `currently-airing`) |
+| rated | string | No | Age rating |
+| score | string | No | Score category |
+| season | string | No | Season (e.g., `spring`, `summer`) |
+| language | string | No | `sub` or `dub` |
+| sort | string | No | Sort order |
+| genres | string | No | Comma-separated genre codes |
+| page | number | No | Page number |
+
+**Example**
+\`\`\`bash
+curl "http://localhost:3030/api/v1/filter?type=tv&status=finished-airing&page=1"
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "pageInfo": {
+      "totalPages": 20,
+      "currentPage": 1,
+      "hasNextPage": true
+    },
+    "animes": [...]
+  }
+}
+\`\`\`
+
+---
+
+## Search Suggestions
+Get auto-complete suggestions for a search query.
+
+**Endpoint**
+\`GET /suggestion?q=:query\`
+
+**Query Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| q | string | Yes | Search query |
+
+**Example**
+\`\`\`bash
+curl "http://localhost:3030/api/v1/suggestion?q=one"
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": [
+    {
+      "title": "Naruto",
+      "alternativeTitle": "Naruto",
+      "poster": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/...",
+      "id": "naruto-677",
+      "aired": "Oct 3, 2002",
+      "type": "TV",
+      "duration": "23m"
+    }
+  ]
+}
+\`\`\`

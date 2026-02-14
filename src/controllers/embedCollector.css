@@ -1,0 +1,256 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+}
+
+#player {
+    width: 100%;
+    height: 100%;
+}
+
+/* Video displays naturally without constraints */
+.jw-video {
+    background: #000 !important;
+}
+
+.jw-media video {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    visibility: visible !important;
+    /* Enhanced video quality and color grading */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    filter: contrast(1.05) saturate(1.1) brightness(1.02);
+    -webkit-filter: contrast(1.05) saturate(1.1) brightness(1.02);
+}
+
+/* Ensure video is visible and not hidden */
+.jw-media {
+    background: transparent !important;
+}
+
+.jw-media video {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.jw-preview {
+    display: none !important;
+}
+
+/* Display container - properly centered */
+.jw-display {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.jw-display-icon-container {
+    position: relative !important;
+    width: 80px !important;
+    height: 80px !important;
+}
+
+/* Center display icons */
+.jw-display-icon-container .jw-icon {
+    width: 80px !important;
+    height: 80px !important;
+    display: block !important;
+}
+
+.jw-display-icon-container .jw-svg-icon {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Hide center display when playing */
+.jw-state-playing .jw-display {
+    display: none !important;
+}
+
+/* Show center display on hover when playing */
+.jw-state-playing:hover .jw-display {
+    display: flex !important;
+}
+
+/* Show center display when paused, idle, buffering, complete */
+.jw-state-paused .jw-display,
+.jw-state-idle .jw-display,
+.jw-state-buffering .jw-display,
+.jw-state-complete .jw-display {
+    display: flex !important;
+}
+
+/* Progress bar highlights - overlays on top of progress bar */
+.jw-progress {
+    position: relative;
+}
+
+.jw-progress-highlights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999 !important;
+}
+
+.jw-progress-highlight {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 999 !important;
+}
+
+.intro-highlight,
+.outro-highlight {
+    background: #00a0ff;
+}
+
+/* Ensure highlights are above all progress bar elements */
+.jw-progress .jw-buffer,
+.jw-progress .jw-progress-played,
+.jw-progress .jw-progress-seek {
+    z-index: 1 !important;
+}
+
+.jw-slider-time {
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* Buffer icon animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.jw-svg-icon-buffer {
+    animation: spin 1s linear infinite;
+}
+
+/* Skip buttons */
+.skip-button {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    font-family: Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.skip-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.05);
+}
+
+.skip-button:active {
+    transform: scale(0.95);
+}
+
+/* Progress bar highlights - must be above all progress colors */
+.jw-progress-highlights {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100 !important;
+}
+
+.jw-progress-highlight {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    opacity: 0.7 !important;
+    pointer-events: none;
+    border-radius: 1px;
+    z-index: 100 !important;
+}
+
+.intro-highlight {
+    background: #00a0ff !important;
+}
+
+.outro-highlight {
+    background: #00a0ff !important;
+}
+
+/* Ensure highlights are above the played progress */
+.jw-progress {
+    position: relative;
+}
+
+.jw-progress .jw-buffer,
+.jw-progress .jw-progress-played {
+    z-index: 1 !important;
+}
+
+/* Fix control icons alignment - move down 3px and right 1px */
+.jw-controlbar .jw-icon {
+    transform: translate(1px, 3px);
+}
+
+/* Hide rewind and forward from display (center screen) - only show in controlbar */
+.jw-display .jw-icon-rewind,
+.jw-display .jw-icon-forward-custom {
+    display: none !important;
+}
+
+/* Move time display to the right */
+.jw-text-elapsed,
+.jw-text-duration {
+    margin-left: 8px;
+}
+
+/* Ensure forward button matches other icon sizes and position */
+.jw-icon-forward-custom {
+    width: 44px !important;
+    height: 44px !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+    cursor: pointer !important;
+    position: relative !important;
+}
+
+.jw-icon-forward-custom svg {
+    width: 24px !important;
+    height: 24px !important;
+    fill: currentColor !important;
+    display: block !important;
+    margin: 10px auto !important;
+}
+
+/* Remove the old CSS-based forward button */
+.jw-icon-rewind::after {
+    display: none !important;
+}

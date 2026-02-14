@@ -73,6 +73,18 @@ app.get('/ping', (c) => {
   });
 });
 
+app.get('/jwplayer/jwplayer.js', async (c) => {
+  try {
+    const script = await Bun.file('src/jwplayer/jwplayer.js').text();
+    return c.body(script, 200, {
+      'Content-Type': 'application/javascript',
+      'Cache-Control': 'public, max-age=31536000',
+    });
+  } catch (error) {
+    return c.text('Script not found', 404);
+  }
+});
+
 app.route('/api/v1', hiAnimeRoutes);
 app.get('/api', (c) => {
   return c.redirect('/');

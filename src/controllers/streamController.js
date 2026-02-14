@@ -8,7 +8,7 @@ const streamController = async (c) => {
   if (!id) throw new validationError('id is required');
 
   server = server.toUpperCase();
-  
+
   const servers = await getServers(id);
 
   // Check if type exists in servers

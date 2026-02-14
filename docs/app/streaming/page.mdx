@@ -1,0 +1,138 @@
+# Streaming
+
+## Episodes
+Get the list of episodes for an anime.
+
+**Endpoint**
+\`GET /episodes/:id\`
+
+**Example**
+\`\`\`bash
+curl http://localhost:3030/api/v1/episodes/one-piece-100
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "totalEpisodes": 25,
+    "episodes": [
+      {
+        "title": "To You, in 2000 Years",
+        "episodeId": "attack-on-titan-112?ep=3301",
+        "number": 1,
+        "isFiller": false
+      }
+    ]
+  }
+}
+\`\`\`
+
+---
+
+## Servers
+Get available servers for an episode.
+
+**Endpoint**
+\`GET /servers?episodeId=:id\`
+
+**Query Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| episodeId | string | Yes | The episode ID (e.g., \`one-piece-100?ep=1234\`) |
+
+**Example**
+\`\`\`bash
+curl "http://localhost:3030/api/v1/servers?episodeId=one-piece-100?ep=1234"
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "episodeId": "one-piece-100?ep=1234",
+    "episodeNumber": 1234,
+    "sub": [
+      {
+        "serverName": "VidStreaming",
+        "serverId": 4
+      }
+    ],
+    "dub": [...],
+    "raw": [...]
+  }
+}
+\`\`\`
+
+---
+
+## Stream Links
+Get the streaming links (M3U8) for a specific episode and server.
+
+**Endpoint**
+\`GET /stream?id=:id&server=:server\`
+
+**Query Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | The episode ID |
+| server | string | No | Server name (e.g., \`hd-1\`, \`hd-2\`). Defaults to \`hd-2\`. |
+| type | string | No | \`sub\` (default), \`dub\`, or \`raw\` |
+
+**Example**
+\`\`\`bash
+curl "http://localhost:3030/api/v1/stream?id=one-piece-100?ep=1234&server=hd-1"
+\`\`\`
+
+**Response Schema**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "sources": [
+      {
+        "url": "https://...",
+        "type": "hls",
+        "isM3U8": true
+      }
+    ],
+    "tracks": [...],
+    "intro": { "start": 0, "end": 90 },
+    "outro": { "start": 1300, "end": 1390 }
+  }
+}
+\`\`\`
+
+---
+
+## Embed Player
+Get an embedded video player for an episode.
+
+**Endpoint**
+\`GET /embed?id=:id&server=:server\`
+OR
+\`GET /embed/:server/:id/:type\`
+
+**Query Parameters**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | The episode ID |
+| server | string | No | Server name (e.g., \`hd-1\`, \`hd-2\`). Defaults to \`hd-2\`. |
+| type | string | No | \`sub\` (default), \`dub\`, or \`raw\` |
+| autoplay | string | No | \`true\` or \`false\` |
+| skipIntro | string | No | \`true\` or \`false\` |
+
+**Example**
+\`\`\`bash
+# Query Parameters
+curl "http://localhost:3030/api/v1/embed?id=one-piece-100?ep=1234&server=hd-1"
+
+# Path Parameters
+curl "http://localhost:3030/api/v1/embed/hd-1/one-piece-100?ep=1234/sub"
+\`\`\`
+
+**Response**
+Returns an HTML page containing the customized JWPlayer implementation.
+

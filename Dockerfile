@@ -42,11 +42,11 @@ LABEL org.opencontainers.image.source="https://github.com/ryanwtf88/hianime-api"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 3030
 
 # Set environment to production
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV PORT=3030
 
 # Run the app
 USER bun

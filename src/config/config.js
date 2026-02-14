@@ -1,27 +1,14 @@
-/**
- * Configuration for HiAnime API
- *
- * All settings are configured directly in this file.
- * Modify the values below to customize the API for your deployment.
- *
- * Platform-specific settings:
- * - Local/Docker: All settings work as-is
- * - Vercel: Set rateLimit.enabled to true, redis can be enabled with Upstash
- * - Cloudflare Workers: Set rateLimit.enabled to false (use CF's built-in rate limiting)
- *                       Redis not supported (use KV storage instead if needed)
- */
-
 const config = {
   // HiAnime source URL
   baseurl: 'https://hianime.to',
-  
+
   baseurl2: 'https://aniwatchtv.to',
 
   // CORS origin (* for all, or comma-separated URLs)
   origin: '*',
 
   // Server port (used for local/Docker deployments)
-  port: 5000,
+  port: 3030,
 
   // External proxy URL for streaming
   proxyUrl: 'https://xeanimeproxy.howtoopengemail.workers.dev',
